@@ -370,8 +370,30 @@ class Player {
 
     loadSaveData(data) {
         if (data.money !== undefined) this.money = data.money;
-        if (data.inventory) this.inventory = data.inventory;
-        if (data.upgrades) this.upgrades = data.upgrades;
+
+        // Merge inventory to ensure backward compatibility
+        if (data.inventory) {
+            // Preserve existing structure and merge saved data
+            if (data.inventory.seeds) {
+                Object.assign(this.inventory.seeds, data.inventory.seeds);
+            }
+            if (data.inventory.harvested) {
+                Object.assign(this.inventory.harvested, data.inventory.harvested);
+            }
+            // Load fruit inventory if exists (new in v2.8)
+            if (data.inventory.fruitSeeds) {
+                Object.assign(this.inventory.fruitSeeds, data.inventory.fruitSeeds);
+            }
+            if (data.inventory.harvestedFruits) {
+                Object.assign(this.inventory.harvestedFruits, data.inventory.harvestedFruits);
+            }
+        }
+
+        // Merge upgrades to ensure backward compatibility
+        if (data.upgrades) {
+            Object.assign(this.upgrades, data.upgrades);
+        }
+
         console.log('Player data loaded:', this);
     }
 }
@@ -911,11 +933,13 @@ class UIManager {
     updateHarvestedCount() {
         // Count total harvested vegetables and fruits
         let total = 0;
-        for (const count of Object.values(this.game.player.inventory.harvested)) {
-            total += count;
+        if (this.game.player.inventory.harvested) {
+            for (const count of Object.values(this.game.player.inventory.harvested)) {
+                total += count;
+            }
         }
         // Add fruits if orchard unlocked
-        if (this.game.player.upgrades.premiumOrchard) {
+        if (this.game.player.upgrades.premiumOrchard && this.game.player.inventory.harvestedFruits) {
             for (const count of Object.values(this.game.player.inventory.harvestedFruits)) {
                 total += count;
             }
@@ -1236,8 +1260,10 @@ class UIManager {
         const inventoryList = document.getElementById('inventory-list');
         if (!inventoryList) return;
 
-        const hasVegetables = Object.values(this.game.player.inventory.harvested).some(count => count > 0);
-        const hasFruits = Object.values(this.game.player.inventory.harvestedFruits).some(count => count > 0);
+        const hasVegetables = this.game.player.inventory.harvested &&
+            Object.values(this.game.player.inventory.harvested).some(count => count > 0);
+        const hasFruits = this.game.player.inventory.harvestedFruits &&
+            Object.values(this.game.player.inventory.harvestedFruits).some(count => count > 0);
 
         if (!hasVegetables && !hasFruits) {
             inventoryList.innerHTML = '<p class="empty-message">No harvested produce yet! Go plant and harvest some vegetables!</p>';
@@ -2175,19 +2201,23 @@ class Game {
         let hasFruits = false;
         let totalValue = 0;
 
-        for (const [key, count] of Object.entries(this.player.inventory.harvested)) {
-            if (count > 0) {
-                hasVegetables = true;
-                const plant = PLANTS[key];
-                totalValue += count * plant.sellPrice;
+        if (this.player.inventory.harvested) {
+            for (const [key, count] of Object.entries(this.player.inventory.harvested)) {
+                if (count > 0) {
+                    hasVegetables = true;
+                    const plant = PLANTS[key];
+                    totalValue += count * plant.sellPrice;
+                }
             }
         }
 
-        for (const [key, count] of Object.entries(this.player.inventory.harvestedFruits)) {
-            if (count > 0) {
-                hasFruits = true;
-                const fruit = FRUITS[key];
-                totalValue += count * fruit.sellPrice;
+        if (this.player.inventory.harvestedFruits) {
+            for (const [key, count] of Object.entries(this.player.inventory.harvestedFruits)) {
+                if (count > 0) {
+                    hasFruits = true;
+                    const fruit = FRUITS[key];
+                    totalValue += count * fruit.sellPrice;
+                }
             }
         }
 
@@ -2205,7 +2235,8 @@ class Game {
             harvestList.innerHTML = '';
 
             // Add vegetables
-            for (const [key, count] of Object.entries(this.player.inventory.harvested)) {
+            if (this.player.inventory.harvested) {
+                for (const [key, count] of Object.entries(this.player.inventory.harvested)) {
                 if (count > 0) {
                     const plant = PLANTS[key];
                     const itemValue = count * plant.sellPrice;
@@ -2244,10 +2275,11 @@ class Game {
 
                     harvestList.appendChild(item);
                 }
+                }
             }
 
             // Add fruits
-            if (this.player.upgrades.premiumOrchard) {
+            if (this.player.upgrades.premiumOrchard && this.player.inventory.harvestedFruits) {
                 for (const [key, count] of Object.entries(this.player.inventory.harvestedFruits)) {
                     if (count > 0) {
                         const fruit = FRUITS[key];
