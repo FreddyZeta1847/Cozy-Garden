@@ -130,23 +130,32 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
-    background: rgba(139, 111, 71, 0.95);
+    /* REDUCED PADDING for more garden space */
+    padding: 6px 15px;
+    padding-bottom: 16px;
+    /* SEASONAL GRADIENT BACKGROUND */
+    background: var(--toolbar-base, rgba(139, 111, 71, 0.90));
+    background-image: var(--toolbar-bg);
+    background-blend-mode: overlay;
     box-shadow: 0 2px 8px var(--shadow);
     backdrop-filter: blur(10px);
     flex-shrink: 0;
     position: relative;
-    padding-bottom: 20px;
+    /* PERFORMANCE OPTIMIZATION */
+    will-change: background;
+    contain: layout style;
+    transform: translateZ(0);
+    transition: background 0.6s ease-in-out;
 }
 
-/* Wood bark border effect for header bottom */
+/* Wood bark border effect for header bottom - SCALED DOWN */
 .header::after {
     content: '';
     position: absolute;
-    bottom: -8px;
+    bottom: -6px; /* Was -8px */
     left: 0;
     right: 0;
-    height: 16px;
+    height: 12px; /* Was 16px - 25% reduction */
     background: linear-gradient(90deg,
         var(--dark-brown) 0%,
         #6B4423 15%,
@@ -160,7 +169,7 @@ body {
                 inset 0 2px 0 rgba(139, 111, 71, 0.5),
                 inset 3px 0 2px rgba(0,0,0,0.2),
                 inset -3px 0 2px rgba(0,0,0,0.2);
-    background-size: 40px 16px;
+    background-size: 40px 12px; /* Scaled down from 16px */
 }
 
 /* Add wood texture details (knots) - Multiple knots using box-shadow trick */
@@ -212,15 +221,17 @@ body {
 
 .resource {
     background: var(--white);
-    padding: 6px 12px;
-    border-radius: 20px;
-    border: 3px solid var(--dark-brown);
+    /* REDUCED PADDING */
+    padding: 4px 10px; /* Was 6px 12px */
+    border-radius: 18px; /* Slightly smaller */
+    border: 3px solid var(--season-border); /* SEASONAL BORDER */
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px; /* Was 6px */
     font-weight: 600;
-    font-size: 16px;
-    box-shadow: 0 2px 0 var(--dark-brown), 0 3px 6px var(--shadow);
+    /* REDUCED FONT SIZE */
+    font-size: 14px; /* Was 16px */
+    box-shadow: 0 2px 0 var(--season-border), 0 3px 6px var(--season-shadow); /* SEASONAL SHADOW */
     transition: transform 0.2s;
 }
 
@@ -257,24 +268,26 @@ body {
 /* Buttons */
 .nav-button {
     background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-    border: 3px solid #FF8C00;
-    border-radius: 10px;
-    padding: 8px 16px;
+    border: 3px solid var(--season-border); /* SEASONAL BORDER */
+    border-radius: 8px; /* Was 10px */
+    /* REDUCED PADDING */
+    padding: 6px 12px; /* Was 8px 16px */
     cursor: pointer;
-    font-size: 14px;
+    /* REDUCED FONT SIZE */
+    font-size: 13px; /* Was 14px */
     font-weight: 600;
     font-family: 'Fredoka', sans-serif;
-    box-shadow: 0 2px 0 #CC7000, 0 3px 6px var(--shadow);
+    box-shadow: 0 2px 0 var(--season-border), 0 3px 6px var(--season-shadow); /* SEASONAL SHADOW */
     transition: all 0.2s;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px; /* Was 5px */
     color: var(--dark-brown);
 }
 
 .nav-button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 0 #CC7000, 0 8px 16px var(--shadow);
+    box-shadow: 0 6px 0 var(--season-border), 0 8px 16px var(--season-shadow); /* SEASONAL SHADOW */
 }
 
 .nav-button:active {
@@ -296,9 +309,13 @@ body {
 
 /* Bottom Bar */
 .bottom-bar {
-    background: rgba(139, 111, 71, 0.95);
-    padding: 8px 15px;
-    padding-top: 20px;
+    /* SEASONAL GRADIENT BACKGROUND */
+    background: var(--toolbar-base, rgba(139, 111, 71, 0.90));
+    background-image: var(--toolbar-bg);
+    background-blend-mode: overlay;
+    /* REDUCED PADDING for more garden space */
+    padding: 5px 12px;
+    padding-top: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -306,16 +323,21 @@ body {
     backdrop-filter: blur(10px);
     flex-shrink: 0;
     position: relative;
+    /* PERFORMANCE OPTIMIZATION */
+    will-change: background;
+    contain: layout style;
+    transform: translateZ(0);
+    transition: background 0.6s ease-in-out;
 }
 
-/* Wood bark border effect for bottom bar top */
+/* Wood bark border effect for bottom bar top - SCALED DOWN */
 .bottom-bar::before {
     content: '';
     position: absolute;
-    top: -8px;
+    top: -6px; /* Was -8px */
     left: 0;
     right: 0;
-    height: 16px;
+    height: 12px; /* Was 16px - 25% reduction */
     background: linear-gradient(90deg,
         var(--dark-brown) 0%,
         #6B4423 12%,
@@ -331,7 +353,7 @@ body {
                 inset 0 -2px 0 rgba(139, 111, 71, 0.5),
                 inset 3px 0 2px rgba(0,0,0,0.2),
                 inset -3px 0 2px rgba(0,0,0,0.2);
-    background-size: 45px 16px;
+    background-size: 45px 12px; /* Scaled down from 16px */
 }
 
 /* Add wood knot details to bottom bar - Multiple knots */
@@ -388,17 +410,19 @@ body {
 
 .tool-button {
     background: var(--white);
-    border: 3px solid var(--dark-brown);
-    border-radius: 10px;
-    padding: 8px 12px;
+    border: 3px solid var(--season-border); /* SEASONAL BORDER */
+    border-radius: 8px; /* Was 10px */
+    /* REDUCED PADDING */
+    padding: 6px 8px; /* Was 8px 12px */
     cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 2px; /* Was 4px */
     transition: all 0.2s;
-    box-shadow: 0 2px 0 var(--dark-brown), 0 3px 6px var(--shadow);
-    min-width: 65px;
+    box-shadow: 0 2px 0 var(--season-border), 0 3px 6px var(--season-shadow); /* SEASONAL SHADOW */
+    /* REDUCED WIDTH */
+    min-width: 55px; /* Was 65px */
 }
 
 .tool-button:hover {
@@ -412,7 +436,8 @@ body {
 }
 
 .tool-name {
-    font-size: 11px;
+    /* REDUCED FONT SIZE */
+    font-size: 10px; /* Was 11px */
     font-weight: 600;
     color: var(--dark-brown);
 }
