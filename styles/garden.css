@@ -1,0 +1,401 @@
+/* Garden and House Styles */
+
+/* House Decoration (CSS Art) */
+.house-decoration {
+    position: relative;
+}
+
+.house {
+    width: 180px;
+    height: 200px;
+    position: relative;
+    filter: drop-shadow(8px 8px 16px rgba(0,0,0,0.3));
+}
+
+/* Walls */
+.walls {
+    position: absolute;
+    bottom: 0;
+    width: 180px;
+    height: 120px;
+    background: linear-gradient(135deg, #D2691E 0%, #A0522D 100%);
+    border: 5px solid #654321;
+    border-radius: 8px;
+}
+
+.walls::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    border: 3px solid rgba(139, 69, 19, 0.5);
+    border-radius: 4px;
+}
+
+/* Roof */
+.roof {
+    position: absolute;
+    top: 20px;
+    left: -10px;
+    width: 0;
+    height: 0;
+    border-left: 100px solid transparent;
+    border-right: 100px solid transparent;
+    border-bottom: 80px solid #8B0000;
+    filter: drop-shadow(0 -4px 8px rgba(0,0,0,0.2));
+}
+
+.roof::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: -95px;
+    width: 0;
+    height: 0;
+    border-left: 95px solid transparent;
+    border-right: 95px solid transparent;
+    border-bottom: 70px solid #A52A2A;
+}
+
+/* Chimney */
+.chimney {
+    position: absolute;
+    top: 30px;
+    right: 40px;
+    width: 20px;
+    height: 40px;
+    background: linear-gradient(90deg, #8B0000 0%, #A52A2A 100%);
+    border: 3px solid #654321;
+    border-radius: 3px;
+    z-index: 1;
+}
+
+.chimney::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -3px;
+    width: 26px;
+    height: 12px;
+    background: #654321;
+    border-radius: 3px 3px 0 0;
+}
+
+/* Door */
+.door {
+    position: absolute;
+    bottom: 0;
+    left: 70px;
+    width: 40px;
+    height: 60px;
+    background: linear-gradient(90deg, #654321 0%, #4a2f1a 100%);
+    border: 3px solid #3a1f0a;
+    border-radius: 8px 8px 0 0;
+}
+
+.door::before {
+    content: '';
+    position: absolute;
+    top: 28px;
+    right: 8px;
+    width: 6px;
+    height: 6px;
+    background: #FFD700;
+    border-radius: 50%;
+    box-shadow: 0 0 4px rgba(255, 215, 0, 0.6);
+}
+
+/* Windows */
+.window {
+    position: absolute;
+    top: 40px;
+    width: 30px;
+    height: 35px;
+    background: linear-gradient(135deg, #87CEEB 0%, #4682B4 100%);
+    border: 4px solid #654321;
+    border-radius: 4px;
+}
+
+.window.left {
+    left: 20px;
+}
+
+.window.right {
+    right: 20px;
+}
+
+.window::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+    height: 100%;
+    background: #654321;
+}
+
+.window::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #654321;
+}
+
+/* Garden Wrapper */
+.garden-wrapper {
+    background: rgba(139, 111, 71, 0.4);
+    padding: 15px;
+    border-radius: 15px;
+    border: 4px solid var(--dark-brown);
+    box-shadow: 0 6px 0 var(--dark-brown), 0 8px 16px var(--shadow);
+    position: relative;
+    backdrop-filter: blur(5px);
+}
+
+.garden-sign {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #D2691E 0%, #A0522D 100%);
+    border: 3px solid var(--dark-brown);
+    border-radius: 10px;
+    padding: 5px 15px;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    text-shadow: 1px 1px 0 var(--dark-brown);
+    box-shadow: 0 3px 6px var(--shadow);
+}
+
+.garden-shadow {
+    position: absolute;
+    bottom: -15px;
+    left: 10%;
+    right: 10%;
+    height: 20px;
+    background: radial-gradient(ellipse, rgba(0,0,0,0.3) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+/* Garden Grid */
+.garden-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 70px);
+    grid-template-rows: repeat(4, 70px);
+    gap: 6px;
+    background: linear-gradient(135deg, rgba(107, 68, 35, 0.6) 0%, rgba(139, 111, 71, 0.6) 100%);
+    padding: 12px;
+    border-radius: 15px;
+    box-shadow: inset 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* Tile Styles */
+.tile {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #8B7355 0%, #6B5D4F 100%);
+    border: 3px solid #654321;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.2s;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 3px 0 #4a2f1a;
+    overflow: hidden;
+    font-size: 32px;
+}
+
+.tile:hover {
+    transform: translateY(-4px);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 8px 0 #4a2f1a, 0 10px 16px var(--shadow);
+}
+
+.tile:active {
+    transform: translateY(-1px);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 2px 0 #4a2f1a;
+}
+
+/* Empty tile dirt texture */
+.tile-dirt {
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(139, 115, 85, 0.8) 2px, transparent 2px),
+        radial-gradient(circle at 60% 70%, rgba(107, 93, 79, 0.8) 2px, transparent 2px),
+        radial-gradient(circle at 80% 20%, rgba(139, 115, 85, 0.8) 1.5px, transparent 1.5px),
+        linear-gradient(135deg, #8B7355 0%, #6B5D4F 100%);
+}
+
+/* Tilled soil */
+.tile.tilled {
+    background: linear-gradient(135deg, #6B4423 0%, #5A3A1F 100%);
+}
+
+.tile-tilled {
+    width: 100%;
+    height: 100%;
+    background:
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 8px,
+            rgba(80, 50, 30, 0.5) 8px,
+            rgba(80, 50, 30, 0.5) 10px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 12px,
+            rgba(80, 50, 30, 0.3) 12px,
+            rgba(80, 50, 30, 0.3) 14px
+        ),
+        linear-gradient(135deg, #6B4423 0%, #5A3A1F 100%);
+}
+
+/* Planted/Growing tile */
+.tile.planted,
+.tile.growing {
+    background: linear-gradient(135deg, #6B4423 0%, #5A3A1F 100%);
+}
+
+/* Needs water indication */
+.tile.needs-water {
+    border-color: #FF6B6B;
+    animation: pulse-warning 1.5s infinite;
+}
+
+@keyframes pulse-warning {
+    0%, 100% {
+        border-color: #FF6B6B;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 4px 0 #4a2f1a, 0 0 0 0 rgba(255, 107, 107, 0.7);
+    }
+    50% {
+        border-color: #FF4444;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 4px 0 #4a2f1a, 0 0 0 8px rgba(255, 107, 107, 0);
+    }
+}
+
+/* Harvestable indication */
+.tile.harvestable {
+    animation: sparkle-pulse 1.5s infinite;
+}
+
+@keyframes sparkle-pulse {
+    0%, 100% {
+        border-color: #FFD700;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 4px 0 #4a2f1a, 0 0 20px rgba(255, 215, 0, 0.6);
+    }
+    50% {
+        border-color: #FFA500;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 4px 0 #4a2f1a, 0 0 30px rgba(255, 215, 0, 0.8);
+    }
+}
+
+.harvest-ready-indicator {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 30px;
+    height: 30px;
+    background: radial-gradient(circle, #FFD700 0%, #FFA500 100%);
+    border-radius: 50%;
+    border: 3px solid #FF8C00;
+    animation: sparkle-rotate 2s linear infinite;
+    z-index: 10;
+}
+
+.harvest-ready-indicator::before,
+.harvest-ready-indicator::after {
+    content: '✨';
+    position: absolute;
+    font-size: 12px;
+}
+
+.harvest-ready-indicator::before {
+    top: -15px;
+    left: -5px;
+    animation: twinkle 1s infinite;
+}
+
+.harvest-ready-indicator::after {
+    bottom: -15px;
+    right: -5px;
+    animation: twinkle 1s 0.5s infinite;
+}
+
+@keyframes sparkle-rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.3; transform: scale(0.8); }
+}
+
+/* Water droplet indicator */
+.water-droplet-indicator {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 18px;
+    animation: bounce-drop 0.8s infinite;
+}
+
+@keyframes bounce-drop {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+/* Plant container */
+.plant-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Effects */
+.water-splash-effect {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 32px;
+    pointer-events: none;
+    z-index: 100;
+}
+
+.harvest-sparkles {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 36px;
+    pointer-events: none;
+    z-index: 100;
+}
+
+.money-popup {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 24px;
+    font-weight: 700;
+    color: #4CAF50;
+    text-shadow: 2px 2px 0 white, -1px -1px 0 white;
+    pointer-events: none;
+    z-index: 100;
+}

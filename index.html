@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cozy Garden - A Farming Adventure</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Comfortaa:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Particles.js for effects -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+    <!-- Anime.js for smooth animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/main.css?v=2.3">
+    <link rel="stylesheet" href="styles/garden.css">
+    <link rel="stylesheet" href="styles/plants.css">
+    <link rel="stylesheet" href="styles/ui.css">
+</head>
+<body>
+    <!-- Particle Background -->
+    <div id="particles-js"></div>
+
+    <!-- Main Garden Screen -->
+    <div id="garden-screen" class="screen active">
+        <div class="header">
+            <div class="resources">
+                <div class="resource money-display">
+                    <div class="coin-icon"></div>
+                    <span id="money-display">100</span>
+                </div>
+                <div class="resource season-display" id="season-display">
+                    <div class="season-icon"></div>
+                    <span>Spring</span>
+                </div>
+                <div class="resource harvested-display" id="harvested-display" title="Click to view your harvest!" onclick="game.showHarvestPopup()" style="cursor: pointer;">
+                    <span>🧺</span>
+                    <span id="harvested-count">0</span>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button class="nav-button market-btn" onclick="game.showMarket()">
+                    <span class="btn-icon">🛒</span>
+                    <span>Market</span>
+                </button>
+                <button class="nav-button" onclick="game.resetGame()" style="background: linear-gradient(135deg, #FF6B6B 0%, #FF4444 100%); border-color: #CC0000;" title="Reset game and start fresh">
+                    <span>🔄 Reset</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="game-container">
+            <div class="garden-wrapper">
+                <div class="garden-sign">My Cozy Garden</div>
+                <div id="garden-grid" class="garden-grid"></div>
+                <div class="garden-shadow"></div>
+            </div>
+        </div>
+
+        <div class="bottom-bar">
+            <div class="tools-bar">
+                <div class="tool-section">
+                    <button class="tool-button active" data-tool="hoe" onclick="game.selectTool('hoe')">
+                        <span class="tool-icon">🔨</span>
+                        <span class="tool-name">Hoe</span>
+                    </button>
+                    <button class="tool-button" data-tool="water" onclick="game.selectTool('water')">
+                        <span class="tool-icon">💧</span>
+                        <span class="tool-name">Water</span>
+                    </button>
+                </div>
+
+                <div class="seed-selector" id="seed-selector">
+                    <!-- Seeds will be added dynamically -->
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-button shop-btn" onclick="game.showShop()">
+                    <span class="btn-icon">🏪</span>
+                    <span>Shop</span>
+                </button>
+                <button class="nav-button upgrade-btn" onclick="game.showUpgrades()">
+                    <span class="btn-icon">🏡</span>
+                    <span>Upgrades</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shop Screen -->
+    <div id="shop-screen" class="screen">
+        <div class="screen-header">
+            <h2>🏪 Seed Shop</h2>
+            <button class="back-button" onclick="game.showGarden()">← Back to Garden</button>
+        </div>
+
+        <div class="shop-content">
+            <div class="player-money">
+                <div class="coin-icon"></div>
+                <span id="shop-money">100</span>
+            </div>
+            <div id="shop-items" class="shop-items"></div>
+        </div>
+    </div>
+
+    <!-- Market Screen -->
+    <div id="market-screen" class="screen">
+        <div class="screen-header">
+            <h2>🛒 Farmers Market</h2>
+            <button class="back-button" onclick="game.showGarden()">← Back to Garden</button>
+        </div>
+
+        <div class="market-content">
+            <div class="player-money">
+                <div class="coin-icon"></div>
+                <span id="market-money">100</span>
+            </div>
+
+            <div class="inventory-display">
+                <h3>Your Harvest:</h3>
+                <div id="inventory-list"></div>
+            </div>
+
+            <div class="selling-area">
+                <h3>Sell Your Produce:</h3>
+                <div id="sell-slots" class="sell-slots"></div>
+                <div class="sell-summary">
+                    <div class="total-display">
+                        <span>Total:</span>
+                        <div class="coin-icon"></div>
+                        <span id="sell-total">0</span>
+                    </div>
+                    <button class="sell-all-button" onclick="game.sellAll()">Sell All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upgrade Hut Screen -->
+    <div id="upgrades-screen" class="screen">
+        <div class="screen-header">
+            <h2>🏡 Upgrade Workshop</h2>
+            <button class="back-button" onclick="game.showGarden()">← Back to Garden</button>
+        </div>
+
+        <div class="upgrades-content">
+            <div class="player-money">
+                <div class="coin-icon"></div>
+                <span id="upgrades-money">100</span>
+            </div>
+            <div id="upgrades-list" class="upgrades-list"></div>
+        </div>
+    </div>
+
+    <!-- Harvest Inventory Popup -->
+    <div id="harvest-popup" class="modal" onclick="if(event.target === this) game.closeHarvestPopup()">
+        <div class="modal-content harvest-modal">
+            <div class="modal-header">
+                <h2>🧺 Your Harvest</h2>
+                <button class="modal-close" onclick="game.closeHarvestPopup()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div id="harvest-list" class="harvest-list">
+                    <!-- Populated by JavaScript -->
+                </div>
+                <div class="harvest-total">
+                    <div class="total-label">Total Value:</div>
+                    <div class="total-value">
+                        <div class="coin-icon"></div>
+                        <span id="harvest-total-value">0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-button secondary" onclick="game.closeHarvestPopup()">Close</button>
+                <button class="modal-button primary" onclick="game.closeHarvestPopup(); game.showMarket();">Go to Market 🛒</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Script (Bundled) - v2.2 with harvest popup -->
+    <script src="game-bundle.js?v=2.2"></script>
+</body>
+</html>

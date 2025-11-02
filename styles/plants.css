@@ -1,0 +1,531 @@
+/* Plant Sprites - Simple Emoji Icons */
+
+.plant {
+    font-size: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+/* =========================
+   TOMATO PLANT
+   ========================= */
+
+/* Stage 0: Seedling */
+.plant.tomato.stage-0 {
+    width: 20px;
+    height: 25px;
+}
+
+.plant.tomato.stage-0::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 3px;
+    height: 12px;
+    background: linear-gradient(to top, #228B22, #32CD32);
+    border-radius: 2px;
+}
+
+.plant.tomato.stage-0::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 12px;
+    background: radial-gradient(circle, #90EE90, #228B22);
+    border-radius: 50% 50% 0 50%;
+    transform-origin: bottom;
+    animation: leaf-sway 2s ease-in-out infinite;
+}
+
+/* Stage 1: Young plant */
+.plant.tomato.stage-1 {
+    width: 35px;
+    height: 40px;
+}
+
+.plant.tomato.stage-1::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 5px;
+    height: 25px;
+    background: linear-gradient(to top, #2F4F2F, #228B22);
+    border-radius: 3px;
+}
+
+.plant.tomato.stage-1::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 10px;
+    width: 15px;
+    height: 15px;
+    background: radial-gradient(circle, #90EE90, #228B22);
+    border-radius: 50% 0 50% 50%;
+    box-shadow:
+        5px -2px 0 0 #228B22,
+        10px 2px 0 0 #90EE90;
+}
+
+/* Stage 2: Mature with tomatoes */
+.plant.tomato.stage-2 {
+    width: 50px;
+    height: 55px;
+}
+
+.plant.tomato.stage-2::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 35px;
+    background: linear-gradient(to top, #2F4F2F, #228B22);
+    border-radius: 3px;
+}
+
+.plant.tomato.stage-2::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 5px;
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle, #90EE90, #228B22);
+    border-radius: 50% 0 50% 50%;
+    box-shadow:
+        15px 3px 0 0 #90EE90,
+        20px -2px 0 -2px #228B22,
+        /* Tomatoes */
+        10px 15px 0 -2px #FF6347,
+        22px 12px 0 -3px #FF4500,
+        18px 20px 0 -4px #DC143C;
+}
+
+/* =========================
+   LETTUCE PLANT
+   ========================= */
+
+/* Stage 0: Seedling */
+.plant.lettuce.stage-0 {
+    width: 15px;
+    height: 20px;
+}
+
+.plant.lettuce.stage-0::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 10px;
+    background: radial-gradient(circle, #90EE90, #228B22);
+    border-radius: 50%;
+}
+
+/* Stage 1: Growing */
+.plant.lettuce.stage-1 {
+    width: 30px;
+    height: 30px;
+}
+
+.plant.lettuce.stage-1::before,
+.plant.lettuce.stage-1::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    width: 15px;
+    height: 20px;
+    background: linear-gradient(135deg, #90EE90, #228B22);
+    border-radius: 50% 50% 30% 30%;
+}
+
+.plant.lettuce.stage-1::before {
+    left: 0;
+    transform: rotate(-15deg);
+}
+
+.plant.lettuce.stage-1::after {
+    right: 0;
+    transform: rotate(15deg);
+}
+
+/* Stage 2: Full lettuce head */
+.plant.lettuce.stage-2 {
+    width: 45px;
+    height: 40px;
+}
+
+.plant.lettuce.stage-2::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 35px;
+    background: radial-gradient(ellipse at center, #98FB98, #90EE90, #228B22);
+    border-radius: 50% 50% 40% 40% / 60% 60% 40% 40%;
+    box-shadow:
+        inset -5px -5px 8px rgba(34, 139, 34, 0.4),
+        inset 5px 5px 8px rgba(152, 251, 152, 0.4);
+}
+
+.plant.lettuce.stage-2::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 15px;
+    height: 15px;
+    background: radial-gradient(circle, #90EE90, #228B22);
+    border-radius: 50% 0 50% 50%;
+    box-shadow:
+        20px 2px 0 -2px #90EE90,
+        10px 15px 0 -3px #228B22,
+        25px 15px 0 -4px #90EE90;
+}
+
+/* =========================
+   CARROT PLANT
+   ========================= */
+
+/* Stage 0: Seedling */
+.plant.carrot.stage-0 {
+    width: 18px;
+    height: 22px;
+}
+
+.plant.carrot.stage-0::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 10px;
+    background: linear-gradient(to top, #228B22, #32CD32);
+    border-radius: 2px;
+}
+
+.plant.carrot.stage-0::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle, #7CFC00, #228B22);
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+/* Stage 1: Growing greens */
+.plant.carrot.stage-1 {
+    width: 30px;
+    height: 35px;
+}
+
+.plant.carrot.stage-1::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 15px;
+    height: 8px;
+    background: linear-gradient(to bottom, #FF8C00, transparent);
+    border-radius: 50% 50% 0 0;
+    opacity: 0.5;
+}
+
+.plant.carrot.stage-1::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 5px;
+    width: 8px;
+    height: 18px;
+    background: linear-gradient(135deg, #90EE90, #228B22);
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    box-shadow:
+        8px -2px 0 0 #228B22,
+        12px 2px 0 0 #90EE90;
+}
+
+/* Stage 2: Mature with visible carrot top */
+.plant.carrot.stage-2 {
+    width: 40px;
+    height: 45px;
+}
+
+.plant.carrot.stage-2::before {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 18px;
+    height: 12px;
+    background: radial-gradient(ellipse at top, #FF8C00, #FF6347);
+    border-radius: 50% 50% 0 0;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.plant.carrot.stage-2::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 3px;
+    width: 10px;
+    height: 25px;
+    background: linear-gradient(135deg, #7CFC00, #228B22);
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    box-shadow:
+        12px -3px 0 0 #228B22,
+        18px 0 0 -1px #7CFC00,
+        24px -2px 0 -2px #228B22;
+}
+
+/* =========================
+   CORN PLANT
+   ========================= */
+
+/* Stage 0: Seedling */
+.plant.corn.stage-0 {
+    width: 15px;
+    height: 25px;
+}
+
+.plant.corn.stage-0::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 15px;
+    background: linear-gradient(to top, #8B7355, #9ACD32);
+    border-radius: 2px;
+}
+
+.plant.corn.stage-0::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 15px;
+    background: linear-gradient(135deg, #9ACD32, #6B8E23);
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}
+
+/* Stage 1: Growing tall */
+.plant.corn.stage-1 {
+    width: 25px;
+    height: 45px;
+}
+
+.plant.corn.stage-1::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 35px;
+    background: linear-gradient(to top, #8B7355, #9ACD32);
+    border-radius: 3px;
+}
+
+.plant.corn.stage-1::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 0;
+    width: 15px;
+    height: 8px;
+    background: linear-gradient(135deg, #9ACD32, #6B8E23);
+    border-radius: 50% 0 0 50%;
+    transform: rotate(-30deg);
+    box-shadow:
+        10px 8px 0 -2px #9ACD32,
+        0 12px 0 -1px #6B8E23;
+}
+
+/* Stage 2: Mature with corn */
+.plant.corn.stage-2 {
+    width: 35px;
+    height: 60px;
+}
+
+.plant.corn.stage-2::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 50px;
+    background: linear-gradient(to top, #8B7355, #9ACD32, #6B8E23);
+    border-radius: 4px;
+}
+
+.plant.corn.stage-2::after {
+    content: '';
+    position: absolute;
+    top: 15px;
+    right: 2px;
+    width: 12px;
+    height: 20px;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    border-radius: 40% 40% 50% 50%;
+    box-shadow:
+        /* Corn cob */
+        inset -2px -2px 4px rgba(0,0,0,0.2),
+        /* Leaves */
+        -8px -5px 0 -1px #9ACD32,
+        -15px 2px 0 -2px #6B8E23,
+        5px -8px 0 -1px #6B8E23;
+}
+
+/* =========================
+   POTATO PLANT
+   ========================= */
+
+/* Stage 0: Seedling */
+.plant.potato.stage-0 {
+    width: 18px;
+    height: 20px;
+}
+
+.plant.potato.stage-0::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 3px;
+    height: 10px;
+    background: linear-gradient(to top, #8B7355, #228B22);
+    border-radius: 2px;
+}
+
+.plant.potato.stage-0::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 12px;
+    background: radial-gradient(circle, #90EE90, #556B2F);
+    border-radius: 50% 50% 0 50%;
+}
+
+/* Stage 1: Bushy growth */
+.plant.potato.stage-1 {
+    width: 35px;
+    height: 35px;
+}
+
+.plant.potato.stage-1::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 5px;
+    height: 20px;
+    background: linear-gradient(to top, #8B7355, #228B22);
+    border-radius: 3px;
+}
+
+.plant.potato.stage-1::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 5px;
+    width: 15px;
+    height: 15px;
+    background: radial-gradient(circle, #90EE90, #556B2F);
+    border-radius: 50%;
+    box-shadow:
+        10px 3px 0 -2px #556B2F,
+        15px -2px 0 -3px #90EE90,
+        5px 10px 0 -4px #228B22;
+}
+
+/* Stage 2: Full bush with potato hint */
+.plant.potato.stage-2 {
+    width: 45px;
+    height: 45px;
+}
+
+.plant.potato.stage-2::before {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 5px;
+    width: 15px;
+    height: 10px;
+    background: radial-gradient(ellipse, #D2B48C, #8B7355);
+    border-radius: 50%;
+    opacity: 0.6;
+    box-shadow:
+        20px 2px 0 0 rgba(210, 180, 140, 0.6),
+        10px -3px 0 -2px rgba(139, 115, 85, 0.5);
+}
+
+.plant.potato.stage-2::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background: radial-gradient(circle, #90EE90, #556B2F);
+    border-radius: 50%;
+    box-shadow:
+        15px 5px 0 -2px #556B2F,
+        22px 0 0 -3px #90EE90,
+        25px 10px 0 -4px #228B22,
+        8px 12px 0 -3px #556B2F,
+        18px 15px 0 -4px #90EE90;
+}
+
+/* Leaf sway animation */
+@keyframes leaf-sway {
+    0%, 100% {
+        transform: translateX(-50%) rotate(-5deg);
+    }
+    50% {
+        transform: translateX(-50%) rotate(5deg);
+    }
+}
+
+/* Add slight sway to all mature plants */
+.plant.stage-2 {
+    animation: plant-sway 3s ease-in-out infinite;
+}
+
+@keyframes plant-sway {
+    0%, 100% {
+        transform: rotate(-1deg);
+    }
+    50% {
+        transform: rotate(1deg);
+    }
+}

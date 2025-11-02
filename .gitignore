@@ -1,0 +1,21 @@
+# IDE and Editor directories
+.claude/
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Screenshots and temporary files
+*.png
+*.jpg
+*.jpeg
+
+# Old/deprecated files
+game.js
+styles.css
+src/
+
+# Empty directories
+assets/
