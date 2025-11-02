@@ -43,7 +43,7 @@ body[data-season="spring"] {
     --season-icon: '🌸';
     --season-accent: rgba(255, 182, 217, 0.15);
     --toolbar-bg: linear-gradient(135deg, rgba(164, 214, 94, 0.25) 0%, rgba(255, 182, 217, 0.25) 100%);
-    --toolbar-base: rgba(139, 111, 71, 0.90);
+    --toolbar-base: rgba(139, 111, 71, 0.20); /* More transparent - was 0.90 */
 }
 
 /* Summer Theme */
@@ -57,7 +57,7 @@ body[data-season="summer"] {
     --season-icon: '☀️';
     --season-accent: rgba(255, 193, 7, 0.15);
     --toolbar-bg: linear-gradient(135deg, rgba(255, 213, 79, 0.25) 0%, rgba(255, 138, 80, 0.25) 100%);
-    --toolbar-base: rgba(139, 111, 71, 0.90);
+    --toolbar-base: rgba(139, 111, 71, 0.20); /* More transparent - was 0.90 */
 }
 
 /* Fall/Autumn Theme */
@@ -71,7 +71,7 @@ body[data-season="fall"] {
     --season-icon: '🍂';
     --season-accent: rgba(255, 138, 80, 0.15);
     --toolbar-bg: linear-gradient(135deg, rgba(255, 138, 80, 0.25) 0%, rgba(216, 67, 21, 0.20) 100%);
-    --toolbar-base: rgba(139, 111, 71, 0.90);
+    --toolbar-base: rgba(139, 111, 71, 0.20); /* More transparent - was 0.90 */
 }
 
 /* Winter Theme */
@@ -85,7 +85,7 @@ body[data-season="winter"] {
     --season-icon: '❄️';
     --season-accent: rgba(129, 212, 250, 0.15);
     --toolbar-bg: linear-gradient(135deg, rgba(129, 212, 250, 0.25) 0%, rgba(179, 229, 252, 0.25) 100%);
-    --toolbar-base: rgba(139, 111, 71, 0.90);
+    --toolbar-base: rgba(139, 111, 71, 0.20); /* More transparent - was 0.90 */
 }
 
 body {
@@ -293,6 +293,19 @@ body {
 .nav-button:active {
     transform: translateY(2px);
     box-shadow: 0 2px 0 #CC7000, 0 3px 6px var(--shadow);
+}
+
+/* Shop and Upgrades buttons - slightly bigger */
+.shop-btn,
+.upgrade-btn {
+    padding: 8px 16px; /* Bigger than regular nav buttons (6px 12px) */
+    font-size: 15px; /* Bigger font (was 13px) */
+    font-weight: 700; /* Bolder */
+}
+
+.shop-btn .btn-icon,
+.upgrade-btn .btn-icon {
+    font-size: 20px; /* Bigger icons */
 }
 
 /* Game Container */
