@@ -952,10 +952,12 @@ class UIManager {
     }
 
     updateSeedSelector() {
-        const selector = document.getElementById('seed-selector');
-        if (!selector) return;
+        const vegetableSection = document.getElementById('vegetable-seeds');
+        const fruitSection = document.getElementById('fruit-seeds');
+        if (!vegetableSection || !fruitSection) return;
 
-        selector.innerHTML = '';
+        vegetableSection.innerHTML = '';
+        fruitSection.innerHTML = '';
 
         // Crop emoji icons (fully grown)
         const cropIcons = {
@@ -966,6 +968,15 @@ class UIManager {
             potato: '🥔'
         };
 
+        // Fruit emoji icons
+        const fruitIcons = {
+            apple: '🍎',
+            orange: '🍊',
+            banana: '🍌',
+            pear: '🍐'
+        };
+
+        // Render vegetable seeds (always visible)
         for (const [key, plant] of Object.entries(PLANTS)) {
             const btn = document.createElement('button');
             btn.className = 'seed-button';
@@ -999,7 +1010,44 @@ class UIManager {
             btn.appendChild(countLabel);
             btn.appendChild(nameLabel);
 
-            selector.appendChild(btn);
+            vegetableSection.appendChild(btn);
+        }
+
+        // Render fruit seeds
+        for (const [key, fruit] of Object.entries(FRUITS)) {
+            const btn = document.createElement('button');
+            btn.className = 'seed-button';
+            btn.dataset.seed = key;
+
+            const count = this.game.player.inventory.fruitSeeds[key] || 0;
+            if (count === 0) {
+                btn.classList.add('disabled');
+            }
+
+            btn.onclick = () => {
+                if (count > 0) {
+                    this.game.selectSeed(key);
+                }
+            };
+
+            const seedVisual = document.createElement('div');
+            seedVisual.className = 'seed-icon';
+            seedVisual.textContent = fruitIcons[key] || '🌳';
+            seedVisual.style.fontSize = '32px';
+
+            const countLabel = document.createElement('span');
+            countLabel.className = 'seed-count';
+            countLabel.textContent = count;
+
+            const nameLabel = document.createElement('span');
+            nameLabel.className = 'seed-name';
+            nameLabel.textContent = fruit.name;
+
+            btn.appendChild(seedVisual);
+            btn.appendChild(countLabel);
+            btn.appendChild(nameLabel);
+
+            fruitSection.appendChild(btn);
         }
     }
 
@@ -1729,6 +1777,9 @@ class Game {
         this.ui.renderGarden();
         this.ui.updateAll();
 
+        // Initialize fruit cells
+        this.initializeFruitCells();
+
         // Show orchard if already unlocked
         if (this.player.upgrades.premiumOrchard) {
             this.ui.showOrchard();
@@ -2133,6 +2184,205 @@ class Game {
 
     showGarden() {
         this.ui.showScreen('garden-screen');
+    }
+
+    switchToFruitGarden() {
+        const slider = document.querySelector('.gardens-slider');
+        if (slider) {
+            slider.classList.add('show-fruits');
+            console.log('🍎 Switched to fruit garden');
+        }
+    }
+
+    switchToVegetableGarden() {
+        const slider = document.querySelector('.gardens-slider');
+        if (slider) {
+            slider.classList.remove('show-fruits');
+            console.log('🥕 Switched to vegetable garden');
+        }
+    }
+
+    scrollToFruitSeeds() {
+        const seedsSlider = document.getElementById('seeds-slider');
+        if (seedsSlider) {
+            seedsSlider.classList.add('show-fruits');
+            console.log('🍎 Scrolled to fruit seeds');
+        }
+    }
+
+    scrollToVegetableSeeds() {
+        const seedsSlider = document.getElementById('seeds-slider');
+        if (seedsSlider) {
+            seedsSlider.classList.remove('show-fruits');
+            console.log('🥕 Scrolled to vegetable seeds');
+        }
+    }
+
+    initializeFruitCells() {
+        const fruitCells = document.querySelectorAll('.fruit-cell');
+        fruitCells.forEach((cell, index) => {
+            cell.onclick = () => this.handleFruitCellClick(index);
+            // Initialize as empty cells
+            cell.classList.add('empty');
+        });
+        console.log('🍎 Initialized 5 fruit cells');
+    }
+
+    handleFruitCellClick(index) {
+        const tree = this.fruitGarden.getTree(index);
+        if (!tree) return;
+
+        console.log(`🍎 Clicked fruit cell ${index}, tool: ${this.selectedTool}, tree status: ${tree.status}`);
+
+        // If ready to harvest, harvest the fruit
+        if (tree.readyToHarvest) {
+            this.harvestFruitCell(index);
+            return;
+        }
+
+        // Handle tool actions
+        if (this.selectedTool === 'hoe') {
+            // Hoe on empty cell = "till" (prepare for planting)
+            if (tree.status === 'empty') {
+                tree.status = 'tilled';
+                this.updateFruitCell(index);
+                this.saveGame();
+                console.log(`🍎 Tilled fruit cell ${index}`);
+            }
+        } else if (this.selectedTool === 'water') {
+            // Water on planted/growing trees
+            if (tree.status === 'planted' || tree.status === 'growing') {
+                this.waterFruitCell(index);
+            }
+        } else if (this.selectedTool.startsWith('seed-')) {
+            // Plant fruit seed on tilled cell
+            const seedType = this.selectedTool.replace('seed-', '');
+            // Check if this is a fruit seed
+            if (FRUITS[seedType] && tree.status === 'tilled' && this.player.useFruitSeed(seedType)) {
+                this.fruitGarden.plantTree(index, seedType, this.gameTime);
+                this.updateFruitCell(index);
+                this.ui.updateSeedSelector();
+                this.saveGame();
+
+                const cellEl = document.querySelector(`.fruit-cell[data-index="${index}"]`);
+                if (cellEl && this.particles) {
+                    this.particles.animatePlantGrowth(cellEl);
+                }
+                console.log(`🌳 Planted ${seedType} tree in cell ${index}`);
+                this.ui.showToast('success', '🌳', 'Tree Planted!', `${FRUITS[seedType].name} tree is growing`);
+            }
+        }
+    }
+
+    waterFruitCell(index) {
+        if (this.fruitGarden.waterTree(index, this.gameTime)) {
+            this.updateFruitCell(index);
+
+            const cellEl = document.querySelector(`.fruit-cell[data-index="${index}"]`);
+            if (cellEl && this.particles) {
+                this.particles.createWaterSplash(cellEl);
+            }
+
+            this.saveGame();
+            console.log(`💧 Watered fruit cell ${index}`);
+        }
+    }
+
+    harvestFruitCell(index) {
+        console.log(`🎯 harvestFruitCell called for cell ${index}`);
+        const result = this.fruitGarden.harvestFruit(index);
+        console.log('🎯 FruitGarden.harvestFruit result:', result);
+
+        if (result) {
+            console.log(`🎯 Calling player.addFruitHarvest(${result.fruitType}, ${result.yield})`);
+            this.player.addFruitHarvest(result.fruitType, result.yield);
+
+            this.updateFruitCell(index);
+            this.ui.updateAll();
+
+            const cellEl = document.querySelector(`.fruit-cell[data-index="${index}"]`);
+            if (cellEl && this.particles) {
+                this.particles.createHarvestSparkle(cellEl);
+            }
+
+            this.saveGame();
+            console.log(`✅ Harvested ${result.yield} ${result.fruitType}!`);
+        } else {
+            console.error('❌ harvestFruit() returned null - fruit not ready or not found');
+        }
+    }
+
+    updateFruitCell(index) {
+        const tree = this.fruitGarden.getTree(index);
+        const cell = document.querySelector(`.fruit-cell[data-index="${index}"]`);
+        if (!cell || !tree) return;
+
+        // Clear all status classes
+        cell.className = 'fruit-cell';
+        cell.setAttribute('data-index', index);
+
+        // Add status class
+        cell.classList.add(tree.status);
+
+        // Add special state classes
+        if (tree.needsWater) {
+            cell.classList.add('needs-water');
+        }
+        if (tree.readyToHarvest) {
+            cell.classList.add('harvestable');
+        }
+
+        // Clear previous content
+        cell.innerHTML = '';
+
+        // Add visual representation based on tree status
+        if (tree.status === 'empty') {
+            // Empty cell - just brown dirt
+            // No content needed, CSS handles it
+        } else if (tree.status === 'tilled') {
+            // Tilled cell - darker soil
+            // No content needed, CSS handles it
+        } else if (tree.status === 'planted' || tree.status === 'growing') {
+            // Show tree with growth stage
+            const fruit = FRUITS[tree.fruitType];
+            const stageEmojis = ['🌱', '🪴', '🌳', '🌳'];
+            const emoji = stageEmojis[tree.growthStage] || '🌱';
+
+            const plantEl = document.createElement('div');
+            plantEl.className = 'plant-sprite';
+            plantEl.textContent = emoji;
+            plantEl.style.fontSize = '48px';
+            cell.appendChild(plantEl);
+
+            // Add water indicator if needs water
+            if (tree.needsWater) {
+                const waterIcon = document.createElement('div');
+                waterIcon.className = 'water-indicator';
+                waterIcon.textContent = '💧';
+                waterIcon.style.position = 'absolute';
+                waterIcon.style.top = '5px';
+                waterIcon.style.right = '5px';
+                waterIcon.style.fontSize = '20px';
+                cell.appendChild(waterIcon);
+            }
+
+            // Add sparkle if ready to harvest
+            if (tree.readyToHarvest) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'harvest-sparkle';
+                sparkle.textContent = '✨';
+                sparkle.style.position = 'absolute';
+                sparkle.style.top = '5px';
+                sparkle.style.left = '5px';
+                sparkle.style.fontSize = '20px';
+                cell.appendChild(sparkle);
+
+                // Add the fruit emoji on top of the tree
+                const fruitIcons = { apple: '🍎', orange: '🍊', banana: '🍌', pear: '🍐' };
+                const fruitEmoji = fruitIcons[tree.fruitType] || '🍎';
+                plantEl.textContent = `🌳${fruitEmoji}`;
+            }
+        }
     }
 
     saveGame() {

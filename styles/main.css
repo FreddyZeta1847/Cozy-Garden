@@ -131,7 +131,7 @@ body {
     justify-content: space-between;
     align-items: center;
     /* REDUCED PADDING for more garden space */
-    padding: 6px 15px;
+    padding: 15px 15px;
     padding-bottom: 16px;
     /* SEASONAL GRADIENT BACKGROUND */
     background: var(--toolbar-base, rgba(139, 111, 71, 0.90));
@@ -146,72 +146,6 @@ body {
     contain: layout style;
     transform: translateZ(0);
     transition: background 0.6s ease-in-out;
-}
-
-/* Wood bark border effect for header bottom - SCALED DOWN */
-.header::after {
-    content: '';
-    position: absolute;
-    bottom: -6px; /* Was -8px */
-    left: 0;
-    right: 0;
-    height: 12px; /* Was 16px - 25% reduction */
-    background: linear-gradient(90deg,
-        var(--dark-brown) 0%,
-        #6B4423 15%,
-        var(--dark-brown) 30%,
-        #6B4423 45%,
-        var(--dark-brown) 60%,
-        #6B4423 75%,
-        var(--dark-brown) 100%);
-    clip-path: path('M0,8 Q10,3 20,8 Q25,12 35,8 Q45,5 55,8 Q65,11 75,8 Q82,5 95,8 Q105,12 115,8 Q125,4 138,8 Q148,13 160,8 Q170,5 182,8 Q192,11 205,8 Q215,6 228,8 Q238,12 250,8 Q260,5 272,8 Q282,10 295,8 Q308,6 320,8 Q330,11 343,8 Q355,5 368,8 Q378,13 390,8 Q402,6 415,8 Q425,11 438,8 Q450,5 462,8 Q472,12 485,8 Q497,6 510,8 Q520,10 532,8 Q544,5 558,8 Q570,12 582,8 Q592,6 605,8 Q618,11 630,8 Q640,5 652,8 Q664,13 678,8 Q690,6 702,8 Q712,10 725,8 Q738,5 750,8 Q760,12 773,8 Q785,6 798,8 Q810,11 822,8 Q832,5 845,8 Q858,13 870,8 Q882,6 895,8 Q907,10 920,8 Q932,5 945,8 Q957,12 970,8 Q982,6 995,8 Q1007,11 1020,8 Q1032,5 1045,8 Q1057,13 1070,8 T1095,8 T1120,8 T1145,8 T1170,8 T1195,8 T1220,8 T1245,8 T1270,8 T1295,8 T1320,8 T1345,8 T1370,8 T1395,8 T1420,8 T1445,8 T1470,8 T1495,8 T1520,8 T1545,8 T1570,8 T1595,8 T1620,8 T1645,8 T1670,8 T1695,8 T1720,8 T1745,8 T1770,8 T1795,8 T1820,8 T1845,8 T1870,8 T1895,8 T1920,8 L1920,16 L0,16 Z');
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3),
-                inset 0 2px 0 rgba(139, 111, 71, 0.5),
-                inset 3px 0 2px rgba(0,0,0,0.2),
-                inset -3px 0 2px rgba(0,0,0,0.2);
-    background-size: 40px 12px; /* Scaled down from 16px */
-}
-
-/* Add wood texture details (knots) - Multiple knots using box-shadow trick */
-.header::before {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 15%;
-    width: 12px;
-    height: 8px;
-    background: radial-gradient(ellipse, rgba(101, 67, 33, 0.9), rgba(139, 111, 71, 0.6) 40%, transparent 70%);
-    border-radius: 50%;
-    z-index: 1;
-    box-shadow:
-        200px 2px 0 -2px rgba(101, 67, 33, 0.7),
-        450px -1px 0 -1px rgba(101, 67, 33, 0.6),
-        680px 3px 0 -3px rgba(101, 67, 33, 0.8),
-        920px 1px 0 -2px rgba(101, 67, 33, 0.65),
-        1150px -2px 0 -1px rgba(101, 67, 33, 0.7);
-}
-
-/* Wood grain lines on header border */
-.game-container::before {
-    content: '';
-    position: absolute;
-    top: -12px;
-    left: 8%;
-    width: 1px;
-    height: 10px;
-    background: linear-gradient(to bottom, transparent, rgba(101, 67, 33, 0.4), transparent);
-    z-index: 2;
-    box-shadow:
-        80px 1px 0 0 rgba(101, 67, 33, 0.3),
-        150px -1px 0 0 rgba(101, 67, 33, 0.35),
-        240px 2px 0 0 rgba(101, 67, 33, 0.4),
-        320px 0px 0 0 rgba(101, 67, 33, 0.3),
-        410px 1px 0 0 rgba(101, 67, 33, 0.35),
-        500px -1px 0 0 rgba(101, 67, 33, 0.4),
-        590px 2px 0 0 rgba(101, 67, 33, 0.3),
-        680px 0px 0 0 rgba(101, 67, 33, 0.35),
-        770px 1px 0 0 rgba(101, 67, 33, 0.4),
-        860px -1px 0 0 rgba(101, 67, 33, 0.3);
 }
 
 .resources {
@@ -328,11 +262,12 @@ body {
     flex: 1;
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 40px;
-    padding: 20px;
+    justify-content: flex-start;
+    padding: 0;
     position: relative;
-    overflow: auto;
+    overflow: hidden; /* Hide overflow for garden slider */
+    width: 100%;
+    max-width: 100%;
 }
 
 /* Bottom Bar */
@@ -341,9 +276,10 @@ body {
     background: var(--toolbar-base, rgba(139, 111, 71, 0.90));
     background-image: var(--toolbar-bg);
     background-blend-mode: overlay;
-    /* REDUCED PADDING for more garden space */
-    padding: 5px 12px;
-    padding-top: 16px;
+    /* INCREASED PADDING to fit seed selector */
+    padding: 10px 12px;
+    padding-top: 18px;
+    padding-bottom: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -351,6 +287,7 @@ body {
     backdrop-filter: blur(10px);
     flex-shrink: 0;
     position: relative;
+    min-height: 90px; /* Ensure enough height for seed buttons */
     /* PERFORMANCE OPTIMIZATION */
     will-change: background;
     contain: layout style;
@@ -470,11 +407,80 @@ body {
     color: var(--dark-brown);
 }
 
-.seed-selector {
+/* Seed Selector Container with Vertical Scroll */
+.seed-selector-container {
+    position: relative;
+    height: 90px; /* Increased height */
+    overflow: hidden; /* Hide content outside container */
+    padding-left: 25px;
+    padding-right: 45px; /* Make room for arrow on the right */
+    border-left: 4px solid var(--dark-brown);
+    flex: 1; /* Take available space */
+}
+
+.seeds-slider {
+    display: flex;
+    flex-direction: column;
+    gap: 30px; /* Add spacing between vegetable and fruit sections */
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    transform: translateY(0); /* Start with vegetables visible */
+}
+
+.seeds-slider.show-fruits {
+    transform: translateY(-120px); /* Slide up to show fruits (90px height + 30px gap) */
+}
+
+.seed-section {
     display: flex;
     gap: 12px;
-    padding-left: 25px;
-    border-left: 4px solid var(--dark-brown);
+    height: 90px; /* Match container height */
+    min-height: 90px;
+    align-items: center;
+    flex-shrink: 0; /* Prevent shrinking */
+}
+
+/* Seed Navigation Arrows (Up/Down) */
+.seed-nav-arrow {
+    position: absolute;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 240, 240, 0.9) 100%);
+    border: 3px solid var(--season-primary, #A4D65E);
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.seed-nav-arrow:hover {
+    transform: scale(1.15);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* Down arrow - visible by default, positioned at bottom */
+.seed-nav-arrow.down-arrow {
+    bottom: 20px;
+    display: flex;
+}
+
+/* Up arrow - hidden by default, positioned at top */
+.seed-nav-arrow.up-arrow {
+    top: 20px;
+    display: none;
+}
+
+/* When showing fruits: hide down, show up */
+.seeds-slider.show-fruits ~ .down-arrow {
+    display: none;
+}
+
+.seeds-slider.show-fruits ~ .up-arrow {
+    display: flex;
 }
 
 .nav-buttons {

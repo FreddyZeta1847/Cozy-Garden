@@ -8,20 +8,20 @@
     background: var(--white);
     border: 3px solid var(--dark-brown);
     border-radius: 10px;
-    padding: 6px 8px;
+    padding: 4px 6px; /* Reduced from 6px 8px */
     cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3px;
+    gap: 2px; /* Reduced from 3px */
     transition: all 0.2s;
     box-shadow: 0 2px 0 var(--dark-brown), 0 3px 6px var(--shadow);
-    min-width: 55px;
+    min-width: 50px; /* Reduced from 55px */
 }
 
 .seed-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 0 var(--dark-brown), 0 8px 12px var(--shadow);
+    transform: translateY(-2px); /* Reduced from -3px */
+    box-shadow: 0 5px 0 var(--dark-brown), 0 7px 10px var(--shadow);
 }
 
 .seed-button.active {

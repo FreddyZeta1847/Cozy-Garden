@@ -27,22 +27,6 @@
     <!-- Particle Background -->
     <div id="particles-js"></div>
 
-    <!-- Premium Orchard Panel -->
-    <div id="orchard-panel" class="orchard-panel">
-        <div class="orchard-header">
-            <h3>🌳 Premium Orchard</h3>
-            <button class="orchard-toggle" onclick="game.ui.toggleOrchard()">◀</button>
-        </div>
-        <div class="orchard-content">
-            <div id="orchard-slots" class="orchard-slots">
-                <!-- Fruit tree slots will be added dynamically -->
-            </div>
-            <div class="orchard-info">
-                <p class="orchard-hint">💡 Plant premium fruit trees for high profits!</p>
-            </div>
-        </div>
-    </div>
-
     <!-- Main Garden Screen -->
     <div id="garden-screen" class="screen active">
         <div class="header">
@@ -73,10 +57,40 @@
         </div>
 
         <div class="game-container">
-            <div class="garden-wrapper">
-                <div class="garden-sign">My Cozy Garden</div>
-                <div id="garden-grid" class="garden-grid"></div>
-                <div class="garden-shadow"></div>
+            <!-- Gardens Slider Container -->
+            <div class="gardens-slider">
+                <!-- Vegetable Garden -->
+                <div class="garden-view vegetable-garden active">
+                    <div class="garden-wrapper">
+                        <div class="garden-sign">My Vegetable Garden</div>
+                        <div id="garden-grid" class="garden-grid"></div>
+                        <div class="garden-shadow"></div>
+                    </div>
+                    <!-- Right Arrow to Fruit Garden -->
+                    <button class="garden-nav-arrow right-arrow" onclick="game.switchToFruitGarden()" title="Go to Fruit Garden">
+                        <span>➡️</span>
+                    </button>
+                </div>
+
+                <!-- Fruit Garden -->
+                <div class="garden-view fruit-garden">
+                    <!-- Left Arrow back to Vegetables -->
+                    <button class="garden-nav-arrow left-arrow" onclick="game.switchToVegetableGarden()" title="Back to Vegetable Garden">
+                        <span>⬅️</span>
+                    </button>
+                    <div class="fruit-wrapper">
+                        <div class="garden-sign">My Fruit Orchard</div>
+                        <div id="fruit-grid" class="fruit-grid">
+                            <!-- 5 fruit cells in triangular layout -->
+                            <div class="fruit-cell" data-index="0"></div>
+                            <div class="fruit-cell" data-index="1"></div>
+                            <div class="fruit-cell" data-index="2"></div>
+                            <div class="fruit-cell" data-index="3"></div>
+                            <div class="fruit-cell" data-index="4"></div>
+                        </div>
+                        <div class="garden-shadow"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -93,8 +107,24 @@
                     </button>
                 </div>
 
-                <div class="seed-selector" id="seed-selector">
-                    <!-- Seeds will be added dynamically -->
+                <div class="seed-selector-container">
+                    <div class="seeds-slider" id="seeds-slider">
+                        <!-- Vegetable Seeds -->
+                        <div class="seed-section vegetable-seeds" id="vegetable-seeds">
+                            <!-- Vegetable seeds will be added dynamically -->
+                        </div>
+                        <!-- Fruit Seeds -->
+                        <div class="seed-section fruit-seeds" id="fruit-seeds">
+                            <!-- Fruit seeds will be added dynamically -->
+                        </div>
+                    </div>
+                    <!-- Navigation Arrows for Seeds -->
+                    <button class="seed-nav-arrow down-arrow" onclick="game.scrollToFruitSeeds()" title="Fruit Seeds">
+                        <span>⬇️</span>
+                    </button>
+                    <button class="seed-nav-arrow up-arrow" onclick="game.scrollToVegetableSeeds()" title="Vegetable Seeds">
+                        <span>⬆️</span>
+                    </button>
                 </div>
             </div>
 
