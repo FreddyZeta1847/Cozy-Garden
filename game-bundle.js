@@ -67,6 +67,58 @@ const PLANTS = {
     }
 };
 
+// Fruits Database
+const FRUITS = {
+    apple: {
+        name: "Apple",
+        seedCost: 80,
+        growthTime: 240,
+        waterInterval: 10,
+        harvestYield: 1,
+        sellPrice: 50,
+        stages: 4,
+        color: "#DC143C",
+        secondaryColor: "#8B0000",
+        description: "Crisp red apples from your own tree"
+    },
+    orange: {
+        name: "Orange",
+        seedCost: 100,
+        growthTime: 300,
+        waterInterval: 12,
+        harvestYield: 1,
+        sellPrice: 70,
+        stages: 4,
+        color: "#FF8C00",
+        secondaryColor: "#FF6347",
+        description: "Juicy sweet oranges bursting with flavor"
+    },
+    banana: {
+        name: "Banana",
+        seedCost: 120,
+        growthTime: 360,
+        waterInterval: 15,
+        harvestYield: 1,
+        sellPrice: 100,
+        stages: 4,
+        color: "#FFD700",
+        secondaryColor: "#FF8C00",
+        description: "Tropical yellow bananas from your grove"
+    },
+    pear: {
+        name: "Pear",
+        seedCost: 90,
+        growthTime: 270,
+        waterInterval: 11,
+        harvestYield: 1,
+        sellPrice: 60,
+        stages: 4,
+        color: "#9ACD32",
+        secondaryColor: "#6B8E23",
+        description: "Sweet golden pears straight from the tree"
+    }
+};
+
 // Upgrades Database
 const UPGRADES = {
     autoWatering: {
@@ -89,6 +141,13 @@ const UPGRADES = {
         description: "Expand your garden to 8x5 tiles for more planting space.",
         cost: 300,
         effect: "expandedGarden"
+    },
+    premiumOrchard: {
+        name: "Premium Orchard",
+        icon: "🌳",
+        description: "Unlock a premium fruit orchard with 5 tree slots. Grow expensive fruits for high profits!",
+        cost: 500,
+        effect: "premiumOrchard"
     }
 };
 
@@ -176,12 +235,25 @@ class Player {
                 carrot: 0,
                 corn: 0,
                 potato: 0
+            },
+            fruitSeeds: {
+                apple: 0,
+                orange: 0,
+                banana: 0,
+                pear: 0
+            },
+            harvestedFruits: {
+                apple: 0,
+                orange: 0,
+                banana: 0,
+                pear: 0
             }
         };
         this.upgrades = {
             autoWatering: false,
             fasterGrowth: 1.0,
-            expandedGarden: false
+            expandedGarden: false,
+            premiumOrchard: false
         };
     }
 
@@ -233,6 +305,43 @@ class Player {
         return false;
     }
 
+    addFruitSeed(type, amount = 1) {
+        if (!this.inventory.fruitSeeds[type]) {
+            this.inventory.fruitSeeds[type] = 0;
+        }
+        this.inventory.fruitSeeds[type] += amount;
+        console.log(`Added ${amount} ${type} fruit seeds. Total: ${this.inventory.fruitSeeds[type]}`);
+    }
+
+    useFruitSeed(type) {
+        if (this.inventory.fruitSeeds[type] > 0) {
+            this.inventory.fruitSeeds[type]--;
+            console.log(`Used 1 ${type} fruit seed. Remaining: ${this.inventory.fruitSeeds[type]}`);
+            return true;
+        }
+        return false;
+    }
+
+    addFruitHarvest(type, amount) {
+        console.log(`🍎 addFruitHarvest called: type=${type}, amount=${amount}`);
+        if (!this.inventory.harvestedFruits[type]) {
+            this.inventory.harvestedFruits[type] = 0;
+        }
+        const oldTotal = this.inventory.harvestedFruits[type];
+        this.inventory.harvestedFruits[type] += amount;
+        console.log(`🍎 Harvested ${amount} ${type}. Old total: ${oldTotal}, New total: ${this.inventory.harvestedFruits[type]}`);
+        console.log('🍎 Full harvested fruits inventory:', this.inventory.harvestedFruits);
+    }
+
+    sellFruit(type, amount) {
+        if (this.inventory.harvestedFruits[type] >= amount) {
+            this.inventory.harvestedFruits[type] -= amount;
+            console.log(`Sold ${amount} ${type} fruit. Remaining: ${this.inventory.harvestedFruits[type]}`);
+            return true;
+        }
+        return false;
+    }
+
     purchaseUpgrade(upgradeType) {
         switch (upgradeType) {
             case 'autoWatering':
@@ -243,6 +352,9 @@ class Player {
                 break;
             case 'expandedGarden':
                 this.upgrades.expandedGarden = true;
+                break;
+            case 'premiumOrchard':
+                this.upgrades.premiumOrchard = true;
                 break;
         }
         console.log(`Purchased upgrade: ${upgradeType}`);
@@ -452,6 +564,161 @@ class Garden {
     }
 }
 
+// Fruit Garden Class
+class FruitGarden {
+    constructor() {
+        this.slots = 5;
+        this.trees = [];
+        this.initializeTrees();
+    }
+
+    initializeTrees() {
+        for (let i = 0; i < this.slots; i++) {
+            this.trees[i] = this.createEmptyTree();
+        }
+    }
+
+    createEmptyTree() {
+        return {
+            status: 'empty',
+            fruitType: null,
+            growthStage: 0,
+            lastWatered: 0,
+            needsWater: false,
+            readyToHarvest: false,
+            plantedAt: 0
+        };
+    }
+
+    getTree(slot) {
+        if (slot >= 0 && slot < this.slots) {
+            return this.trees[slot];
+        }
+        return null;
+    }
+
+    plantTree(slot, fruitType, currentTime) {
+        const tree = this.getTree(slot);
+        if (tree && tree.status === 'empty') {
+            tree.status = 'planted';
+            tree.fruitType = fruitType;
+            tree.growthStage = 0;
+            tree.plantedAt = currentTime;
+            tree.lastWatered = currentTime;
+            tree.needsWater = false;
+            tree.readyToHarvest = false;
+            console.log(`Planted ${fruitType} tree in slot ${slot}`);
+            return true;
+        }
+        return false;
+    }
+
+    waterTree(slot, currentTime) {
+        const tree = this.getTree(slot);
+        if (tree && (tree.status === 'planted' || tree.status === 'growing')) {
+            tree.lastWatered = currentTime;
+            tree.needsWater = false;
+            console.log(`Watered fruit tree in slot ${slot}`);
+            return true;
+        }
+        return false;
+    }
+
+    harvestFruit(slot) {
+        const tree = this.getTree(slot);
+        console.log(`🍎 FruitGarden.harvestFruit - tree at slot ${slot}:`, tree);
+
+        if (tree && tree.readyToHarvest) {
+            const fruitType = tree.fruitType;
+            const fruit = FRUITS[fruitType];
+            const yield_ = fruit.harvestYield;
+
+            console.log(`🍎 Fruit ready! Type: ${fruitType}, Yield: ${yield_}`);
+
+            // Reset tree to stage 2 (mature tree) after harvest - tree persists
+            tree.growthStage = 2;
+            tree.readyToHarvest = false;
+            tree.plantedAt = Date.now(); // Reset growth timer for next fruit
+            tree.lastWatered = Date.now();
+
+            console.log(`🍎 Harvested ${yield_} ${fruitType} from slot ${slot}`);
+            return { fruitType, yield: yield_ };
+        }
+
+        console.log(`🍎 Tree not ready to harvest. readyToHarvest: ${tree ? tree.readyToHarvest : 'tree is null'}`);
+        return null;
+    }
+
+    updateGrowth(currentTime, growthMultiplier = 1.0) {
+        let updated = false;
+
+        for (let slot = 0; slot < this.slots; slot++) {
+            const tree = this.trees[slot];
+
+            if (tree.status === 'planted' || tree.status === 'growing') {
+                const fruit = FRUITS[tree.fruitType];
+
+                // Check if tree needs water
+                const timeSinceWatered = currentTime - tree.lastWatered;
+                if (timeSinceWatered > fruit.waterInterval) {
+                    if (!tree.needsWater) {
+                        tree.needsWater = true;
+                        updated = true;
+                    }
+                    continue; // Stop growth if needs water
+                }
+
+                // Calculate growth stage
+                const adjustedGrowthTime = fruit.growthTime / growthMultiplier;
+                const stageTime = adjustedGrowthTime / fruit.stages;
+                const timeSincePlanted = currentTime - tree.plantedAt;
+                const newStage = Math.min(
+                    Math.floor(timeSincePlanted / stageTime),
+                    fruit.stages - 1
+                );
+
+                if (newStage !== tree.growthStage) {
+                    tree.growthStage = newStage;
+                    tree.status = 'growing';
+                    updated = true;
+                }
+
+                // Check if ready to harvest (final stage)
+                if (tree.growthStage === fruit.stages - 1 && !tree.readyToHarvest) {
+                    tree.readyToHarvest = true;
+                    updated = true;
+                }
+            }
+        }
+
+        return updated;
+    }
+
+    autoWater(currentTime) {
+        for (let slot = 0; slot < this.slots; slot++) {
+            const tree = this.trees[slot];
+            if (tree.status === 'planted' || tree.status === 'growing') {
+                tree.lastWatered = currentTime;
+                tree.needsWater = false;
+            }
+        }
+        console.log('Auto-watered all fruit trees');
+    }
+
+    getSaveData() {
+        return {
+            slots: this.slots,
+            trees: JSON.parse(JSON.stringify(this.trees))
+        };
+    }
+
+    loadSaveData(data) {
+        if (data.slots) this.slots = data.slots;
+        if (data.trees) this.trees = data.trees;
+        console.log('Fruit garden data loaded');
+    }
+}
+
 // Particle Effects Class
 class ParticleEffects {
     constructor() {
@@ -642,15 +909,21 @@ class UIManager {
     }
 
     updateHarvestedCount() {
-        // Count total harvested vegetables
+        // Count total harvested vegetables and fruits
         let total = 0;
         for (const count of Object.values(this.game.player.inventory.harvested)) {
             total += count;
         }
+        // Add fruits if orchard unlocked
+        if (this.game.player.upgrades.premiumOrchard) {
+            for (const count of Object.values(this.game.player.inventory.harvestedFruits)) {
+                total += count;
+            }
+        }
         const el = document.getElementById('harvested-count');
         if (el) {
             el.textContent = total;
-            console.log(`🧺 Updated harvested display: ${total} total vegetables`);
+            console.log(`🧺 Updated harvested display: ${total} total produce`);
         }
     }
 
@@ -872,6 +1145,7 @@ class UIManager {
             potato: '🥔'
         };
 
+        // Add vegetable seeds section
         for (const [key, plant] of Object.entries(PLANTS)) {
             const item = document.createElement('div');
             item.className = 'shop-item';
@@ -902,6 +1176,55 @@ class UIManager {
 
             shopItems.appendChild(item);
         }
+
+        // Add fruit seeds section if orchard is unlocked
+        if (this.game.player.upgrades.premiumOrchard) {
+            // Add section divider
+            const divider = document.createElement('div');
+            divider.style.cssText = 'grid-column: 1/-1; text-align: center; margin: 20px 0; font-size: 24px; font-weight: bold; color: #DAA520;';
+            divider.innerHTML = '🌳 Premium Fruit Seeds';
+            shopItems.appendChild(divider);
+
+            const fruitIcons = {
+                apple: '🍎',
+                orange: '🍊',
+                banana: '🍌',
+                pear: '🍐'
+            };
+
+            for (const [key, fruit] of Object.entries(FRUITS)) {
+                const item = document.createElement('div');
+                item.className = 'shop-item';
+                item.style.borderColor = '#DAA520';
+                item.style.boxShadow = '0 6px 0 #DAA520, 0 8px 16px rgba(218, 165, 32, 0.3)';
+
+                const canBuy = this.game.player.money >= fruit.seedCost;
+
+                item.innerHTML = `
+                    <div class="shop-item-icon" style="background: linear-gradient(135deg, rgba(218, 165, 32, 0.1), rgba(184, 134, 11, 0.1));">${fruitIcons[key] || '🌳'}</div>
+                    <div class="shop-item-header">
+                        <h3>🌳 ${fruit.name} Tree</h3>
+                    </div>
+                    <div class="shop-item-details">
+                        <p>${fruit.description}</p>
+                        <div class="stats">
+                            <div class="stat"><span>⏱️</span> ${fruit.growthTime}s</div>
+                            <div class="stat"><span>💧</span> ${fruit.waterInterval}s</div>
+                            <div class="stat"><span>🍇</span> Yield: ${fruit.harvestYield}</div>
+                            <div class="stat"><span>💰</span> Sells for: $${fruit.sellPrice}</div>
+                        </div>
+                    </div>
+                    <div class="shop-item-footer">
+                        <div class="price" style="color: #DAA520;"><div class="coin-icon"></div>${fruit.seedCost}</div>
+                        <button class="buy-button" style="background: linear-gradient(135deg, #DAA520, #B8860B);" onclick="game.buyFruitSeed('${key}')" ${!canBuy ? 'disabled' : ''}>
+                            Buy Tree
+                        </button>
+                    </div>
+                `;
+
+                shopItems.appendChild(item);
+            }
+        }
     }
 
     renderMarket() {
@@ -913,9 +1236,10 @@ class UIManager {
         const inventoryList = document.getElementById('inventory-list');
         if (!inventoryList) return;
 
-        const hasItems = Object.values(this.game.player.inventory.harvested).some(count => count > 0);
+        const hasVegetables = Object.values(this.game.player.inventory.harvested).some(count => count > 0);
+        const hasFruits = Object.values(this.game.player.inventory.harvestedFruits).some(count => count > 0);
 
-        if (!hasItems) {
+        if (!hasVegetables && !hasFruits) {
             inventoryList.innerHTML = '<p class="empty-message">No harvested produce yet! Go plant and harvest some vegetables!</p>';
             return;
         }
@@ -923,6 +1247,16 @@ class UIManager {
         inventoryList.innerHTML = '<div class="inventory-grid"></div>';
         const grid = inventoryList.querySelector('.inventory-grid');
 
+        // Vegetable icons
+        const vegIcons = {
+            tomato: '🍅',
+            lettuce: '🥬',
+            carrot: '🥕',
+            corn: '🌽',
+            potato: '🥔'
+        };
+
+        // Add vegetables
         for (const [key, count] of Object.entries(this.game.player.inventory.harvested)) {
             if (count > 0) {
                 const plant = PLANTS[key];
@@ -932,11 +1266,40 @@ class UIManager {
                 item.style.setProperty('--plant-secondary', plant.secondaryColor);
 
                 item.innerHTML = `
-                    <div class="inventory-visual ${key}"></div>
+                    <div class="inventory-visual" style="font-size: 48px;">${vegIcons[key]}</div>
                     <div class="inventory-name">${plant.name}</div>
                     <div class="inventory-count">×${count}</div>
                 `;
                 grid.appendChild(item);
+            }
+        }
+
+        // Fruit icons
+        const fruitIcons = {
+            apple: '🍎',
+            orange: '🍊',
+            banana: '🍌',
+            pear: '🍐'
+        };
+
+        // Add fruits if orchard unlocked
+        if (this.game.player.upgrades.premiumOrchard) {
+            for (const [key, count] of Object.entries(this.game.player.inventory.harvestedFruits)) {
+                if (count > 0) {
+                    const fruit = FRUITS[key];
+                    const item = document.createElement('div');
+                    item.className = 'inventory-item';
+                    item.style.setProperty('--plant-color', fruit.color);
+                    item.style.setProperty('--plant-secondary', fruit.secondaryColor);
+                    item.style.border = '3px solid #DAA520';
+
+                    item.innerHTML = `
+                        <div class="inventory-visual" style="font-size: 48px;">${fruitIcons[key]}</div>
+                        <div class="inventory-name">🌳 ${fruit.name}</div>
+                        <div class="inventory-count">×${count}</div>
+                    `;
+                    grid.appendChild(item);
+                }
             }
         }
     }
@@ -953,19 +1316,30 @@ class UIManager {
             slot.id = `sell-slot-${i}`;
 
             const select = document.createElement('select');
-            select.innerHTML = '<option value="">Select vegetable...</option>';
+            select.innerHTML = '<option value="">Select produce...</option>';
 
+            // Add vegetables
             for (const [key, count] of Object.entries(this.game.player.inventory.harvested)) {
                 if (count > 0) {
                     const plant = PLANTS[key];
-                    select.innerHTML += `<option value="${key}">${plant.name} (${count} available)</option>`;
+                    select.innerHTML += `<option value="veg:${key}">${plant.name} (${count} available)</option>`;
+                }
+            }
+
+            // Add fruits if orchard unlocked
+            if (this.game.player.upgrades.premiumOrchard) {
+                for (const [key, count] of Object.entries(this.game.player.inventory.harvestedFruits)) {
+                    if (count > 0) {
+                        const fruit = FRUITS[key];
+                        select.innerHTML += `<option value="fruit:${key}">🌳 ${fruit.name} (${count} available)</option>`;
+                    }
                 }
             }
 
             const input = document.createElement('input');
             input.type = 'number';
             input.min = '0';
-            input.max = '20';
+            input.max = '100';
             input.value = '0';
             input.placeholder = 'Qty';
 
@@ -993,17 +1367,27 @@ class UIManager {
         const input = slot.querySelector('input');
         const calc = slot.querySelector('.sell-slot-calculation span');
 
-        const plantType = select.value;
+        const selectedValue = select.value;
         const quantity = parseInt(input.value) || 0;
 
-        if (plantType && quantity > 0) {
-            const plant = PLANTS[plantType];
-            const available = this.game.player.inventory.harvested[plantType];
-            const actualQty = Math.min(quantity, available);
-            input.value = actualQty;
+        if (selectedValue && quantity > 0) {
+            const [type, key] = selectedValue.split(':');
 
-            const total = actualQty * plant.sellPrice;
-            calc.textContent = total;
+            if (type === 'veg') {
+                const plant = PLANTS[key];
+                const available = this.game.player.inventory.harvested[key];
+                const actualQty = Math.min(quantity, available);
+                input.value = actualQty;
+                const total = actualQty * plant.sellPrice;
+                calc.textContent = total;
+            } else if (type === 'fruit') {
+                const fruit = FRUITS[key];
+                const available = this.game.player.inventory.harvestedFruits[key];
+                const actualQty = Math.min(quantity, available);
+                input.value = actualQty;
+                const total = actualQty * fruit.sellPrice;
+                calc.textContent = total;
+            }
         } else {
             calc.textContent = '0';
         }
@@ -1021,14 +1405,23 @@ class UIManager {
             const select = slot.querySelector('select');
             const input = slot.querySelector('input');
 
-            const plantType = select.value;
+            const selectedValue = select.value;
             const quantity = parseInt(input.value) || 0;
 
-            if (plantType && quantity > 0) {
-                const plant = PLANTS[plantType];
-                const available = this.game.player.inventory.harvested[plantType];
-                const actualQty = Math.min(quantity, available);
-                total += actualQty * plant.sellPrice;
+            if (selectedValue && quantity > 0) {
+                const [type, key] = selectedValue.split(':');
+
+                if (type === 'veg') {
+                    const plant = PLANTS[key];
+                    const available = this.game.player.inventory.harvested[key];
+                    const actualQty = Math.min(quantity, available);
+                    total += actualQty * plant.sellPrice;
+                } else if (type === 'fruit') {
+                    const fruit = FRUITS[key];
+                    const available = this.game.player.inventory.harvestedFruits[key];
+                    const actualQty = Math.min(quantity, available);
+                    total += actualQty * fruit.sellPrice;
+                }
             }
         }
 
@@ -1140,6 +1533,142 @@ class UIManager {
             }
         }, 3000);
     }
+
+    // ===== ORCHARD UI METHODS =====
+
+    showOrchard() {
+        const panel = document.getElementById('orchard-panel');
+        if (panel && this.game.player.upgrades.premiumOrchard) {
+            panel.classList.add('visible', 'unlocking');
+            setTimeout(() => {
+                panel.classList.remove('unlocking');
+            }, 800);
+            console.log('🌳 Orchard panel shown');
+        }
+    }
+
+    hideOrchard() {
+        const panel = document.getElementById('orchard-panel');
+        if (panel) {
+            panel.classList.remove('visible');
+            console.log('🌳 Orchard panel hidden');
+        }
+    }
+
+    toggleOrchard() {
+        const panel = document.getElementById('orchard-panel');
+        if (panel) {
+            panel.classList.toggle('collapsed');
+        }
+    }
+
+    renderOrchard() {
+        if (!this.game.player.upgrades.premiumOrchard) {
+            return;
+        }
+
+        const slotsContainer = document.getElementById('orchard-slots');
+        if (!slotsContainer) return;
+
+        slotsContainer.innerHTML = '';
+
+        for (let slot = 0; slot < this.game.fruitGarden.slots; slot++) {
+            const slotEl = this.createFruitSlot(slot);
+            slotsContainer.appendChild(slotEl);
+        }
+
+        console.log('🌳 Orchard rendered with 5 slots');
+    }
+
+    createFruitSlot(slot) {
+        const slotEl = document.createElement('div');
+        slotEl.className = 'fruit-slot';
+        slotEl.dataset.slot = slot;
+        slotEl.onclick = () => this.game.handleFruitSlotClick(slot);
+
+        this.updateFruitSlotVisual(slotEl, slot);
+        return slotEl;
+    }
+
+    updateFruitSlotVisual(slotEl, slot) {
+        const tree = this.game.fruitGarden.getTree(slot);
+        if (!tree) return;
+
+        slotEl.className = 'fruit-slot';
+        slotEl.innerHTML = '';
+
+        slotEl.classList.add(tree.status);
+
+        if (tree.needsWater) {
+            slotEl.classList.add('needs-water');
+        }
+
+        if (tree.readyToHarvest) {
+            slotEl.classList.add('harvestable');
+        }
+
+        if (tree.status === 'empty') {
+            const label = document.createElement('div');
+            label.className = 'empty-label';
+            label.textContent = '🌳 Empty Slot';
+            slotEl.appendChild(label);
+        } else {
+            const fruit = FRUITS[tree.fruitType];
+            if (!fruit) return;
+
+            // Fruit type label
+            const label = document.createElement('div');
+            label.className = 'fruit-label';
+            label.textContent = fruit.name;
+            slotEl.appendChild(label);
+
+            // Tree visual with growth stages
+            const treeVisual = document.createElement('div');
+            treeVisual.className = `fruit-tree stage-${tree.growthStage}`;
+            treeVisual.textContent = this.getFruitTreeEmoji(tree.fruitType, tree.growthStage);
+            slotEl.appendChild(treeVisual);
+
+            // Water indicator
+            if (tree.needsWater) {
+                const waterIndicator = document.createElement('div');
+                waterIndicator.className = 'fruit-water-indicator';
+                waterIndicator.textContent = '💧';
+                slotEl.appendChild(waterIndicator);
+            }
+
+            // Harvest ready sparkle
+            if (tree.readyToHarvest) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'fruit-harvest-sparkle';
+                sparkle.textContent = '✨';
+                slotEl.appendChild(sparkle);
+            }
+        }
+    }
+
+    getFruitTreeEmoji(fruitType, stage) {
+        const treeStages = {
+            apple: ['🌱', '🌿', '🌳', '🍎'],
+            orange: ['🌱', '🌿', '🌳', '🍊'],
+            banana: ['🌱', '🌿', '🌳', '🍌'],
+            pear: ['🌱', '🌿', '🌳', '🍐']
+        };
+
+        return treeStages[fruitType] ? treeStages[fruitType][stage] : '🌱';
+    }
+
+    refreshFruitSlots() {
+        if (!this.game.player.upgrades.premiumOrchard) {
+            return;
+        }
+
+        for (let slot = 0; slot < this.game.fruitGarden.slots; slot++) {
+            const slotEl = document.querySelector(`.fruit-slot[data-slot="${slot}"]`);
+            if (slotEl) {
+                this.updateFruitSlotVisual(slotEl, slot);
+            }
+        }
+    }
 }
 
 // Main Game Class
@@ -1147,6 +1676,7 @@ class Game {
     constructor() {
         this.player = new Player();
         this.garden = new Garden(4, 6);
+        this.fruitGarden = new FruitGarden();
         this.ui = new UIManager(this);
         this.particles = new ParticleEffects();
 
@@ -1172,6 +1702,13 @@ class Game {
 
         this.ui.renderGarden();
         this.ui.updateAll();
+
+        // Show orchard if already unlocked
+        if (this.player.upgrades.premiumOrchard) {
+            this.ui.showOrchard();
+            this.ui.renderOrchard();
+        }
+
         this.startGameLoop();
 
         console.log('✅ Game initialized successfully!');
@@ -1181,19 +1718,29 @@ class Game {
         setInterval(() => {
             this.gameTime++;
 
+            // Update vegetable garden growth
             const updated = this.garden.updateGrowth(this.gameTime, this.player.upgrades.fasterGrowth);
             if (updated) {
                 this.refreshAllTiles();
             }
 
+            // Update fruit garden growth
+            const fruitUpdated = this.fruitGarden.updateGrowth(this.gameTime, this.player.upgrades.fasterGrowth);
+            if (fruitUpdated) {
+                this.ui.refreshFruitSlots();
+            }
+
             this.updateSeasons();
 
+            // Auto-watering system
             if (this.player.upgrades.autoWatering) {
                 this.autoWateringTimer++;
                 if (this.autoWateringTimer >= 30) {
                     this.autoWateringTimer = 0;
                     this.garden.autoWater(this.gameTime);
+                    this.fruitGarden.autoWater(this.gameTime);
                     this.refreshAllTiles();
+                    this.ui.refreshFruitSlots();
                 }
             }
 
@@ -1287,6 +1834,85 @@ class Game {
         }
     }
 
+    handleFruitSlotClick(slot) {
+        const tree = this.fruitGarden.getTree(slot);
+        if (!tree) return;
+
+        // If ready to harvest, harvest the fruit
+        if (tree.readyToHarvest) {
+            this.harvestFruit(slot);
+            return;
+        }
+
+        // If empty slot, check if user has selected a fruit seed to plant
+        if (tree.status === 'empty') {
+            // For now, let's assume user needs to select from shop or we'll add selection later
+            console.log(`🌳 Clicked empty fruit slot ${slot}. Need to implement seed selection.`);
+            this.ui.showToast('info', '🌳', 'Empty Slot', 'Visit the shop to buy fruit seeds!');
+            return;
+        }
+
+        // If planted or growing, water the tree
+        if (tree.status === 'planted' || tree.status === 'growing') {
+            this.waterFruitTree(slot);
+        }
+    }
+
+    waterFruitTree(slot) {
+        if (this.fruitGarden.waterTree(slot, this.gameTime)) {
+            this.ui.refreshFruitSlots();
+
+            const slotEl = document.querySelector(`.fruit-slot[data-slot="${slot}"]`);
+            if (slotEl && this.particles) {
+                this.particles.createWaterSplash(slotEl);
+            }
+
+            this.saveGame();
+        }
+    }
+
+    harvestFruit(slot) {
+        console.log(`🎯 harvestFruit called for slot ${slot}`);
+        const result = this.fruitGarden.harvestFruit(slot);
+        console.log('🎯 FruitGarden.harvestFruit result:', result);
+
+        if (result) {
+            console.log(`🎯 Calling player.addFruitHarvest(${result.fruitType}, ${result.yield})`);
+            this.player.addFruitHarvest(result.fruitType, result.yield);
+
+            this.ui.refreshFruitSlots();
+            this.ui.updateAll();
+
+            const slotEl = document.querySelector(`.fruit-slot[data-slot="${slot}"]`);
+            if (slotEl && this.particles) {
+                this.particles.createHarvestSparkle(slotEl);
+            }
+
+            this.saveGame();
+            console.log(`✅ Harvested ${result.yield} ${result.fruitType}!`);
+        } else {
+            console.error('❌ harvestFruit() returned null - fruit not ready or not found');
+        }
+    }
+
+    plantFruitTree(slot, fruitType) {
+        if (this.player.useFruitSeed(fruitType) && this.fruitGarden.plantTree(slot, fruitType, this.gameTime)) {
+            this.ui.refreshFruitSlots();
+            this.ui.updateAll();
+            this.saveGame();
+
+            const slotEl = document.querySelector(`.fruit-slot[data-slot="${slot}"]`);
+            if (slotEl && this.particles) {
+                this.particles.animatePlantGrowth(slotEl);
+            }
+
+            console.log(`🌳 Planted ${fruitType} tree in slot ${slot}`);
+            this.ui.showToast('success', '🌳', 'Tree Planted!', `${FRUITS[fruitType].name} tree is growing`);
+            return true;
+        }
+        return false;
+    }
+
     refreshAllTiles() {
         for (let row = 0; row < this.garden.rows; row++) {
             for (let col = 0; col < this.garden.cols; col++) {
@@ -1359,6 +1985,33 @@ class Game {
         }
     }
 
+    buyFruitSeed(fruitType) {
+        const fruit = FRUITS[fruitType];
+
+        if (this.player.spendMoney(fruit.seedCost)) {
+            this.player.addFruitSeed(fruitType, 1);
+            this.ui.updateAll();
+            this.ui.renderShop();
+            this.saveGame();
+
+            const shopMoney = document.getElementById('shop-money');
+            if (shopMoney && this.particles) {
+                this.particles.animateTilePulse(shopMoney.parentElement);
+            }
+
+            // Get the fruit icon for the toast
+            const fruitIcons = {
+                apple: '🍎',
+                orange: '🍊',
+                banana: '🍌',
+                pear: '🍐'
+            };
+
+            // Show success toast
+            this.ui.showToast('success', fruitIcons[fruitType], 'Tree Purchased!', `Bought 1 ${fruit.name} tree for $${fruit.seedCost}`);
+        }
+    }
+
     showMarket() {
         this.ui.showScreen('market-screen');
         this.ui.renderMarket();
@@ -1374,17 +2027,30 @@ class Game {
             const select = slot.querySelector('select');
             const input = slot.querySelector('input');
 
-            const plantType = select.value;
+            const selectedValue = select.value;
             const quantity = parseInt(input.value) || 0;
 
-            if (plantType && quantity > 0) {
-                const plant = PLANTS[plantType];
-                const available = this.player.inventory.harvested[plantType];
-                const actualQty = Math.min(quantity, available);
+            if (selectedValue && quantity > 0) {
+                const [type, key] = selectedValue.split(':');
 
-                if (this.player.sellHarvest(plantType, actualQty)) {
-                    const earnings = actualQty * plant.sellPrice;
-                    totalEarned += earnings;
+                if (type === 'veg') {
+                    const plant = PLANTS[key];
+                    const available = this.player.inventory.harvested[key];
+                    const actualQty = Math.min(quantity, available);
+
+                    if (this.player.sellHarvest(key, actualQty)) {
+                        const earnings = actualQty * plant.sellPrice;
+                        totalEarned += earnings;
+                    }
+                } else if (type === 'fruit') {
+                    const fruit = FRUITS[key];
+                    const available = this.player.inventory.harvestedFruits[key];
+                    const actualQty = Math.min(quantity, available);
+
+                    if (this.player.sellFruit(key, actualQty)) {
+                        const earnings = actualQty * fruit.sellPrice;
+                        totalEarned += earnings;
+                    }
                 }
             }
         }
@@ -1423,6 +2089,11 @@ class Game {
                 this.ui.renderGarden();
             }
 
+            if (upgrade.effect === 'premiumOrchard') {
+                this.ui.showOrchard();
+                this.ui.renderOrchard();
+            }
+
             this.ui.updateAll();
             this.ui.renderUpgrades();
             this.saveGame();
@@ -1440,8 +2111,10 @@ class Game {
 
     saveGame() {
         const saveData = {
+            version: '2.8',
             player: this.player.getSaveData(),
             garden: this.garden.getSaveData(),
+            fruitGarden: this.fruitGarden.getSaveData(),
             gameTime: this.gameTime,
             currentSeason: this.currentSeason,
             seasonTimer: this.seasonTimer,
@@ -1450,7 +2123,7 @@ class Game {
         };
 
         localStorage.setItem('cozyGardenSave', JSON.stringify(saveData));
-        console.log('💾 Game saved');
+        console.log('💾 Game saved (v2.8 with fruit garden)');
     }
 
     loadGame() {
@@ -1462,13 +2135,19 @@ class Game {
 
                 this.player.loadSaveData(data.player);
                 this.garden.loadSaveData(data.garden);
+
+                // Load fruit garden if exists (backward compatibility)
+                if (data.fruitGarden) {
+                    this.fruitGarden.loadSaveData(data.fruitGarden);
+                }
+
                 this.gameTime = data.gameTime || 0;
                 this.currentSeason = data.currentSeason || 0;
                 this.seasonTimer = data.seasonTimer || 0;
                 this.selectedTool = data.selectedTool || 'hoe';
                 this.selectedSeed = data.selectedSeed || 'tomato';
 
-                console.log('📂 Game loaded from save');
+                console.log('📂 Game loaded from save (v' + (data.version || '2.7') + ')');
                 console.log('📦 Loaded inventory:', this.player.inventory);
             } catch (e) {
                 console.error('❌ Failed to load save data:', e);
@@ -1492,19 +2171,28 @@ class Game {
         const harvestList = document.getElementById('harvest-list');
 
         // Check if there are any harvested items
-        let hasItems = false;
+        let hasVegetables = false;
+        let hasFruits = false;
         let totalValue = 0;
 
         for (const [key, count] of Object.entries(this.player.inventory.harvested)) {
             if (count > 0) {
-                hasItems = true;
+                hasVegetables = true;
                 const plant = PLANTS[key];
                 totalValue += count * plant.sellPrice;
             }
         }
 
+        for (const [key, count] of Object.entries(this.player.inventory.harvestedFruits)) {
+            if (count > 0) {
+                hasFruits = true;
+                const fruit = FRUITS[key];
+                totalValue += count * fruit.sellPrice;
+            }
+        }
+
         // Populate the list
-        if (!hasItems) {
+        if (!hasVegetables && !hasFruits) {
             harvestList.innerHTML = `
                 <div class="harvest-empty">
                     <div class="harvest-empty-icon">🧺</div>
@@ -1516,6 +2204,7 @@ class Game {
         } else {
             harvestList.innerHTML = '';
 
+            // Add vegetables
             for (const [key, count] of Object.entries(this.player.inventory.harvested)) {
                 if (count > 0) {
                     const plant = PLANTS[key];
@@ -1554,6 +2243,50 @@ class Game {
                     `;
 
                     harvestList.appendChild(item);
+                }
+            }
+
+            // Add fruits
+            if (this.player.upgrades.premiumOrchard) {
+                for (const [key, count] of Object.entries(this.player.inventory.harvestedFruits)) {
+                    if (count > 0) {
+                        const fruit = FRUITS[key];
+                        const itemValue = count * fruit.sellPrice;
+
+                        const item = document.createElement('div');
+                        item.className = 'harvest-item';
+                        item.style.setProperty('--item-color', fruit.color);
+                        item.style.setProperty('--item-secondary', fruit.secondaryColor);
+                        item.style.border = '3px solid #DAA520';
+
+                        // Get fruit emoji based on type
+                        const fruitEmoji = {
+                            apple: '🍎',
+                            orange: '🍊',
+                            banana: '🍌',
+                            pear: '🍐'
+                        }[key] || '🌳';
+
+                        item.innerHTML = `
+                            <div class="harvest-item-icon">${fruitEmoji}</div>
+                            <div class="harvest-item-info">
+                                <div class="harvest-item-name">🌳 ${fruit.name}</div>
+                                <div class="harvest-item-details">
+                                    <div class="harvest-item-quantity">Qty: <strong>${count}</strong></div>
+                                    <div class="harvest-item-price">
+                                        <div class="coin-icon" style="width: 16px; height: 16px; font-size: 10px;"></div>
+                                        ${fruit.sellPrice} each
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="harvest-item-total">
+                                <div class="coin-icon" style="width: 20px; height: 20px; font-size: 12px;"></div>
+                                ${itemValue}
+                            </div>
+                        `;
+
+                        harvestList.appendChild(item);
+                    }
                 }
             }
 

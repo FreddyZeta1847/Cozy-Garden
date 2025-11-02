@@ -17,14 +17,31 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="styles/main.css?v=2.7">
+    <link rel="stylesheet" href="styles/main.css?v=2.8">
     <link rel="stylesheet" href="styles/garden.css">
     <link rel="stylesheet" href="styles/plants.css">
-    <link rel="stylesheet" href="styles/ui.css?v=2.7">
+    <link rel="stylesheet" href="styles/ui.css?v=2.8">
+    <link rel="stylesheet" href="styles/fruits.css?v=2.8">
 </head>
 <body>
     <!-- Particle Background -->
     <div id="particles-js"></div>
+
+    <!-- Premium Orchard Panel -->
+    <div id="orchard-panel" class="orchard-panel">
+        <div class="orchard-header">
+            <h3>🌳 Premium Orchard</h3>
+            <button class="orchard-toggle" onclick="game.ui.toggleOrchard()">◀</button>
+        </div>
+        <div class="orchard-content">
+            <div id="orchard-slots" class="orchard-slots">
+                <!-- Fruit tree slots will be added dynamically -->
+            </div>
+            <div class="orchard-info">
+                <p class="orchard-hint">💡 Plant premium fruit trees for high profits!</p>
+            </div>
+        </div>
+    </div>
 
     <!-- Main Garden Screen -->
     <div id="garden-screen" class="screen active">
@@ -195,7 +212,7 @@
     <!-- Toast Notification Container -->
     <div id="toast-container"></div>
 
-    <!-- Game Script (Bundled) - v2.7 with seasonal toolbar themes -->
-    <script src="game-bundle.js?v=2.7"></script>
+    <!-- Game Script (Bundled) - v2.8 with fruit garden feature -->
+    <script src="game-bundle.js?v=2.8"></script>
 </body>
 </html>

@@ -1,0 +1,330 @@
+/* Fruit Garden / Premium Orchard Styles */
+
+/* Orchard Panel - Floating Right Sidebar */
+.orchard-panel {
+    position: fixed;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    width: 280px;
+    max-height: 85vh;
+    background: linear-gradient(135deg, rgba(250, 248, 240, 0.95) 0%, rgba(255, 250, 230, 0.95) 100%);
+    border: 5px solid #DAA520;
+    border-right: none;
+    border-radius: 20px 0 0 20px;
+    box-shadow: -5px 0 20px rgba(218, 165, 32, 0.4),
+                inset 0 0 20px rgba(218, 165, 32, 0.1);
+    z-index: 500;
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    overflow: hidden;
+    display: none; /* Hidden until Premium Orchard is unlocked */
+}
+
+.orchard-panel.visible {
+    display: block;
+}
+
+.orchard-panel.collapsed {
+    transform: translateY(-50%) translateX(calc(100% - 50px));
+}
+
+/* Orchard Header */
+.orchard-header {
+    background: linear-gradient(135deg, #DAA520 0%, #B8860B 100%);
+    padding: 12px 15px;
+    border-bottom: 3px solid #8B6914;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.orchard-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #FFF;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    font-family: 'Fredoka', sans-serif;
+}
+
+.orchard-toggle {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #FFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.orchard-toggle:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.orchard-panel.collapsed .orchard-toggle {
+    transform: rotate(180deg);
+}
+
+/* Orchard Content */
+.orchard-content {
+    padding: 15px;
+    overflow-y: auto;
+    max-height: calc(85vh - 60px);
+}
+
+.orchard-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.orchard-content::-webkit-scrollbar-track {
+    background: rgba(218, 165, 32, 0.1);
+    border-radius: 4px;
+}
+
+.orchard-content::-webkit-scrollbar-thumb {
+    background: #DAA520;
+    border-radius: 4px;
+}
+
+.orchard-content::-webkit-scrollbar-thumb:hover {
+    background: #B8860B;
+}
+
+/* Orchard Slots Container */
+.orchard-slots {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+/* Individual Fruit Tree Slot */
+.fruit-slot {
+    background: linear-gradient(135deg, #FFF 0%, #FFFEF0 100%);
+    border: 4px dashed #DAA520;
+    border-radius: 15px;
+    height: 140px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(218, 165, 32, 0.15);
+    overflow: hidden;
+}
+
+.fruit-slot:hover {
+    border-color: #B8860B;
+    box-shadow: 0 6px 15px rgba(218, 165, 32, 0.3);
+    transform: translateY(-2px);
+}
+
+.fruit-slot.empty {
+    border-style: dashed;
+    opacity: 0.7;
+}
+
+.fruit-slot.planted,
+.fruit-slot.growing {
+    border-style: solid;
+    background: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%);
+}
+
+.fruit-slot.needs-water {
+    border-color: #FF6B6B;
+    animation: pulse-red 1.5s ease-in-out infinite;
+}
+
+.fruit-slot.harvestable {
+    border-color: #4CAF50;
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.4),
+                0 4px 10px rgba(218, 165, 32, 0.3);
+    animation: pulse-gold 1s ease-in-out infinite;
+}
+
+@keyframes pulse-red {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 15px 5px rgba(255, 107, 107, 0.2);
+    }
+}
+
+@keyframes pulse-gold {
+    0%, 100% {
+        box-shadow: 0 0 15px 5px rgba(218, 165, 32, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 25px 10px rgba(218, 165, 32, 0.6);
+    }
+}
+
+/* Fruit Tree Visual */
+.fruit-tree {
+    font-size: 64px;
+    line-height: 1;
+    margin-bottom: 5px;
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));
+    transition: transform 0.3s ease;
+}
+
+.fruit-slot:hover .fruit-tree {
+    transform: scale(1.1);
+}
+
+/* Tree Growth Stages (Emoji-based) */
+.fruit-tree.stage-0 {
+    font-size: 48px;
+}
+
+.fruit-tree.stage-1 {
+    font-size: 56px;
+}
+
+.fruit-tree.stage-2 {
+    font-size: 64px;
+}
+
+.fruit-tree.stage-3 {
+    font-size: 72px;
+    animation: bounce 0.6s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Fruit Type Label */
+.fruit-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #6B4423;
+    text-align: center;
+    margin-bottom: 3px;
+    font-family: 'Comfortaa', sans-serif;
+}
+
+/* Empty Slot Label */
+.empty-label {
+    font-size: 14px;
+    color: #999;
+    text-align: center;
+    font-family: 'Comfortaa', sans-serif;
+}
+
+/* Water Indicator for Fruits */
+.fruit-water-indicator {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 24px;
+    animation: drip 1s ease-in-out infinite;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
+}
+
+@keyframes drip {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(3px);
+    }
+}
+
+/* Harvest Ready Sparkle for Fruits */
+.fruit-harvest-sparkle {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-size: 24px;
+    animation: sparkle 1s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+    0%, 100% {
+        opacity: 0.5;
+        transform: scale(1) rotate(0deg);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2) rotate(180deg);
+    }
+}
+
+/* Orchard Info Section */
+.orchard-info {
+    background: linear-gradient(135deg, rgba(218, 165, 32, 0.1) 0%, rgba(184, 134, 11, 0.1) 100%);
+    border: 2px solid rgba(218, 165, 32, 0.3);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+}
+
+.orchard-hint {
+    margin: 0;
+    font-size: 13px;
+    color: #6B4423;
+    font-family: 'Comfortaa', sans-serif;
+    line-height: 1.4;
+}
+
+/* Responsive - Hide on mobile */
+@media (max-width: 768px) {
+    .orchard-panel {
+        display: none !important;
+    }
+}
+
+/* Tablet - Narrower panel */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .orchard-panel {
+        width: 220px;
+    }
+
+    .fruit-slot {
+        height: 120px;
+    }
+
+    .fruit-tree {
+        font-size: 56px;
+    }
+
+    .fruit-tree.stage-3 {
+        font-size: 64px;
+    }
+}
+
+/* Premium Orchard Unlock Animation */
+@keyframes orchard-unlock {
+    0% {
+        transform: translateY(-50%) translateX(100%);
+        opacity: 0;
+    }
+    60% {
+        transform: translateY(-50%) translateX(-10px);
+    }
+    100% {
+        transform: translateY(-50%) translateX(0);
+        opacity: 1;
+    }
+}
+
+.orchard-panel.unlocking {
+    animation: orchard-unlock 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
