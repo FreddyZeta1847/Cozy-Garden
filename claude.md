@@ -415,3 +415,164 @@ Console showed `harvested: {tomato: 2}` but user saw seed count (3 tomato) think
 ✅ Complete documentation (README, DEBUG, HARVEST_FIX)
 ✅ Green grass aesthetic throughout
 ✅ Professional modal/popup system
+
+#### Iteration 6: Seasonal Background Images (v2.4)
+**Date**: November 2, 2025
+
+**User Request**: Implement seasonal background images from `src/images/grass-field/` directory instead of CSS gradients
+
+**Implementation**:
+
+**Seasonal Image Assets**:
+The project includes 4 hand-drawn seasonal backgrounds:
+- **Spring.png**: Bright green grass with pink & yellow flowers, full tree with foliage
+- **Summer.png**: Vibrant green with orange flowers, mature tree
+- **Autumn.png**: Warm orange tones with falling leaves, bare tree branches
+- **Winter.png**: Light blue sky with white snow clouds, bare tree
+
+**Code Changes**:
+
+1. **Updated SEASONS Constant** (`game-bundle.js:95-157`):
+   - Added `backgroundImage` property to each season
+   - Maps to corresponding PNG file in `src/images/grass-field/`
+   - Kept existing `colors` and `particles` properties for fallback/effects
+
+2. **Modified updateSeason() Method** (`game-bundle.js:700-724`):
+   - Changed from CSS gradient to background image
+   - Sets `backgroundImage` with image URL
+   - Configured `backgroundSize: 'cover'` for full viewport coverage
+   - Set `backgroundPosition: 'center'` for proper alignment
+   - Set `backgroundRepeat: 'no-repeat'` to prevent tiling
+   - Uses `backgroundColor` as fallback with season primary color
+
+3. **Enhanced Body CSS** (`styles/main.css:25-35`):
+   - Added `background-size: cover` for responsive scaling
+   - Added `background-position: center` for centering
+   - Added `background-repeat: no-repeat` to prevent tiling
+   - Added `background-attachment: fixed` for fixed positioning
+   - Maintains gradient as fallback for initial load
+
+**Technical Details**:
+- Images dynamically load when season changes (every 300 game ticks)
+- JavaScript overrides CSS background on season update
+- Maintains particle effects overlay on top of images
+- Season icons and names update synchronously
+- No performance impact - single image load per season change
+
+**Files Modified**:
+- `game-bundle.js`: SEASONS constant (lines 95-157), updateSeason() method (lines 700-724)
+- `styles/main.css`: body styling (lines 25-35)
+- `CLAUDE.md`: Documentation update (this entry)
+
+**Result**:
+✅ Beautiful seasonal backgrounds with hand-drawn artwork
+✅ Dynamic background changes matching game season
+✅ Seamless integration with existing particle effects
+✅ Proper image scaling and positioning across viewports
+✅ Fallback support with CSS gradients and background colors
+
+#### Iteration 7: Toast Notifications & Crop Icons (v2.5)
+**Date**: November 2, 2025
+
+**User Request**:
+1. Add toast/popup notifications for game actions (selling crops, buying seeds, purchasing upgrades)
+2. Change seed selector icons in bottom bar to use fully-grown crop emojis
+3. Change shop seed icons to use fully-grown crop emojis
+
+**Implementation**:
+
+**1. Toast Notification System**:
+
+Created a complete toast notification system with:
+- **HTML Container** (`index.html:188`): Fixed position container for toast messages
+- **CSS Styling** (`styles/main.css:725-817`):
+  - Slide-in animation from right
+  - Auto fade-out after 3 seconds
+  - 3 toast types: `success` (green), `error` (red), `info` (blue)
+  - Gradient backgrounds with borders and shadows
+  - Responsive design with icon + title + message layout
+- **JavaScript Method** (`game-bundle.js:1080-1103`):
+  - `UIManager.showToast(type, icon, title, message)`
+  - Creates toast element dynamically
+  - Auto-removes after 3 seconds
+  - Stacks multiple toasts vertically
+
+**2. Toast Integration**:
+
+Added toast notifications to key game actions:
+
+**Selling Crops** (`game-bundle.js:1352-1353`):
+```javascript
+this.ui.showToast('success', '💰', 'Sale Complete!', `Sold produce for $${totalEarned}`);
+```
+
+**Buying Seeds** (`game-bundle.js:1309-1319`):
+```javascript
+const cropIcons = { tomato: '🍅', lettuce: '🥬', carrot: '🥕', corn: '🌽', potato: '🥔' };
+this.ui.showToast('success', cropIcons[seedType], 'Seed Purchased!', `Bought 1 ${plant.name} seed for $${plant.seedCost}`);
+```
+
+**Purchasing Upgrades** (`game-bundle.js:1391-1392`):
+```javascript
+this.ui.showToast('success', upgrade.icon, 'Upgrade Purchased!', `${upgrade.name} - $${upgrade.cost}`);
+```
+
+**3. Updated Seed Selector Icons** (`game-bundle.js:657-707`):
+
+Changed bottom bar seed selector from CSS art to crop emoji icons:
+- Removed `seed-packet` CSS class with color gradients
+- Added `seed-icon` class with emoji display
+- Uses fully-grown crop icons: 🍅 🥬 🥕 🌽 🥔
+- Font size: 32px for visibility
+- Shows crop type at a glance
+
+**4. Updated Shop Icons** (`game-bundle.js:857-902`):
+
+Changed shop seed display from CSS art to crop emoji icons:
+- Replaced `shop-item-visual` with `shop-item-icon`
+- Uses same crop emoji mapping as seed selector
+- Added CSS styling (`styles/ui.css:104-116`):
+  - Light green gradient background
+  - 70px font size for large display
+  - Centered with flexbox
+  - Drop shadow for depth
+- Legacy CSS kept for backwards compatibility
+
+**Crop Icon Mapping**:
+```javascript
+const cropIcons = {
+    tomato: '🍅',   // Red tomato
+    lettuce: '🥬',  // Leafy lettuce
+    carrot: '🥕',   // Orange carrot
+    corn: '🌽',     // Yellow corn
+    potato: '🥔'    // Brown potato
+};
+```
+
+**Visual Design**:
+- Toast notifications slide in from right edge
+- 3-second auto-dismiss with fade animation
+- Green success theme for positive actions
+- Icons match the actual crop being bought/sold
+- Consistent emoji usage across UI (garden, selector, shop, toasts)
+
+**Files Modified**:
+- `index.html`: Added toast container (line 188), version bump to v2.5
+- `styles/main.css`: Complete toast CSS system (lines 725-817)
+- `styles/ui.css`: Added `.shop-item-icon` styling (lines 104-116)
+- `game-bundle.js`:
+  - Added `showToast()` method to UIManager (lines 1080-1103)
+  - Updated `buySeed()` with toast (lines 1309-1319)
+  - Updated `sellAll()` with toast (lines 1352-1353)
+  - Updated `buyUpgrade()` with toast (lines 1391-1392)
+  - Updated `updateSeedSelector()` with crop icons (lines 663-707)
+  - Updated `renderShop()` with crop icons (lines 863-902)
+- `CLAUDE.md`: Documentation update (this entry)
+
+**Result**:
+✅ Professional toast notification system with smooth animations
+✅ User feedback for all major game actions
+✅ Consistent crop emoji icons across all UI elements
+✅ Improved visual clarity - users see what they're buying/selling
+✅ Better UX with instant action confirmation
+✅ Clean, modern notification design

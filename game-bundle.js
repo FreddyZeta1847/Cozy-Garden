@@ -92,12 +92,13 @@ const UPGRADES = {
     }
 };
 
-// Seasons - Green grass backgrounds
+// Seasons - Seasonal background images
 const SEASONS = [
     {
         name: "Spring",
         icon: "🌸",
         duration: 300,
+        backgroundImage: "src/images/grass-field/Spring.png",
         colors: {
             sky: "linear-gradient(to bottom, #87CEEB 0%, #7CB342 50%, #558B2F 100%)",
             primary: "#FFB6C1",
@@ -112,6 +113,7 @@ const SEASONS = [
         name: "Summer",
         icon: "☀️",
         duration: 300,
+        backgroundImage: "src/images/grass-field/Summer.png",
         colors: {
             sky: "linear-gradient(to bottom, #FFD700 0%, #9CCC65 40%, #689F38 100%)",
             primary: "#FFD700",
@@ -126,6 +128,7 @@ const SEASONS = [
         name: "Fall",
         icon: "🍂",
         duration: 300,
+        backgroundImage: "src/images/grass-field/Autumn.png",
         colors: {
             sky: "linear-gradient(to bottom, #FF8C00 0%, #8BC34A 50%, #558B2F 100%)",
             primary: "#FF8C00",
@@ -140,6 +143,7 @@ const SEASONS = [
         name: "Winter",
         icon: "❄️",
         duration: 300,
+        backgroundImage: "src/images/grass-field/Winter.png",
         colors: {
             sky: "linear-gradient(to bottom, #E0F7FA 0%, #81C784 50%, #66BB6A 100%)",
             primary: "#B0E0E6",
@@ -656,6 +660,15 @@ class UIManager {
 
         selector.innerHTML = '';
 
+        // Crop emoji icons (fully grown)
+        const cropIcons = {
+            tomato: '🍅',
+            lettuce: '🥬',
+            carrot: '🥕',
+            corn: '🌽',
+            potato: '🥔'
+        };
+
         for (const [key, plant] of Object.entries(PLANTS)) {
             const btn = document.createElement('button');
             btn.className = 'seed-button';
@@ -673,9 +686,9 @@ class UIManager {
             };
 
             const seedVisual = document.createElement('div');
-            seedVisual.className = `seed-packet ${key}`;
-            seedVisual.style.setProperty('--plant-color', plant.color);
-            seedVisual.style.setProperty('--plant-secondary', plant.secondaryColor);
+            seedVisual.className = 'seed-icon';
+            seedVisual.textContent = cropIcons[key] || '🌱';
+            seedVisual.style.fontSize = '32px';
 
             const countLabel = document.createElement('span');
             countLabel.className = 'seed-count';
@@ -707,7 +720,12 @@ class UIManager {
             }
         }
 
-        document.body.style.background = season.colors.sky;
+        // Use seasonal background image
+        document.body.style.backgroundImage = `url('${season.backgroundImage}')`;
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center';
+        document.body.style.backgroundRepeat = 'no-repeat';
+        document.body.style.backgroundColor = season.colors.primary;
 
         if (this.game.particles) {
             this.game.particles.updateSeason(season.name);
@@ -842,6 +860,15 @@ class UIManager {
 
         shopItems.innerHTML = '';
 
+        // Crop emoji icons (fully grown)
+        const cropIcons = {
+            tomato: '🍅',
+            lettuce: '🥬',
+            carrot: '🥕',
+            corn: '🌽',
+            potato: '🥔'
+        };
+
         for (const [key, plant] of Object.entries(PLANTS)) {
             const item = document.createElement('div');
             item.className = 'shop-item';
@@ -849,7 +876,7 @@ class UIManager {
             const canBuy = this.game.player.money >= plant.seedCost;
 
             item.innerHTML = `
-                <div class="shop-item-visual ${key}" style="--plant-color: ${plant.color}; --plant-secondary: ${plant.secondaryColor}"></div>
+                <div class="shop-item-icon">${cropIcons[key] || '🌱'}</div>
                 <div class="shop-item-header">
                     <h3>${plant.name} Seeds</h3>
                 </div>
@@ -1067,6 +1094,31 @@ class UIManager {
             }
         }
     }
+
+    showToast(type, icon, title, message) {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+
+        toast.innerHTML = `
+            <div class="toast-icon">${icon}</div>
+            <div class="toast-content">
+                <div class="toast-title">${title}</div>
+                <div class="toast-message">${message}</div>
+            </div>
+        `;
+
+        container.appendChild(toast);
+
+        // Auto-remove after 3 seconds
+        setTimeout(() => {
+            if (toast.parentElement) {
+                toast.remove();
+            }
+        }, 3000);
+    }
 }
 
 // Main Game Class
@@ -1271,6 +1323,18 @@ class Game {
             if (shopMoney && this.particles) {
                 this.particles.animateTilePulse(shopMoney.parentElement);
             }
+
+            // Get the crop icon for the toast
+            const cropIcons = {
+                tomato: '🍅',
+                lettuce: '🥬',
+                carrot: '🥕',
+                corn: '🌽',
+                potato: '🥔'
+            };
+
+            // Show success toast
+            this.ui.showToast('success', cropIcons[seedType], 'Seed Purchased!', `Bought 1 ${plant.name} seed for $${plant.seedCost}`);
         }
     }
 
@@ -1314,6 +1378,9 @@ class Game {
             if (marketMoney && this.particles) {
                 this.particles.createMoneyPopup(marketMoney.parentElement, totalEarned);
             }
+
+            // Show success toast
+            this.ui.showToast('success', '💰', 'Sale Complete!', `Sold produce for $${totalEarned}`);
         }
 
         console.log(`💰 Sold produce for $${totalEarned}!`);
@@ -1338,6 +1405,9 @@ class Game {
             this.ui.updateAll();
             this.ui.renderUpgrades();
             this.saveGame();
+
+            // Show success toast
+            this.ui.showToast('success', upgrade.icon, 'Upgrade Purchased!', `${upgrade.name} - $${upgrade.cost}`);
 
             console.log(`✅ Purchased upgrade: ${upgrade.name}`);
         }
