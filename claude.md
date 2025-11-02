@@ -576,3 +576,153 @@ const cropIcons = {
 ✅ Improved visual clarity - users see what they're buying/selling
 ✅ Better UX with instant action confirmation
 ✅ Clean, modern notification design
+
+#### Iteration 8: Seasonal Shop & Market Redesign (v2.6)
+**Date**: November 2, 2025
+
+**User Request**: Redesign Shop and Market interfaces to be more beautiful and cozy with seasonal variations
+
+**UX Design Analysis**:
+Consulted with UX design critic agent who identified:
+- Visual disconnect between garden (seasonal backgrounds) and shop/market (sterile white)
+- Poor space utilization in market (no two-column layout)
+- Missing seasonal identity in shop/market interfaces
+- Weak visual metaphors (didn't feel like cozy seed shop or farmers market)
+
+**Implementation - Phase 1: Seasonal CSS System** (Highest Impact):
+
+**1. Data-Season Attribute System**:
+- Modified `updateSeason()` in `game-bundle.js` (line 724)
+- Added `document.body.setAttribute('data-season', season.name.toLowerCase())`
+- Enables CSS selectors like `body[data-season="spring"]`
+
+**2. Seasonal CSS Variables** (`styles/main.css:24-81`):
+Created complete seasonal color palette system:
+```css
+--season-primary: Main season color
+--season-secondary: Accent color
+--season-background: Gradient for content areas
+--season-border: Border color for cards/elements
+--season-shadow: Shadow color with transparency
+--season-text: Text color for season
+--season-icon: Season emoji
+--season-accent: Subtle accent overlay
+```
+
+**Seasonal Palettes**:
+- **Spring**: Fresh lime green (#A4D65E) with pastel pink (#FFB6D9)
+- **Summer**: Golden yellow (#FFD54F) with vibrant orange (#FF8A50)
+- **Fall**: Burnt orange (#FF8A50) with russet red (#D84315)
+- **Winter**: Ice blue (#81D4FA) with silver-white (#B3E5FC)
+
+**3. Seasonal Background Patterns** (`styles/main.css:461-544`):
+- Shop/Market content areas use `var(--season-background)` gradients
+- Animated decorative overlays using radial gradients:
+  - **Spring**: Floating flower dots with 40s animation
+  - **Summer**: Sun ray dots (static)
+  - **Fall**: Falling leaf dots with 50s animation
+  - **Winter**: Snowflake dots with 60s animation
+- `@keyframes floatPattern` for gentle vertical movement
+
+**4. Seasonal UI Element Styling**:
+
+**Shop Cards** (`styles/ui.css:87-116`):
+- Borders use `var(--season-border)` instead of fixed brown
+- Box shadows use `var(--season-shadow)`
+- Added `::before` pseudo-element with seasonal icon in corner (60px, 15% opacity, rotated)
+- Enhanced hover: `translateY(-8px) scale(1.02)` with seasonal shadows
+
+**Market Elements** (`styles/ui.css:246-358`):
+- Inventory display: Seasonal borders + corner icon decoration (top-left)
+- Selling area: Seasonal borders + corner icon decoration (bottom-right)
+- Inventory items: Seasonal borders with enhanced hover (`scale(1.03)`)
+- All shadows upgraded to use `var(--season-shadow)`
+
+**Implementation - Phase 2: Layout Improvements**:
+
+**5. Two-Column Market Layout** (`styles/ui.css:246-264`):
+```css
+@media (min-width: 1200px) {
+    .market-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+}
+```
+- Side-by-side inventory and selling on wide screens
+- Stacks vertically on mobile/tablet
+- Player money spans full width
+
+**Implementation - Phase 3: Animation Polish**:
+
+**6. Enhanced Screen Transitions** (`game-bundle.js:1079-1117`):
+Completely rewrote `showScreen()` method:
+- Fade out current screen (200ms, easeInQuad)
+- Wait for fade out to complete
+- Fade in + slide up new screen (500ms, easeOutCubic, 30px translateY)
+- Smooth, professional screen switching
+
+**7. HTML Structure Updates** (`index.html`):
+
+**Shop Screen** (lines 97-114):
+- Added `.seasonal-header` class
+- Structured header with `.header-icon` and `.season-subtitle`
+- Added ARIA labels for accessibility
+- Added `role="list"` to shop items container
+
+**Market Screen** (lines 117-131):
+- Added `.seasonal-header` class
+- Improved semantic structure
+- Added ARIA labels and roles for screen readers
+
+**8. Seasonal Header Styling** (`styles/main.css:435-473`):
+- Headers use flexbox with icon + title + subtitle
+- `.header-icon`: 42px with drop shadow
+- `.season-subtitle`: 18px italic for contextual info
+- Border colors change per season
+
+**Technical Details**:
+- CSS variables cascade from `body[data-season]` to all child elements
+- Pseudo-elements use `content: var(--season-icon)` for dynamic icons
+- Z-index layering ensures decorative patterns sit behind content
+- Animations use `will-change` for GPU acceleration (implicit via anime.js)
+
+**Files Modified**:
+- `game-bundle.js`:
+  - `updateSeason()` method (line 724)
+  - `showScreen()` method (lines 1079-1117)
+- `styles/main.css`:
+  - Seasonal variables (lines 24-81)
+  - Content area backgrounds (lines 461-544)
+  - Header styling (lines 435-473)
+- `styles/ui.css`:
+  - Shop items (lines 87-116)
+  - Market layout (lines 246-264)
+  - Inventory display (lines 266-267)
+  - Selling area (lines 338-358)
+  - Inventory items (lines 282-295)
+- `index.html`:
+  - Shop header (lines 97-114)
+  - Market header (lines 117-131)
+  - Version bump to v2.6
+- `CLAUDE.md`: Documentation update (this entry)
+
+**Design Decisions**:
+- Chose CSS approach over images for decorative patterns (better performance, easier to modify)
+- Used subtle opacity (0.1-0.15) for corner decorations to avoid visual clutter
+- Animated only Spring, Fall, and Winter patterns; Summer static (represents stillness of hot days)
+- Two-column layout at 1200px breakpoint (common desktop resolution)
+- Kept wood bark borders neutral brown (don't change with seasons) for consistency
+
+**Result**:
+✅ Complete seasonal transformation of Shop and Market interfaces
+✅ Dynamic color schemes that match garden backgrounds
+✅ Animated decorative elements (floating flowers, falling leaves, snowflakes)
+✅ Professional screen transition animations (fade out/in + slide up)
+✅ Improved Market layout with two-column responsive design
+✅ Enhanced hover states with seasonal shadows
+✅ Better accessibility with ARIA labels and semantic HTML
+✅ Unified visual language across all game screens
+✅ Cozy, immersive experience that changes with seasons
+✅ All CSS-based (no additional image assets required)

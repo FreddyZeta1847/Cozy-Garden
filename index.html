@@ -17,10 +17,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="styles/main.css?v=2.3">
+    <link rel="stylesheet" href="styles/main.css?v=2.6">
     <link rel="stylesheet" href="styles/garden.css">
     <link rel="stylesheet" href="styles/plants.css">
-    <link rel="stylesheet" href="styles/ui.css">
+    <link rel="stylesheet" href="styles/ui.css?v=2.6">
 </head>
 <body>
     <!-- Particle Background -->
@@ -95,31 +95,39 @@
 
     <!-- Shop Screen -->
     <div id="shop-screen" class="screen">
-        <div class="screen-header">
-            <h2>🏪 Seed Shop</h2>
+        <div class="screen-header seasonal-header">
+            <h2>
+                <span class="header-icon">🏪</span>
+                Seed Shop
+                <span class="season-subtitle"></span>
+            </h2>
             <button class="back-button" onclick="game.showGarden()">← Back to Garden</button>
         </div>
 
         <div class="shop-content">
-            <div class="player-money">
-                <div class="coin-icon"></div>
-                <span id="shop-money">100</span>
+            <div class="player-money seasonal-money">
+                <div class="coin-icon" aria-label="Your money"></div>
+                <span id="shop-money" role="status" aria-live="polite">100</span>
             </div>
-            <div id="shop-items" class="shop-items"></div>
+            <div id="shop-items" class="shop-items" role="list"></div>
         </div>
     </div>
 
     <!-- Market Screen -->
     <div id="market-screen" class="screen">
-        <div class="screen-header">
-            <h2>🛒 Farmers Market</h2>
+        <div class="screen-header seasonal-header">
+            <h2>
+                <span class="header-icon">🛒</span>
+                Farmers Market
+                <span class="season-subtitle"></span>
+            </h2>
             <button class="back-button" onclick="game.showGarden()">← Back to Garden</button>
         </div>
 
         <div class="market-content">
-            <div class="player-money">
-                <div class="coin-icon"></div>
-                <span id="market-money">100</span>
+            <div class="player-money seasonal-money">
+                <div class="coin-icon" aria-label="Your money"></div>
+                <span id="market-money" role="status" aria-live="polite">100</span>
             </div>
 
             <div class="inventory-display">
@@ -187,7 +195,7 @@
     <!-- Toast Notification Container -->
     <div id="toast-container"></div>
 
-    <!-- Game Script (Bundled) - v2.5 with toast notifications -->
-    <script src="game-bundle.js?v=2.5"></script>
+    <!-- Game Script (Bundled) - v2.6 with seasonal shop/market themes -->
+    <script src="game-bundle.js?v=2.6"></script>
 </body>
 </html>

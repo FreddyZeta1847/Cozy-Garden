@@ -720,6 +720,9 @@ class UIManager {
             }
         }
 
+        // Add data-season attribute to body for CSS theming
+        document.body.setAttribute('data-season', season.name.toLowerCase());
+
         // Use seasonal background image
         document.body.style.backgroundImage = `url('${season.backgroundImage}')`;
         document.body.style.backgroundSize = 'cover';
@@ -1074,24 +1077,42 @@ class UIManager {
     }
 
     showScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(screen => {
-            screen.classList.remove('active');
-        });
+        // Fade out current screen
+        const currentActive = document.querySelector('.screen.active');
 
+        if (currentActive && window.anime) {
+            anime({
+                targets: currentActive,
+                opacity: 0,
+                duration: 200,
+                easing: 'easeInQuad',
+                complete: () => {
+                    currentActive.classList.remove('active');
+                }
+            });
+        } else {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+        }
+
+        // Fade and slide in new screen
         const screen = document.getElementById(screenId);
         if (screen) {
-            screen.classList.add('active');
-            this.currentScreen = screenId.replace('-screen', '');
+            setTimeout(() => {
+                screen.classList.add('active');
+                this.currentScreen = screenId.replace('-screen', '');
 
-            if (window.anime) {
-                anime({
-                    targets: screen,
-                    opacity: [0, 1],
-                    translateY: [20, 0],
-                    duration: 400,
-                    easing: 'easeOutQuad'
-                });
-            }
+                if (window.anime) {
+                    anime({
+                        targets: screen,
+                        opacity: [0, 1],
+                        translateY: [30, 0],
+                        duration: 500,
+                        easing: 'easeOutCubic'
+                    });
+                }
+            }, currentActive && window.anime ? 200 : 0);
         }
     }
 

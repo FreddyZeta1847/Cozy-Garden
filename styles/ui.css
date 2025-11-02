@@ -86,19 +86,33 @@
 
 .shop-item {
     background: var(--white);
-    border: 5px solid var(--dark-brown);
+    border: 5px solid var(--season-border);
     border-radius: 20px;
     padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 12px;
-    box-shadow: 0 6px 0 var(--dark-brown), 0 8px 16px var(--shadow);
-    transition: all 0.3s;
+    box-shadow: 0 6px 0 var(--season-border), 0 8px 16px var(--season-shadow);
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Seasonal corner decoration */
+.shop-item::before {
+    content: var(--season-icon);
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 60px;
+    opacity: 0.15;
+    transform: rotate(15deg);
+    pointer-events: none;
 }
 
 .shop-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 0 var(--dark-brown), 0 12px 20px var(--shadow);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 0 var(--season-border), 0 16px 30px var(--season-shadow);
 }
 
 .shop-item-icon {
@@ -229,13 +243,47 @@
    MARKET SCREEN
    =========================== */
 
+/* Two-column layout for market on wider screens */
+.market-content {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+@media (min-width: 1200px) {
+    .market-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        align-items: start;
+    }
+
+    .market-content .player-money {
+        grid-column: 1 / -1;
+    }
+}
+
 .inventory-display {
     background: rgba(255, 255, 255, 0.95);
-    border: 5px solid var(--dark-brown);
+    border: 5px solid var(--season-border);
     border-radius: 20px;
     padding: 25px;
     margin-bottom: 30px;
-    box-shadow: 0 6px 0 var(--dark-brown), 0 8px 16px var(--shadow);
+    box-shadow: 0 6px 0 var(--season-border), 0 8px 16px var(--season-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Seasonal decoration for inventory */
+.inventory-display::before {
+    content: var(--season-icon);
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    font-size: 50px;
+    opacity: 0.1;
+    transform: rotate(-15deg);
+    pointer-events: none;
 }
 
 .inventory-display h3 {
@@ -253,16 +301,17 @@
 
 .inventory-item {
     background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,240,240,0.9));
-    border: 4px solid var(--dark-brown);
+    border: 4px solid var(--season-border);
     border-radius: 15px;
     padding: 15px;
     text-align: center;
-    box-shadow: 0 4px 0 var(--dark-brown), 0 6px 10px var(--shadow);
+    box-shadow: 0 4px 0 var(--season-border), 0 6px 10px var(--season-shadow);
     transition: all 0.2s;
 }
 
 .inventory-item:hover {
-    transform: translateY(-3px);
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 6px 0 var(--season-border), 0 8px 12px var(--season-shadow);
 }
 
 .inventory-visual {
@@ -309,10 +358,24 @@
 /* Selling Area */
 .selling-area {
     background: rgba(255, 255, 255, 0.95);
-    border: 5px solid var(--dark-brown);
+    border: 5px solid var(--season-border);
     border-radius: 20px;
     padding: 25px;
-    box-shadow: 0 6px 0 var(--dark-brown), 0 8px 16px var(--shadow);
+    box-shadow: 0 6px 0 var(--season-border), 0 8px 16px var(--season-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Seasonal decoration for selling area */
+.selling-area::before {
+    content: var(--season-icon);
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    font-size: 50px;
+    opacity: 0.1;
+    transform: rotate(15deg);
+    pointer-events: none;
 }
 
 .selling-area h3 {
