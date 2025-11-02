@@ -295,17 +295,32 @@ body {
     box-shadow: 0 2px 0 #CC7000, 0 3px 6px var(--shadow);
 }
 
-/* Shop and Upgrades buttons - slightly bigger */
+/* Shop, Upgrades, Market, and Reset buttons - slightly bigger */
 .shop-btn,
-.upgrade-btn {
+.upgrade-btn,
+.market-btn,
+.reset-btn {
     padding: 8px 16px; /* Bigger than regular nav buttons (6px 12px) */
     font-size: 15px; /* Bigger font (was 13px) */
     font-weight: 700; /* Bolder */
 }
 
 .shop-btn .btn-icon,
-.upgrade-btn .btn-icon {
+.upgrade-btn .btn-icon,
+.market-btn .btn-icon,
+.reset-btn .btn-icon {
     font-size: 20px; /* Bigger icons */
+}
+
+/* Reset button - red styling */
+.reset-btn {
+    background: linear-gradient(135deg, #FF6B6B 0%, #FF4444 100%);
+    border-color: #CC0000;
+}
+
+.reset-btn:hover {
+    background: linear-gradient(135deg, #FF8888 0%, #FF6666 100%);
+    border-color: #FF0000;
 }
 
 /* Game Container */
