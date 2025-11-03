@@ -442,7 +442,9 @@ body {
 /* Seed Navigation Arrows (Up/Down) */
 .seed-nav-arrow {
     position: absolute;
-    right: 8px;
+    right: 5px; /* Moved closer to right edge */
+    top: 50%; /* Vertically centered */
+    transform: translateY(-50%); /* Center alignment */
     width: 32px;
     height: 32px;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 240, 240, 0.9) 100%);
@@ -458,19 +460,17 @@ body {
 }
 
 .seed-nav-arrow:hover {
-    transform: scale(1.15);
+    transform: translateY(-50%) scale(1.15); /* Maintain centering on hover */
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
 }
 
-/* Down arrow - visible by default, positioned at bottom */
+/* Down arrow - visible by default */
 .seed-nav-arrow.down-arrow {
-    bottom: 20px;
     display: flex;
 }
 
-/* Up arrow - hidden by default, positioned at top */
+/* Up arrow - hidden by default */
 .seed-nav-arrow.up-arrow {
-    top: 20px;
     display: none;
 }
 
@@ -937,7 +937,7 @@ body[data-season="winter"] .market-content::before {
 
 .harvest-empty {
     text-align: center;
-    padding: 40px 20px;
+    padding: 30px 20px;
     color: #654321;
 }
 

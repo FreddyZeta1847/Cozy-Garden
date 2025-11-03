@@ -608,7 +608,8 @@ class FruitGarden {
             lastWatered: 0,
             needsWater: false,
             readyToHarvest: false,
-            plantedAt: 0
+            plantedAt: 0,
+            harvestCount: 0
         };
     }
 
@@ -621,7 +622,7 @@ class FruitGarden {
 
     plantTree(slot, fruitType, currentTime) {
         const tree = this.getTree(slot);
-        if (tree && tree.status === 'empty') {
+        if (tree && (tree.status === 'empty' || tree.status === 'tilled')) {
             tree.status = 'planted';
             tree.fruitType = fruitType;
             tree.growthStage = 0;
@@ -657,13 +658,22 @@ class FruitGarden {
 
             console.log(`🍎 Fruit ready! Type: ${fruitType}, Yield: ${yield_}`);
 
-            // Reset tree to stage 2 (mature tree) after harvest - tree persists
-            tree.growthStage = 2;
-            tree.readyToHarvest = false;
-            tree.plantedAt = Date.now(); // Reset growth timer for next fruit
-            tree.lastWatered = Date.now();
+            // Increment harvest count
+            tree.harvestCount = (tree.harvestCount || 0) + 1;
 
-            console.log(`🍎 Harvested ${yield_} ${fruitType} from slot ${slot}`);
+            // After 4 harvests, tree dies
+            if (tree.harvestCount >= 4) {
+                console.log(`🍎 Tree has produced 4 times - tree dies and returns to empty soil`);
+                Object.assign(tree, this.createEmptyTree());
+            } else {
+                // Reset tree to stage 2 (mature tree) after harvest - tree persists
+                tree.growthStage = 2;
+                tree.readyToHarvest = false;
+                tree.plantedAt = Date.now(); // Reset growth timer for next fruit
+                tree.lastWatered = Date.now();
+                console.log(`🍎 Harvested ${yield_} ${fruitType} from slot ${slot} (${tree.harvestCount}/4 harvests)`);
+            }
+
             return { fruitType, yield: yield_ };
         }
 
@@ -1267,29 +1277,27 @@ class UIManager {
             for (const [key, fruit] of Object.entries(FRUITS)) {
                 const item = document.createElement('div');
                 item.className = 'shop-item';
-                item.style.borderColor = '#DAA520';
-                item.style.boxShadow = '0 6px 0 #DAA520, 0 8px 16px rgba(218, 165, 32, 0.3)';
 
                 const canBuy = this.game.player.money >= fruit.seedCost;
 
                 item.innerHTML = `
-                    <div class="shop-item-icon" style="background: linear-gradient(135deg, rgba(218, 165, 32, 0.1), rgba(184, 134, 11, 0.1));">${fruitIcons[key] || '🌳'}</div>
+                    <div class="shop-item-icon">${fruitIcons[key] || '🌳'}</div>
                     <div class="shop-item-header">
-                        <h3>🌳 ${fruit.name} Tree</h3>
+                        <h3>${fruit.name} Seeds</h3>
                     </div>
                     <div class="shop-item-details">
                         <p>${fruit.description}</p>
                         <div class="stats">
                             <div class="stat"><span>⏱️</span> ${fruit.growthTime}s</div>
                             <div class="stat"><span>💧</span> ${fruit.waterInterval}s</div>
-                            <div class="stat"><span>🍇</span> Yield: ${fruit.harvestYield}</div>
+                            <div class="stat"><span>🌾</span> Yield: ${fruit.harvestYield}</div>
                             <div class="stat"><span>💰</span> Sells for: $${fruit.sellPrice}</div>
                         </div>
                     </div>
                     <div class="shop-item-footer">
-                        <div class="price" style="color: #DAA520;"><div class="coin-icon"></div>${fruit.seedCost}</div>
-                        <button class="buy-button" style="background: linear-gradient(135deg, #DAA520, #B8860B);" onclick="game.buyFruitSeed('${key}')" ${!canBuy ? 'disabled' : ''}>
-                            Buy Tree
+                        <div class="price"><div class="coin-icon"></div>${fruit.seedCost}</div>
+                        <button class="buy-button" onclick="game.buyFruitSeed('${key}')" ${!canBuy ? 'disabled' : ''}>
+                            Buy Seed
                         </button>
                     </div>
                 `;
@@ -1804,7 +1812,7 @@ class Game {
             // Update fruit garden growth
             const fruitUpdated = this.fruitGarden.updateGrowth(this.gameTime, this.player.upgrades.fasterGrowth);
             if (fruitUpdated) {
-                this.ui.refreshFruitSlots();
+                this.refreshAllFruitCells();
             }
 
             this.updateSeasons();
@@ -1817,7 +1825,7 @@ class Game {
                     this.garden.autoWater(this.gameTime);
                     this.fruitGarden.autoWater(this.gameTime);
                     this.refreshAllTiles();
-                    this.ui.refreshFruitSlots();
+                    this.refreshAllFruitCells();
                 }
             }
 
@@ -1995,6 +2003,12 @@ class Game {
             for (let col = 0; col < this.garden.cols; col++) {
                 this.ui.updateTile(row, col);
             }
+        }
+    }
+
+    refreshAllFruitCells() {
+        for (let i = 0; i < this.fruitGarden.slots; i++) {
+            this.updateFruitCell(i);
         }
     }
 
@@ -2222,10 +2236,10 @@ class Game {
         const fruitCells = document.querySelectorAll('.fruit-cell');
         fruitCells.forEach((cell, index) => {
             cell.onclick = () => this.handleFruitCellClick(index);
-            // Initialize as empty cells
-            cell.classList.add('empty');
+            // Update cell to match saved state from FruitGarden
+            this.updateFruitCell(index);
         });
-        console.log('🍎 Initialized 5 fruit cells');
+        console.log('🍎 Initialized 5 fruit cells with saved state');
     }
 
     handleFruitCellClick(index) {
@@ -2366,6 +2380,23 @@ class Game {
                 cell.appendChild(waterIcon);
             }
 
+            // Add harvest counter indicator
+            if (tree.harvestCount > 0) {
+                const harvestCounter = document.createElement('div');
+                harvestCounter.className = 'harvest-counter';
+                harvestCounter.textContent = `${tree.harvestCount}/4`;
+                harvestCounter.style.position = 'absolute';
+                harvestCounter.style.bottom = '5px';
+                harvestCounter.style.right = '5px';
+                harvestCounter.style.fontSize = '12px';
+                harvestCounter.style.fontWeight = 'bold';
+                harvestCounter.style.background = 'rgba(0,0,0,0.6)';
+                harvestCounter.style.color = '#fff';
+                harvestCounter.style.padding = '2px 5px';
+                harvestCounter.style.borderRadius = '8px';
+                cell.appendChild(harvestCounter);
+            }
+
             // Add sparkle if ready to harvest
             if (tree.readyToHarvest) {
                 const sparkle = document.createElement('div');
@@ -2377,10 +2408,10 @@ class Game {
                 sparkle.style.fontSize = '20px';
                 cell.appendChild(sparkle);
 
-                // Add the fruit emoji on top of the tree
+                // Show only the fruit emoji when ready to harvest
                 const fruitIcons = { apple: '🍎', orange: '🍊', banana: '🍌', pear: '🍐' };
                 const fruitEmoji = fruitIcons[tree.fruitType] || '🍎';
-                plantEl.textContent = `🌳${fruitEmoji}`;
+                plantEl.textContent = fruitEmoji;
             }
         }
     }
