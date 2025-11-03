@@ -488,35 +488,50 @@ body {
     gap: 12px;
 }
 
-/* Screen Headers */
+/* Screen Headers - COMPACT REDESIGN */
 .screen-header {
-    background: rgba(139, 111, 71, 0.95);
-    border-bottom: 5px solid var(--dark-brown);
-    padding: 25px 30px;
+    /* SEASONAL GRADIENT BACKGROUND - matches main header */
+    background: var(--toolbar-base, rgba(139, 111, 71, 0.90));
+    background-image: var(--toolbar-bg);
+    background-blend-mode: overlay;
+    border-bottom: 4px solid var(--season-border);
+    /* REDUCED PADDING - was 25px 30px */
+    padding: 12px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 12px var(--shadow);
+    box-shadow: 0 2px 8px var(--season-shadow);
+    backdrop-filter: blur(10px);
+    flex-shrink: 0;
+    /* PERFORMANCE OPTIMIZATION */
+    will-change: background;
+    contain: layout style;
+    transform: translateZ(0);
+    transition: background 0.6s ease-in-out;
 }
 
 .screen-header h2 {
-    font-size: 36px;
+    /* REDUCED FONT SIZE - was 36px */
+    font-size: 22px;
     color: var(--white);
-    text-shadow: 3px 3px 0 var(--dark-brown);
+    text-shadow: 2px 2px 0 var(--dark-brown);
     font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 8px;
     flex-wrap: wrap;
+    margin: 0;
 }
 
 .header-icon {
-    font-size: 42px;
+    /* REDUCED SIZE - was 42px */
+    font-size: 28px;
     filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
 }
 
 .season-subtitle {
-    font-size: 18px;
+    /* REDUCED SIZE - was 18px */
+    font-size: 14px;
     font-weight: 500;
     opacity: 0.9;
     font-style: italic;
@@ -541,28 +556,32 @@ body[data-season="winter"] .seasonal-header {
 
 .back-button {
     background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%);
-    border: 4px solid #FF1493;
-    border-radius: 12px;
-    padding: 12px 20px;
+    border: 3px solid #FF1493;
+    border-radius: 8px;
+    /* REDUCED PADDING - was 12px 20px */
+    padding: 6px 14px;
     cursor: pointer;
-    font-size: 16px;
+    /* REDUCED FONT SIZE - was 16px */
+    font-size: 14px;
     font-weight: 600;
     font-family: 'Fredoka', sans-serif;
-    box-shadow: 0 4px 0 #C71585, 0 6px 12px var(--shadow);
+    box-shadow: 0 2px 0 #C71585, 0 3px 6px var(--shadow);
     transition: all 0.2s;
     color: white;
 }
 
 .back-button:hover {
-    transform: translateY(-3px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 0 #C71585, 0 5px 8px var(--shadow);
 }
 
-/* Content areas */
+/* Content areas - REDUCED PADDING */
 .shop-content,
 .market-content,
 .upgrades-content {
     flex: 1;
-    padding: 30px;
+    /* REDUCED PADDING - was 30px */
+    padding: 20px;
     overflow-y: auto;
     background: var(--season-background);
     position: relative;
@@ -645,18 +664,42 @@ body[data-season="winter"] .market-content::before {
 
 .player-money {
     background: var(--white);
-    border: 4px solid var(--dark-brown);
-    border-radius: 15px;
-    padding: 20px;
-    font-size: 28px;
+    border: 3px solid var(--season-border);
+    border-radius: 12px;
+    /* REDUCED PADDING - was 20px */
+    padding: 12px 16px;
+    /* REDUCED FONT SIZE - was 28px */
+    font-size: 20px;
     font-weight: 700;
     text-align: center;
-    margin-bottom: 30px;
-    box-shadow: 0 6px 0 var(--dark-brown), 0 8px 16px var(--shadow);
+    /* REDUCED MARGIN - was 30px */
+    margin-bottom: 20px;
+    box-shadow: 0 3px 0 var(--season-border), 0 4px 10px var(--season-shadow);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 10px;
+}
+
+/* Seasonal money display variant */
+.player-money.seasonal-money {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.95) 0%,
+        var(--season-accent) 100%);
+    border-color: var(--season-border);
+    position: relative;
+    overflow: hidden;
+}
+
+.player-money.seasonal-money::before {
+    content: var(--season-icon);
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%) rotate(15deg);
+    font-size: 50px;
+    opacity: 0.08;
+    pointer-events: none;
 }
 
 /* Animations */

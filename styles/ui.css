@@ -75,57 +75,71 @@
 }
 
 /* ===========================
-   SHOP SCREEN
+   SHOP SCREEN - COMPACT & COLORFUL REDESIGN
    =========================== */
 
 .shop-items {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
+    /* RESPONSIVE: 2 columns on medium+ screens, 1 on mobile */
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    /* REDUCED GAP - was 20px */
+    gap: 15px;
 }
 
 .shop-item {
-    background: var(--white);
-    border: 5px solid var(--season-border);
-    border-radius: 20px;
-    padding: 20px;
+    /* SEASONAL GRADIENT BACKGROUND instead of white */
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        var(--season-accent) 60%,
+        rgba(255, 255, 255, 0.95) 100%);
+    border: 4px solid var(--season-border);
+    border-radius: 16px;
+    /* REDUCED PADDING - was 20px */
+    padding: 15px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    box-shadow: 0 6px 0 var(--season-border), 0 8px 16px var(--season-shadow);
+    /* REDUCED GAP - was 12px */
+    gap: 10px;
+    box-shadow: 0 4px 0 var(--season-border), 0 6px 12px var(--season-shadow);
     transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
     position: relative;
     overflow: hidden;
 }
 
-/* Seasonal corner decoration */
+/* Seasonal corner decoration - LARGER & MORE VISIBLE */
 .shop-item::before {
     content: var(--season-icon);
     position: absolute;
-    top: -10px;
-    right: -10px;
-    font-size: 60px;
-    opacity: 0.15;
+    top: -15px;
+    right: -15px;
+    font-size: 70px;
+    opacity: 0.2;
     transform: rotate(15deg);
     pointer-events: none;
 }
 
 .shop-item:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 12px 0 var(--season-border), 0 16px 30px var(--season-shadow);
+    transform: translateY(-5px) scale(1.01);
+    box-shadow: 0 8px 0 var(--season-border), 0 12px 24px var(--season-shadow);
 }
 
 .shop-item-icon {
     width: 100%;
-    height: 120px;
+    /* REDUCED HEIGHT - was 120px */
+    height: 90px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(200, 200, 200, 0.1) 100%);
-    border: 4px solid var(--dark-brown);
-    border-radius: 15px;
-    box-shadow: inset 0 4px 8px rgba(0,0,0,0.1);
-    font-size: 70px;
+    /* COLORFUL SEASONAL GRADIENT */
+    background: linear-gradient(135deg,
+        var(--season-accent) 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        var(--season-accent) 100%);
+    border: 3px solid var(--season-border);
+    border-radius: 12px;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.08);
+    /* REDUCED SIZE - was 70px */
+    font-size: 56px;
     filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
 }
 
@@ -151,21 +165,29 @@
 }
 
 .shop-item-header h3 {
-    font-size: 22px;
+    /* REDUCED SIZE - was 22px */
+    font-size: 18px;
     color: var(--dark-brown);
     text-align: center;
+    margin: 0;
 }
 
 .shop-item-details {
-    background: rgba(139, 111, 71, 0.1);
-    padding: 12px;
-    border-radius: 10px;
+    /* COLORFUL SEASONAL BACKGROUND */
+    background: linear-gradient(135deg,
+        var(--season-accent) 0%,
+        rgba(255, 255, 255, 0.6) 100%);
+    /* REDUCED PADDING - was 12px */
+    padding: 10px;
+    border-radius: 8px;
+    border: 2px solid var(--season-border);
 }
 
 .shop-item-details p {
-    font-size: 14px;
-    color: #654321;
-    margin-bottom: 10px;
+    /* REDUCED SIZE - was 14px */
+    font-size: 13px;
+    color: var(--season-text);
+    margin-bottom: 8px;
     text-align: center;
 }
 
@@ -176,14 +198,17 @@
 }
 
 .stat {
-    background: rgba(255, 255, 255, 0.8);
-    padding: 6px;
-    border-radius: 8px;
-    font-size: 13px;
+    background: rgba(255, 255, 255, 0.9);
+    /* REDUCED PADDING */
+    padding: 5px 8px;
+    border-radius: 6px;
+    /* REDUCED SIZE - was 13px */
+    font-size: 12px;
     font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
+    border: 1px solid var(--season-border);
 }
 
 .shop-item-footer {
@@ -197,34 +222,38 @@
     background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
     color: black;
     border: 3px solid #FF8C00;
-    border-radius: 12px;
-    padding: 10px 15px;
-    font-size: 20px;
+    border-radius: 10px;
+    /* REDUCED PADDING - was 10px 15px */
+    padding: 8px 12px;
+    /* REDUCED SIZE - was 20px */
+    font-size: 17px;
     font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 8px;
-    box-shadow: 0 3px 0 #CC7000;
+    gap: 6px;
+    box-shadow: 0 2px 0 #CC7000;
 }
 
 .buy-button {
     background: linear-gradient(135deg, #90EE90 0%, #7CB342 100%);
     border: 3px solid #558B2F;
-    border-radius: 12px;
-    padding: 12px 20px;
+    border-radius: 10px;
+    /* REDUCED PADDING - was 12px 20px */
+    padding: 10px 16px;
     cursor: pointer;
-    font-size: 16px;
+    /* REDUCED SIZE - was 16px */
+    font-size: 15px;
     font-weight: 700;
     font-family: 'Fredoka', sans-serif;
     color: white;
-    box-shadow: 0 4px 0 #3D6B1F, 0 6px 12px var(--shadow);
+    box-shadow: 0 3px 0 #3D6B1F, 0 4px 10px var(--shadow);
     transition: all 0.2s;
     flex: 1;
 }
 
 .buy-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 0 #3D6B1F, 0 8px 14px var(--shadow);
+    box-shadow: 0 5px 0 #3D6B1F, 0 6px 12px var(--shadow);
 }
 
 .buy-button:active {
@@ -241,21 +270,22 @@
 }
 
 /* ===========================
-   MARKET SCREEN
+   MARKET SCREEN - COMPACT & COLORFUL REDESIGN
    =========================== */
 
 /* Two-column layout for market on wider screens */
 .market-content {
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    /* REDUCED GAP - was 30px */
+    gap: 20px;
 }
 
 @media (min-width: 1200px) {
     .market-content {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 30px;
+        gap: 20px;
         align-items: start;
     }
 
@@ -265,65 +295,76 @@
 }
 
 .inventory-display {
-    background: rgba(255, 255, 255, 0.95);
-    border: 5px solid var(--season-border);
-    border-radius: 20px;
-    padding: 25px;
-    margin-bottom: 30px;
-    box-shadow: 0 6px 0 var(--season-border), 0 8px 16px var(--season-shadow);
+    /* SEASONAL GRADIENT BACKGROUND */
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        var(--season-accent) 50%,
+        rgba(255, 255, 255, 0.95) 100%);
+    border: 4px solid var(--season-border);
+    border-radius: 16px;
+    /* REDUCED PADDING - was 25px */
+    padding: 18px;
+    /* REDUCED MARGIN - was 30px */
+    margin-bottom: 20px;
+    box-shadow: 0 4px 0 var(--season-border), 0 6px 12px var(--season-shadow);
     position: relative;
     overflow: hidden;
 }
 
-/* Seasonal decoration for inventory */
+/* Seasonal decoration for inventory - MORE VISIBLE */
 .inventory-display::before {
     content: var(--season-icon);
     position: absolute;
-    top: -5px;
-    left: -5px;
-    font-size: 50px;
-    opacity: 0.1;
+    top: -10px;
+    left: -10px;
+    font-size: 60px;
+    opacity: 0.15;
     transform: rotate(-15deg);
     pointer-events: none;
 }
 
 .inventory-display h3 {
-    font-size: 26px;
+    /* REDUCED SIZE - was 26px */
+    font-size: 20px;
     color: var(--dark-brown);
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     text-align: center;
 }
 
 .inventory-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 15px;
+    /* SMALLER MIN-WIDTH for more items per row */
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    /* REDUCED GAP - was 15px */
+    gap: 12px;
 }
 
 .inventory-item {
-    background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,240,240,0.9));
-    border: 4px solid var(--season-border);
-    border-radius: 15px;
-    padding: 15px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(240,240,240,0.9));
+    border: 3px solid var(--season-border);
+    border-radius: 12px;
+    /* REDUCED PADDING - was 15px */
+    padding: 12px;
     text-align: center;
-    box-shadow: 0 4px 0 var(--season-border), 0 6px 10px var(--season-shadow);
+    box-shadow: 0 3px 0 var(--season-border), 0 4px 8px var(--season-shadow);
     transition: all 0.2s;
 }
 
 .inventory-item:hover {
-    transform: translateY(-3px) scale(1.03);
-    box-shadow: 0 6px 0 var(--season-border), 0 8px 12px var(--season-shadow);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 5px 0 var(--season-border), 0 6px 10px var(--season-shadow);
 }
 
 .inventory-visual {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 10px;
+    /* REDUCED SIZE - was 80px */
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 8px;
     background: linear-gradient(135deg, var(--plant-color, #90EE90) 0%, var(--plant-secondary, #228B22) 100%);
-    border: 3px solid var(--dark-brown);
+    border: 3px solid var(--season-border);
     border-radius: 50%;
     position: relative;
-    box-shadow: inset 0 3px 6px rgba(0,0,0,0.2);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);
 }
 
 .inventory-visual::before {
@@ -332,20 +373,23 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 45px;
+    /* REDUCED SIZE - was 45px */
+    font-size: 35px;
 }
 
 .inventory-name {
-    font-size: 16px;
+    /* REDUCED SIZE - was 16px */
+    font-size: 14px;
     font-weight: 600;
     color: var(--dark-brown);
-    margin-bottom: 5px;
+    margin-bottom: 4px;
 }
 
 .inventory-count {
-    font-size: 20px;
+    /* REDUCED SIZE - was 20px */
+    font-size: 18px;
     font-weight: 700;
-    color: #228B22;
+    color: var(--season-primary);
 }
 
 .empty-message {
@@ -356,33 +400,39 @@
     font-style: italic;
 }
 
-/* Selling Area */
+/* Selling Area - COLORFUL REDESIGN */
 .selling-area {
-    background: rgba(255, 255, 255, 0.95);
-    border: 5px solid var(--season-border);
-    border-radius: 20px;
-    padding: 25px;
-    box-shadow: 0 6px 0 var(--season-border), 0 8px 16px var(--season-shadow);
+    /* SEASONAL GRADIENT BACKGROUND */
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        var(--season-accent) 50%,
+        rgba(255, 255, 255, 0.95) 100%);
+    border: 4px solid var(--season-border);
+    border-radius: 16px;
+    /* REDUCED PADDING - was 25px */
+    padding: 18px;
+    box-shadow: 0 4px 0 var(--season-border), 0 6px 12px var(--season-shadow);
     position: relative;
     overflow: hidden;
 }
 
-/* Seasonal decoration for selling area */
+/* Seasonal decoration for selling area - MORE VISIBLE */
 .selling-area::before {
     content: var(--season-icon);
     position: absolute;
-    bottom: -5px;
-    right: -5px;
-    font-size: 50px;
-    opacity: 0.1;
+    bottom: -10px;
+    right: -10px;
+    font-size: 60px;
+    opacity: 0.15;
     transform: rotate(15deg);
     pointer-events: none;
 }
 
 .selling-area h3 {
-    font-size: 26px;
+    /* REDUCED SIZE - was 26px */
+    font-size: 20px;
     color: var(--dark-brown);
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     text-align: center;
 }
 
@@ -481,55 +531,84 @@
 }
 
 /* ===========================
-   UPGRADES SCREEN
+   UPGRADES SCREEN - COMPACT & COLORFUL REDESIGN
    =========================== */
 
 .upgrades-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 25px;
+    /* SMALLER MIN-WIDTH - was 320px */
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    /* REDUCED GAP - was 25px */
+    gap: 18px;
 }
 
 .upgrade-item {
-    background: var(--white);
-    border: 5px solid var(--dark-brown);
-    border-radius: 20px;
-    padding: 25px;
+    /* SEASONAL GRADIENT BACKGROUND */
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        var(--season-accent) 60%,
+        rgba(255, 255, 255, 0.95) 100%);
+    border: 4px solid var(--season-border);
+    border-radius: 16px;
+    /* REDUCED PADDING - was 25px */
+    padding: 18px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    box-shadow: 0 6px 0 var(--dark-brown), 0 8px 16px var(--shadow);
+    gap: 12px;
+    box-shadow: 0 4px 0 var(--season-border), 0 6px 12px var(--season-shadow);
     transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Seasonal decoration on upgrades */
+.upgrade-item::before {
+    content: var(--season-icon);
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    font-size: 60px;
+    opacity: 0.15;
+    transform: rotate(20deg);
+    pointer-events: none;
 }
 
 .upgrade-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 0 var(--dark-brown), 0 12px 20px var(--shadow);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 0 var(--season-border), 0 10px 18px var(--season-shadow);
 }
 
 .upgrade-item.owned {
-    background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+    background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 50%, #A5D6A7 100%);
     border-color: #4CAF50;
 }
 
+.upgrade-item.owned::before {
+    content: '✅';
+    opacity: 0.2;
+}
+
 .upgrade-icon-large {
-    font-size: 80px;
+    /* REDUCED SIZE - was 80px */
+    font-size: 64px;
     text-align: center;
-    filter: drop-shadow(4px 4px 8px rgba(0,0,0,0.2));
+    filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.2));
 }
 
 .upgrade-info h3 {
-    font-size: 24px;
+    /* REDUCED SIZE - was 24px */
+    font-size: 19px;
     color: var(--dark-brown);
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .upgrade-info p {
-    font-size: 15px;
-    color: #654321;
+    /* REDUCED SIZE - was 15px */
+    font-size: 13px;
+    color: var(--season-text);
     text-align: center;
-    line-height: 1.5;
+    line-height: 1.4;
 }
 
 .upgrade-footer {
@@ -542,22 +621,24 @@
 
 .upgrade-button {
     background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-    border: 4px solid #FF8C00;
-    border-radius: 12px;
-    padding: 12px 20px;
+    border: 3px solid #FF8C00;
+    border-radius: 10px;
+    /* REDUCED PADDING - was 12px 20px */
+    padding: 10px 16px;
     cursor: pointer;
-    font-size: 16px;
+    /* REDUCED SIZE - was 16px */
+    font-size: 15px;
     font-weight: 700;
     font-family: 'Fredoka', sans-serif;
     color: var(--dark-brown);
-    box-shadow: 0 4px 0 #CC7000, 0 6px 12px var(--shadow);
+    box-shadow: 0 3px 0 #CC7000, 0 4px 10px var(--shadow);
     transition: all 0.2s;
     flex: 1;
 }
 
 .upgrade-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 0 #CC7000, 0 8px 14px var(--shadow);
+    box-shadow: 0 5px 0 #CC7000, 0 6px 12px var(--shadow);
 }
 
 .upgrade-button:active {
@@ -576,10 +657,12 @@
 .owned-badge {
     background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
     color: white;
-    padding: 12px 25px;
-    border-radius: 12px;
+    /* REDUCED PADDING - was 12px 25px */
+    padding: 10px 20px;
+    border-radius: 10px;
     text-align: center;
     font-weight: 700;
-    font-size: 18px;
-    box-shadow: 0 4px 0 #2E7D32, 0 6px 10px var(--shadow);
+    /* REDUCED SIZE - was 18px */
+    font-size: 16px;
+    box-shadow: 0 3px 0 #2E7D32, 0 4px 8px var(--shadow);
 }
