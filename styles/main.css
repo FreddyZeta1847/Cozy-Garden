@@ -133,8 +133,8 @@ body {
     /* REDUCED PADDING for more garden space */
     padding: 15px 15px;
     padding-bottom: 16px;
-    /* SEASONAL GRADIENT BACKGROUND */
-    background: var(--toolbar-base, rgba(139, 111, 71, 0.90));
+    /* SEASONAL GRADIENT BACKGROUND - MORE TRANSPARENT */
+    background: var(--toolbar-base, rgba(139, 111, 71, 0.65));
     background-image: var(--toolbar-bg);
     background-blend-mode: overlay;
     box-shadow: 0 2px 8px var(--shadow);
@@ -272,8 +272,8 @@ body {
 
 /* Bottom Bar */
 .bottom-bar {
-    /* SEASONAL GRADIENT BACKGROUND */
-    background: var(--toolbar-base, rgba(139, 111, 71, 0.90));
+    /* SEASONAL GRADIENT BACKGROUND - MORE TRANSPARENT */
+    background: var(--toolbar-base, rgba(139, 111, 71, 0.65));
     background-image: var(--toolbar-bg);
     background-blend-mode: overlay;
     /* INCREASED PADDING to fit seed selector */
@@ -490,13 +490,13 @@ body {
 
 /* Screen Headers - COMPACT REDESIGN */
 .screen-header {
-    /* SEASONAL GRADIENT BACKGROUND - matches main header */
-    background: var(--toolbar-base, rgba(139, 111, 71, 0.90));
+    /* SEASONAL GRADIENT BACKGROUND - MORE TRANSPARENT */
+    background: var(--toolbar-base, rgba(139, 111, 71, 0.65));
     background-image: var(--toolbar-bg);
     background-blend-mode: overlay;
     border-bottom: 4px solid var(--season-border);
-    /* REDUCED PADDING - was 25px 30px */
-    padding: 12px 20px;
+    /* SAME PADDING AS MAIN HEADER */
+    padding: 15px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;

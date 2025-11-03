@@ -368,13 +368,11 @@
 }
 
 .inventory-visual::before {
-    content: '🌿';
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 40%;
+    left: 40%;
     transform: translate(-50%, -50%);
     /* REDUCED SIZE - was 45px */
-    font-size: 35px;
 }
 
 .inventory-name {

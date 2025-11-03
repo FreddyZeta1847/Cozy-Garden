@@ -399,3 +399,56 @@
     pointer-events: none;
     z-index: 100;
 }
+
+/* Growth Timer Tooltip */
+.growth-tooltip {
+    position: absolute;
+    top: -55px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.92);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    font-family: 'Comfortaa', sans-serif;
+}
+
+.growth-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid rgba(0, 0, 0, 0.92);
+}
+
+.growth-tooltip.show {
+    opacity: 1;
+}
+
+.growth-tooltip .time-label {
+    color: #FFD700;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.growth-tooltip .time-value {
+    color: #90EE90;
+    font-size: 13px;
+    font-weight: 700;
+}

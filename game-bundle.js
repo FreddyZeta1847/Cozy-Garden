@@ -157,7 +157,7 @@ const SEASONS = [
         name: "Spring",
         icon: "🌸",
         duration: 300,
-        backgroundImage: "src/images/grass-field/Spring.png",
+        backgroundImage: "assets/images/grass-field/Spring.png",
         colors: {
             sky: "linear-gradient(to bottom, #87CEEB 0%, #7CB342 50%, #558B2F 100%)",
             primary: "#FFB6C1",
@@ -172,7 +172,7 @@ const SEASONS = [
         name: "Summer",
         icon: "☀️",
         duration: 300,
-        backgroundImage: "src/images/grass-field/Summer.png",
+        backgroundImage: "assets/images/grass-field/Summer.png",
         colors: {
             sky: "linear-gradient(to bottom, #FFD700 0%, #9CCC65 40%, #689F38 100%)",
             primary: "#FFD700",
@@ -187,7 +187,7 @@ const SEASONS = [
         name: "Fall",
         icon: "🍂",
         duration: 300,
-        backgroundImage: "src/images/grass-field/Autumn.png",
+        backgroundImage: "assets/images/grass-field/Autumn.png",
         colors: {
             sky: "linear-gradient(to bottom, #FF8C00 0%, #8BC34A 50%, #558B2F 100%)",
             primary: "#FF8C00",
@@ -202,7 +202,7 @@ const SEASONS = [
         name: "Winter",
         icon: "❄️",
         duration: 300,
-        backgroundImage: "src/images/grass-field/Winter.png",
+        backgroundImage: "assets/images/grass-field/Winter.png",
         colors: {
             sky: "linear-gradient(to bottom, #E0F7FA 0%, #81C784 50%, #66BB6A 100%)",
             primary: "#B0E0E6",
@@ -1113,6 +1113,21 @@ class UIManager {
         tile.dataset.col = col;
         tile.onclick = () => this.game.handleTileClick(row, col);
 
+        // Add hover delay for growth tooltip
+        let hoverTimeout = null;
+        tile.addEventListener('mouseenter', () => {
+            hoverTimeout = setTimeout(() => {
+                this.game.showGrowthTooltip(tile, row, col, 'vegetable');
+            }, 2000); // 2 second delay
+        });
+
+        tile.addEventListener('mouseleave', () => {
+            if (hoverTimeout) {
+                clearTimeout(hoverTimeout);
+            }
+            this.game.hideGrowthTooltip(tile);
+        });
+
         this.updateTileVisual(tile, row, col);
         return tile;
     }
@@ -1215,6 +1230,9 @@ class UIManager {
     renderShop() {
         const shopItems = document.getElementById('shop-items');
         if (!shopItems) return;
+        const fruitTitle = document.createElement('div');
+        fruitTitle.style.cssText = 'grid-column: 1/-1; text-align: center; margin: 20px 0; font-size: 24px; font-weight: bold; color: #5d5d5dff;';
+        fruitTitle.innerHTML = '🥬 Vegetables Seeds';
 
         shopItems.innerHTML = '';
 
@@ -1226,6 +1244,8 @@ class UIManager {
             corn: '🌽',
             potato: '🥔'
         };
+
+        shopItems.appendChild(fruitTitle);
 
         // Add vegetable seeds section
         for (const [key, plant] of Object.entries(PLANTS)) {
@@ -1264,7 +1284,7 @@ class UIManager {
             // Add section divider
             const divider = document.createElement('div');
             divider.style.cssText = 'grid-column: 1/-1; text-align: center; margin: 20px 0; font-size: 24px; font-weight: bold; color: #DAA520;';
-            divider.innerHTML = '🌳 Premium Fruit Seeds';
+            divider.innerHTML = '🌳 Fruit Seeds';
             shopItems.appendChild(divider);
 
             const fruitIcons = {
@@ -1377,7 +1397,7 @@ class UIManager {
 
                     item.innerHTML = `
                         <div class="inventory-visual" style="font-size: 48px;">${fruitIcons[key]}</div>
-                        <div class="inventory-name">🌳 ${fruit.name}</div>
+                        <div class="inventory-name">${fruit.name}</div>
                         <div class="inventory-count">×${count}</div>
                     `;
                     grid.appendChild(item);
@@ -2236,6 +2256,22 @@ class Game {
         const fruitCells = document.querySelectorAll('.fruit-cell');
         fruitCells.forEach((cell, index) => {
             cell.onclick = () => this.handleFruitCellClick(index);
+
+            // Add hover delay for growth tooltip
+            let hoverTimeout = null;
+            cell.addEventListener('mouseenter', () => {
+                hoverTimeout = setTimeout(() => {
+                    this.showGrowthTooltip(cell, index, null, 'fruit');
+                }, 2000); // 2 second delay
+            });
+
+            cell.addEventListener('mouseleave', () => {
+                if (hoverTimeout) {
+                    clearTimeout(hoverTimeout);
+                }
+                this.hideGrowthTooltip(cell);
+            });
+
             // Update cell to match saved state from FruitGarden
             this.updateFruitCell(index);
         });
@@ -2413,6 +2449,78 @@ class Game {
                 const fruitEmoji = fruitIcons[tree.fruitType] || '🍎';
                 plantEl.textContent = fruitEmoji;
             }
+        }
+    }
+
+    showGrowthTooltip(element, rowOrIndex, col, type) {
+        // Calculate remaining time
+        let remainingTime = null;
+
+        if (type === 'vegetable') {
+            const cell = this.garden.getCell(rowOrIndex, col);
+            if (!cell || cell.status === 'empty' || cell.status === 'tilled' || cell.readyToHarvest) {
+                return; // Don't show tooltip for empty, tilled, or harvestable tiles
+            }
+
+            const plant = PLANTS[cell.plantType];
+            if (!plant) return;
+
+            // Calculate remaining time
+            const adjustedGrowthTime = plant.growthTime / this.player.upgrades.fasterGrowth;
+            const stageTime = adjustedGrowthTime / plant.stages;
+            const timeSincePlanted = this.gameTime - cell.plantedAt;
+            const totalGrowthTime = plant.stages * stageTime;
+            remainingTime = Math.max(0, totalGrowthTime - timeSincePlanted);
+
+        } else if (type === 'fruit') {
+            const tree = this.fruitGarden.getTree(rowOrIndex);
+            if (!tree || tree.status === 'empty' || tree.status === 'tilled' || tree.readyToHarvest) {
+                return; // Don't show tooltip for empty, tilled, or harvestable trees
+            }
+
+            const fruit = FRUITS[tree.fruitType];
+            if (!fruit) return;
+
+            // Calculate remaining time
+            const adjustedGrowthTime = fruit.growthTime / this.player.upgrades.fasterGrowth;
+            const stageTime = adjustedGrowthTime / fruit.stages;
+            const timeSincePlanted = this.gameTime - tree.plantedAt;
+            const totalGrowthTime = fruit.stages * stageTime;
+            remainingTime = Math.max(0, totalGrowthTime - timeSincePlanted);
+        }
+
+        if (remainingTime === null) return;
+
+        // Create tooltip element
+        const tooltip = document.createElement('div');
+        tooltip.className = 'growth-tooltip show';
+        tooltip.innerHTML = `
+            <div class="time-label">Time Remaining:</div>
+            <div class="time-value">${this.formatTime(remainingTime)}</div>
+        `;
+
+        element.style.position = 'relative';
+        element.appendChild(tooltip);
+    }
+
+    hideGrowthTooltip(element) {
+        const tooltip = element.querySelector('.growth-tooltip');
+        if (tooltip) {
+            tooltip.remove();
+        }
+    }
+
+    formatTime(seconds) {
+        if (seconds < 60) {
+            return `${Math.ceil(seconds)}s`;
+        } else if (seconds < 3600) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.ceil(seconds % 60);
+            return secs > 0 ? `${minutes}m ${secs}s` : `${minutes}m`;
+        } else {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
         }
     }
 
