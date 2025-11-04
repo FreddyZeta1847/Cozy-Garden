@@ -101,6 +101,18 @@ body {
 
     /* Custom cursor using your image with centered hotspot (for 24x24 image) */
     cursor: url('../assets/images/cursor/Cursor.png') 12 12, auto;
+
+    /* Smooth transitions for season changes */
+    transition: opacity 0.8s ease-in-out, background-color 1.2s ease-in-out;
+}
+
+/* Smooth transition for seasonal CSS variables */
+body[data-season] {
+    transition:
+        opacity 0.8s ease-in-out,
+        background-color 1.2s ease-in-out,
+        --season-primary 1s ease-in-out,
+        --season-secondary 1s ease-in-out;
 }
 
 /* Interactive elements - Same cursor for now (you can add hover image later) */
@@ -1138,5 +1150,95 @@ body[data-season="winter"] .market-content::before {
     to {
         transform: translateX(400px);
         opacity: 0;
+    }
+}
+
+/* Season Display Smooth Transition */
+.season-display {
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+/* Season Change Toast - Special Styling */
+.season-change-toast {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        var(--season-background) 100%);
+    border: 3px solid var(--season-primary);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.5) inset,
+        0 0 30px var(--season-shadow);
+    min-width: 350px;
+    padding: 20px;
+}
+
+.season-change-toast .toast-icon.season-transition {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 42px;
+    margin-right: 20px;
+}
+
+.season-change-toast .season-from {
+    animation: seasonFadeOut 2s ease-in-out infinite;
+}
+
+.season-change-toast .season-arrow {
+    font-size: 28px;
+    color: var(--season-primary);
+    font-weight: bold;
+    animation: seasonArrowPulse 1.5s ease-in-out infinite;
+}
+
+.season-change-toast .season-to {
+    animation: seasonFadeIn 2s ease-in-out infinite;
+}
+
+.season-change-toast .toast-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--season-primary);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 5px;
+}
+
+.season-change-toast .toast-message {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--season-text);
+}
+
+/* Season Transition Animations */
+@keyframes seasonFadeOut {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.4;
+        transform: scale(0.9);
+    }
+}
+
+@keyframes seasonFadeIn {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.6;
+        transform: scale(1.1);
+    }
+}
+
+@keyframes seasonArrowPulse {
+    0%, 100% {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: translateX(8px) scale(1.2);
+        opacity: 0.8;
     }
 }

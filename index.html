@@ -17,11 +17,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="styles/main.css?v=2.11">
+    <link rel="stylesheet" href="styles/main.css?v=2.14">
     <link rel="stylesheet" href="styles/garden.css">
     <link rel="stylesheet" href="styles/plants.css">
-    <link rel="stylesheet" href="styles/ui.css?v=2.11">
-    <link rel="stylesheet" href="styles/fruits.css?v=2.11">
+    <link rel="stylesheet" href="styles/ui.css?v=2.14">
+    <link rel="stylesheet" href="styles/fruits.css?v=2.14">
 </head>
 <body>
     <!-- Particle Background -->
@@ -36,13 +36,13 @@
                     <div class="season-icon"></div>              
                 </div>
                 <div class="resources">
-                    <div class="resource money-display">
-                        <div class="coin-icon"></div>
-                        <span id="money-display">100</span>
-                    </div>
                     <div class="resource season-display" id="season-display">
                         <div style="align-items: center;"><div class="season-icon"></div></div>
                         <span>Spring</span>
+                    </div>
+                    <div class="resource money-display">
+                        <div class="coin-icon"></div>
+                        <span id="money-display">100</span>
                     </div>
                     <div class="resource harvested-display" id="harvested-display" title="Click to view your harvest!" onclick="game.showHarvestPopup()" style="cursor: pointer;">
                         <span style="font-size: 24px;">🧺</span>
@@ -252,7 +252,7 @@
     <!-- Toast Notification Container -->
     <div id="toast-container"></div>
 
-    <!-- Game Script (Bundled) - v2.13 with gameTime fix -->
-    <script src="game-bundle.js?v=2.13"></script>
+    <!-- Game Script (Bundled) - v2.14 with smooth season transitions -->
+    <script src="game-bundle.js?v=2.14"></script>
 </body>
 </html>

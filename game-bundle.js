@@ -1144,6 +1144,100 @@ class UIManager {
         }
     }
 
+    transitionSeason(previousSeason, newSeason) {
+        // Add transition class to body for smooth CSS transitions
+        document.body.classList.add('season-transitioning');
+
+        // Show beautiful season change notification
+        this.showSeasonChangeNotification(previousSeason, newSeason);
+
+        // Update season display with animation
+        const display = document.getElementById('season-display');
+        if (display) {
+            // Fade out old season
+            display.style.opacity = '0';
+            display.style.transform = 'translateY(-10px)';
+
+            setTimeout(() => {
+                // Update icon and name
+                const seasonIcon = display.querySelector('.season-icon');
+                if (seasonIcon) {
+                    seasonIcon.textContent = newSeason.icon;
+                }
+                const seasonName = display.querySelector('span:last-child');
+                if (seasonName) {
+                    seasonName.textContent = newSeason.name;
+                }
+
+                // Fade in new season
+                display.style.opacity = '1';
+                display.style.transform = 'translateY(0)';
+            }, 300);
+        }
+
+        // Smoothly transition data-season attribute for CSS theming
+        document.body.setAttribute('data-season', newSeason.name.toLowerCase());
+
+        // Preload next background image
+        const img = new Image();
+        img.onload = () => {
+            // Fade out current background
+            document.body.style.opacity = '0.7';
+
+            setTimeout(() => {
+                // Change background image
+                document.body.style.backgroundImage = `url('${newSeason.backgroundImage}')`;
+                document.body.style.backgroundColor = newSeason.colors.primary;
+
+                // Fade in new background
+                document.body.style.opacity = '1';
+
+                // Remove transition class after animation completes
+                setTimeout(() => {
+                    document.body.classList.remove('season-transitioning');
+                }, 800);
+            }, 400);
+        };
+        img.src = newSeason.backgroundImage;
+
+        // Update particles with animation
+        if (this.game.particles) {
+            this.game.particles.updateSeason(newSeason.name);
+        }
+    }
+
+    showSeasonChangeNotification(previousSeason, newSeason) {
+        // Create a special toast for season change
+        const toast = document.createElement('div');
+        toast.className = 'toast season-change-toast show';
+
+        toast.innerHTML = `
+            <div class="toast-icon season-transition">
+                <span class="season-from">${previousSeason.icon}</span>
+                <span class="season-arrow">→</span>
+                <span class="season-to">${newSeason.icon}</span>
+            </div>
+            <div class="toast-content">
+                <div class="toast-title">Season Changed!</div>
+                <div class="toast-message">${previousSeason.name} → ${newSeason.name}</div>
+            </div>
+        `;
+
+        const container = document.getElementById('toast-container');
+        if (container) {
+            container.appendChild(toast);
+
+            // Trigger animation
+            setTimeout(() => toast.classList.add('show'), 10);
+
+            // Auto remove after 5 seconds (longer for season change)
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
+    }
+
     renderGarden() {
         const gardenGrid = document.getElementById('garden-grid');
         if (!gardenGrid) return;
@@ -1934,9 +2028,14 @@ class Game {
 
         if (this.seasonTimer >= currentSeasonDuration) {
             this.seasonTimer = 0;
+            const previousSeason = SEASONS[this.currentSeason];
             this.currentSeason = (this.currentSeason + 1) % SEASONS.length;
-            this.ui.updateSeason();
-            console.log(`🌸 Season changed to ${SEASONS[this.currentSeason].name}`);
+            const newSeason = SEASONS[this.currentSeason];
+
+            // Trigger smooth season transition
+            this.ui.transitionSeason(previousSeason, newSeason);
+
+            console.log(`🌸 Season changed: ${previousSeason.name} → ${newSeason.name}`);
         }
     }
 
