@@ -67,19 +67,21 @@ const PLANTS = {
     }
 };
 
-// Fruits Database
+// Fruits Database - With Tree Lifecycle System
 const FRUITS = {
     apple: {
         name: "Apple",
         seedCost: 80,
-        growthTime: 240,
-        waterInterval: 10,
-        harvestYield: 1,
-        sellPrice: 50,
-        stages: 4,
+        growthTime: 240,        // Time to grow from seed to mature tree (240 game seconds)
+        waterInterval: 10,       // Needs water every 10 seconds during growth
+        harvestYield: 1,         // Fruits produced per harvest
+        sellPrice: 50,           // Price per fruit
+        stages: 4,               // Growth stages (0: seed, 1: sapling, 2: young, 3: mature)
+        productionInterval: 60,  // NEW: Seconds between fruit production (mature tree only)
+        maxHarvests: 10,         // NEW: Total fruits before tree dies
         color: "#DC143C",
         secondaryColor: "#8B0000",
-        description: "Crisp red apples from your own tree"
+        description: "Crisp red apples from your own tree - produces fruit every 60s"
     },
     orange: {
         name: "Orange",
@@ -89,9 +91,11 @@ const FRUITS = {
         harvestYield: 1,
         sellPrice: 70,
         stages: 4,
+        productionInterval: 80,  // NEW: Slower production (premium fruit)
+        maxHarvests: 8,          // NEW: Fewer total harvests
         color: "#FF8C00",
         secondaryColor: "#FF6347",
-        description: "Juicy sweet oranges bursting with flavor"
+        description: "Juicy sweet oranges - produces fruit every 80s"
     },
     banana: {
         name: "Banana",
@@ -101,9 +105,11 @@ const FRUITS = {
         harvestYield: 1,
         sellPrice: 100,
         stages: 4,
+        productionInterval: 100, // NEW: Slowest production (most valuable)
+        maxHarvests: 6,          // NEW: Fewest total harvests
         color: "#FFD700",
         secondaryColor: "#FF8C00",
-        description: "Tropical yellow bananas from your grove"
+        description: "Tropical yellow bananas - produces fruit every 100s"
     },
     pear: {
         name: "Pear",
@@ -113,9 +119,11 @@ const FRUITS = {
         harvestYield: 1,
         sellPrice: 60,
         stages: 4,
+        productionInterval: 70,  // NEW: Moderate production
+        maxHarvests: 9,          // NEW: Good longevity
         color: "#9ACD32",
         secondaryColor: "#6B8E23",
-        description: "Sweet golden pears straight from the tree"
+        description: "Sweet golden pears - produces fruit every 70s"
     }
 };
 
@@ -123,8 +131,8 @@ const FRUITS = {
 const UPGRADES = {
     autoWatering: {
         name: "Auto-Watering System",
-        icon: "💦",
-        description: "Automatically waters all plants every 30 seconds. No more manual watering!",
+        icon: "💧",
+        description: "Automatically waters all vegetables plants every 30 seconds. No more manual watering!",
         cost: 200,
         effect: "autoWatering"
     },
@@ -138,7 +146,7 @@ const UPGRADES = {
     expandedGarden: {
         name: "Garden Expansion",
         icon: "📏",
-        description: "Expand your garden to 8x5 tiles for more planting space.",
+        description: "Expand your garden to 4×8 tiles for more planting space (adds 2 more columns).",
         cost: 300,
         effect: "expandedGarden"
     },
@@ -148,6 +156,13 @@ const UPGRADES = {
         description: "Unlock a premium fruit orchard with 5 tree slots. Grow expensive fruits for high profits!",
         cost: 500,
         effect: "premiumOrchard"
+    },
+    premiumAutoWatering: {
+        name: "Premium Auto Watering",
+        icon: "💦",
+        description: "Automatically waters all fruits plants every 15 seconds. No more manual watering (for real)!",
+        cost: 800,
+        effect: "premiumAutoWatering"
     }
 };
 
@@ -253,7 +268,8 @@ class Player {
             autoWatering: false,
             fasterGrowth: 1.0,
             expandedGarden: false,
-            premiumOrchard: false
+            premiumOrchard: false,
+            premiumAutoWatering: false
         };
     }
 
@@ -355,6 +371,9 @@ class Player {
                 break;
             case 'premiumOrchard':
                 this.upgrades.premiumOrchard = true;
+                break;
+            case 'premiumAutoWatering':
+                this.upgrades.premiumAutoWatering = true;
                 break;
         }
         console.log(`Purchased upgrade: ${upgradeType}`);
@@ -581,8 +600,19 @@ class Garden {
     loadSaveData(data) {
         if (data.rows) this.rows = data.rows;
         if (data.cols) this.cols = data.cols;
+
+        // Backward compatibility: Fix old 5x8 expansion to 4x8
+        if (this.rows === 5 && this.cols === 8) {
+            console.log('🔧 Fixing old 5×8 garden to 4×8...');
+            this.rows = 4;
+            // Remove the 5th row from grid if it exists
+            if (data.grid && data.grid.length === 5) {
+                data.grid = data.grid.slice(0, 4); // Keep only first 4 rows
+            }
+        }
+
         if (data.grid) this.grid = data.grid;
-        console.log('Garden data loaded');
+        console.log(`Garden data loaded: ${this.rows}×${this.cols}`);
     }
 }
 
@@ -602,14 +632,16 @@ class FruitGarden {
 
     createEmptyTree() {
         return {
-            status: 'empty',
+            status: 'empty',           // 'empty', 'planted', 'growing', 'mature', 'producing', 'dead'
             fruitType: null,
-            growthStage: 0,
+            growthStage: 0,            // 0: seed, 1: sapling, 2: young, 3: mature
             lastWatered: 0,
             needsWater: false,
-            readyToHarvest: false,
+            readyToHarvest: false,     // True when fruit is ready to pick
             plantedAt: 0,
-            harvestCount: 0
+            harvestCount: 0,           // Total fruits harvested from this tree
+            lastProduced: 0,           // NEW: Timestamp of last fruit production
+            isMature: false            // NEW: True when tree reaches final growth stage
         };
     }
 
@@ -647,7 +679,7 @@ class FruitGarden {
         return false;
     }
 
-    harvestFruit(slot) {
+    harvestFruit(slot, currentTime) {
         const tree = this.getTree(slot);
         console.log(`🍎 FruitGarden.harvestFruit - tree at slot ${slot}:`, tree);
 
@@ -661,17 +693,20 @@ class FruitGarden {
             // Increment harvest count
             tree.harvestCount = (tree.harvestCount || 0) + 1;
 
-            // After 4 harvests, tree dies
-            if (tree.harvestCount >= 4) {
-                console.log(`🍎 Tree has produced 4 times - tree dies and returns to empty soil`);
-                Object.assign(tree, this.createEmptyTree());
-            } else {
-                // Reset tree to stage 2 (mature tree) after harvest - tree persists
-                tree.growthStage = 2;
+            // Check if tree has reached max harvests (tree dies)
+            if (tree.harvestCount >= fruit.maxHarvests) {
+                console.log(`🍎 Tree has produced ${tree.harvestCount}/${fruit.maxHarvests} times - tree dies 🍂`);
+                tree.status = 'dead';
                 tree.readyToHarvest = false;
-                tree.plantedAt = Date.now(); // Reset growth timer for next fruit
-                tree.lastWatered = Date.now();
-                console.log(`🍎 Harvested ${yield_} ${fruitType} from slot ${slot} (${tree.harvestCount}/4 harvests)`);
+                tree.growthStage = -1; // Special stage for dead tree
+                console.log(`🍎 Tree died after ${tree.harvestCount} harvests. Click to remove.`);
+            } else {
+                // Tree remains mature, start production timer for next fruit
+                tree.readyToHarvest = false;
+                tree.lastProduced = currentTime;
+                tree.status = 'mature';
+                console.log(`🍎 Harvested ${yield_} ${fruitType} from slot ${slot} (${tree.harvestCount}/${fruit.maxHarvests} harvests)`);
+                console.log(`🍎 Next fruit in ${fruit.productionInterval} seconds`);
             }
 
             return { fruitType, yield: yield_ };
@@ -687,10 +722,14 @@ class FruitGarden {
         for (let slot = 0; slot < this.slots; slot++) {
             const tree = this.trees[slot];
 
-            if (tree.status === 'planted' || tree.status === 'growing') {
-                const fruit = FRUITS[tree.fruitType];
+            // Skip empty and dead trees
+            if (tree.status === 'empty' || tree.status === 'dead') continue;
 
-                // Check if tree needs water
+            const fruit = FRUITS[tree.fruitType];
+
+            // PHASE 1: Growing to maturity (planted → mature)
+            if (tree.status === 'planted' || tree.status === 'growing') {
+                // Check if tree needs water during growth
                 const timeSinceWatered = currentTime - tree.lastWatered;
                 if (timeSinceWatered > fruit.waterInterval) {
                     if (!tree.needsWater) {
@@ -715,10 +754,25 @@ class FruitGarden {
                     updated = true;
                 }
 
-                // Check if ready to harvest (final stage)
-                if (tree.growthStage === fruit.stages - 1 && !tree.readyToHarvest) {
+                // Tree reaches maturity (final growth stage)
+                if (tree.growthStage === fruit.stages - 1 && !tree.isMature) {
+                    tree.isMature = true;
+                    tree.status = 'mature';
+                    tree.lastProduced = currentTime; // Start production timer
+                    updated = true;
+                    console.log(`🌳 Tree in slot ${slot} reached maturity! Starting fruit production...`);
+                }
+            }
+
+            // PHASE 2: Mature tree producing fruit periodically
+            if (tree.status === 'mature' && tree.isMature) {
+                const timeSinceProduced = currentTime - tree.lastProduced;
+
+                // Check if it's time to produce a new fruit
+                if (timeSinceProduced >= fruit.productionInterval && !tree.readyToHarvest) {
                     tree.readyToHarvest = true;
                     updated = true;
+                    console.log(`🍎 Fruit ready in slot ${slot}! (${tree.harvestCount + 1}/${fruit.maxHarvests})`);
                 }
             }
         }
@@ -1441,7 +1495,7 @@ class UIManager {
             const input = document.createElement('input');
             input.type = 'number';
             input.min = '0';
-            input.max = '100';
+            input.max = '20'; // Default max for vegetables
             input.value = '0';
             input.placeholder = 'Qty';
 
@@ -1478,14 +1532,18 @@ class UIManager {
             if (type === 'veg') {
                 const plant = PLANTS[key];
                 const available = this.game.player.inventory.harvested[key];
-                const actualQty = Math.min(quantity, available);
+                const slotLimit = 20; // Max 20 vegetables per slot
+                input.max = slotLimit;
+                const actualQty = Math.min(quantity, available, slotLimit);
                 input.value = actualQty;
                 const total = actualQty * plant.sellPrice;
                 calc.textContent = total;
             } else if (type === 'fruit') {
                 const fruit = FRUITS[key];
                 const available = this.game.player.inventory.harvestedFruits[key];
-                const actualQty = Math.min(quantity, available);
+                const slotLimit = 5; // Max 5 fruits per slot
+                input.max = slotLimit;
+                const actualQty = Math.min(quantity, available, slotLimit);
                 input.value = actualQty;
                 const total = actualQty * fruit.sellPrice;
                 calc.textContent = total;
@@ -1516,12 +1574,14 @@ class UIManager {
                 if (type === 'veg') {
                     const plant = PLANTS[key];
                     const available = this.game.player.inventory.harvested[key];
-                    const actualQty = Math.min(quantity, available);
+                    const slotLimit = 20; // Max 20 vegetables per slot
+                    const actualQty = Math.min(quantity, available, slotLimit);
                     total += actualQty * plant.sellPrice;
                 } else if (type === 'fruit') {
                     const fruit = FRUITS[key];
                     const available = this.game.player.inventory.harvestedFruits[key];
-                    const actualQty = Math.min(quantity, available);
+                    const slotLimit = 5; // Max 5 fruits per slot
+                    const actualQty = Math.min(quantity, available, slotLimit);
                     total += actualQty * fruit.sellPrice;
                 }
             }
@@ -1749,14 +1809,19 @@ class UIManager {
     }
 
     getFruitTreeEmoji(fruitType, stage) {
+        // Premium tree growth progression:
+        // Stage 0: Seedling/sapling
+        // Stage 1: Young tree (establishing)
+        // Stage 2: Mature tree (ready to fruit)
+        // Stage 3: Abundant harvest (large fruit display)
         const treeStages = {
-            apple: ['🌱', '🌿', '🌳', '🍎'],
-            orange: ['🌱', '🌿', '🌳', '🍊'],
-            banana: ['🌱', '🌿', '🌳', '🍌'],
-            pear: ['🌱', '🌿', '🌳', '🍐']
+            apple: ['🌰', '🌳', '🌳', '🍎'],
+            orange: ['🌰', '🌳', '🌳', '🍊'],
+            banana: ['🌰', '🌳', '🌳', '🍌'],
+            pear: ['🌰', '🌳', '🌳', '🍐']
         };
 
-        return treeStages[fruitType] ? treeStages[fruitType][stage] : '🌱';
+        return treeStages[fruitType] ? treeStages[fruitType][stage] : '🌰';
     }
 
     refreshFruitSlots() {
@@ -1788,6 +1853,7 @@ class Game {
         this.seasonTimer = 0;
         this.gameTime = 0;
         this.autoWateringTimer = 0;
+        this.premiumAutoWateringTimer = 0;
 
         this.initialize();
     }
@@ -1843,8 +1909,15 @@ class Game {
                 if (this.autoWateringTimer >= 30) {
                     this.autoWateringTimer = 0;
                     this.garden.autoWater(this.gameTime);
-                    this.fruitGarden.autoWater(this.gameTime);
                     this.refreshAllTiles();
+                }
+            }
+
+            if(this.player.upgrades.premiumAutoWatering) {
+                this.premiumAutoWateringTimer++;
+                if(this.premiumAutoWateringTimer >= 15) {
+                    this.premiumAutoWateringTimer = 0;
+                    this.fruitGarden.autoWater(this.gameTime);
                     this.refreshAllFruitCells();
                 }
             }
@@ -2065,7 +2138,35 @@ class Game {
 
     showShop() {
         this.ui.showScreen('shop-screen');
+        this.switchShopTab('buy'); // Default to buy tab
         this.ui.renderShop();
+    }
+
+    showMarket() {
+        // Redirect to shop with sell tab active
+        this.ui.showScreen('shop-screen');
+        this.switchShopTab('sell');
+        this.ui.renderMarket();
+    }
+
+    switchShopTab(tab) {
+        // Remove active class from all tabs
+        document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.shop-tab-content').forEach(c => c.classList.remove('active'));
+
+        // Add active class to selected tab
+        const tabButton = document.querySelector(`.shop-tab[data-tab="${tab}"]`);
+        const tabContent = document.getElementById(`${tab}-tab`);
+
+        if (tabButton) tabButton.classList.add('active');
+        if (tabContent) tabContent.classList.add('active');
+
+        // Update content based on tab
+        if (tab === 'buy') {
+            this.ui.renderShop();
+        } else if (tab === 'sell') {
+            this.ui.renderMarket();
+        }
     }
 
     buySeed(seedType) {
@@ -2123,10 +2224,6 @@ class Game {
         }
     }
 
-    showMarket() {
-        this.ui.showScreen('market-screen');
-        this.ui.renderMarket();
-    }
 
     sellAll() {
         let totalEarned = 0;
@@ -2196,7 +2293,7 @@ class Game {
             this.player.purchaseUpgrade(upgrade.effect);
 
             if (upgrade.effect === 'expandedGarden') {
-                this.garden.expand(5, 8);
+                this.garden.expand(4, 8); // Keep 4 rows, expand to 8 columns (horizontal only)
                 this.ui.renderGarden();
             }
 
@@ -2340,7 +2437,20 @@ class Game {
 
     harvestFruitCell(index) {
         console.log(`🎯 harvestFruitCell called for cell ${index}`);
-        const result = this.fruitGarden.harvestFruit(index);
+        const tree = this.fruitGarden.getTree(index);
+
+        // Check if clicking on a dead tree (remove it)
+        if (tree && tree.status === 'dead') {
+            console.log(`🍂 Removing dead tree from slot ${index}`);
+            Object.assign(tree, this.fruitGarden.createEmptyTree());
+            this.updateFruitCell(index);
+            this.ui.updateAll();
+            this.saveGame();
+            return;
+        }
+
+        // Otherwise, harvest fruit if ready
+        const result = this.fruitGarden.harvestFruit(index, this.gameTime);
         console.log('🎯 FruitGarden.harvestFruit result:', result);
 
         if (result) {
@@ -2385,6 +2495,35 @@ class Game {
         // Clear previous content
         cell.innerHTML = '';
 
+        // Handle DEAD tree status
+        if (tree.status === 'dead') {
+            const deadTreeEl = document.createElement('div');
+            deadTreeEl.className = 'plant-sprite dead-tree';
+            deadTreeEl.textContent = '🍂';
+            deadTreeEl.style.fontSize = '48px';
+            deadTreeEl.style.filter = 'grayscale(0.5)';
+            deadTreeEl.style.opacity = '0.7';
+            cell.appendChild(deadTreeEl);
+
+            // Add "Click to remove" tooltip
+            const removeLabel = document.createElement('div');
+            removeLabel.className = 'remove-label';
+            removeLabel.textContent = 'Click to remove';
+            removeLabel.style.position = 'absolute';
+            removeLabel.style.bottom = '5px';
+            removeLabel.style.left = '50%';
+            removeLabel.style.transform = 'translateX(-50%)';
+            removeLabel.style.fontSize = '10px';
+            removeLabel.style.fontWeight = 'bold';
+            removeLabel.style.background = 'rgba(139, 69, 19, 0.9)';
+            removeLabel.style.color = '#fff';
+            removeLabel.style.padding = '3px 8px';
+            removeLabel.style.borderRadius = '8px';
+            removeLabel.style.whiteSpace = 'nowrap';
+            cell.appendChild(removeLabel);
+            return;
+        }
+
         // Add visual representation based on tree status
         if (tree.status === 'empty') {
             // Empty cell - just brown dirt
@@ -2392,9 +2531,10 @@ class Game {
         } else if (tree.status === 'tilled') {
             // Tilled cell - darker soil
             // No content needed, CSS handles it
-        } else if (tree.status === 'planted' || tree.status === 'growing') {
-            // Show tree with growth stage
+        } else if (tree.status === 'planted' || tree.status === 'growing' || tree.status === 'mature') {
             const fruit = FRUITS[tree.fruitType];
+
+            // Show tree with growth stage
             const stageEmojis = ['🌱', '🪴', '🌳', '🌳'];
             const emoji = stageEmojis[tree.growthStage] || '🌱';
 
@@ -2416,21 +2556,49 @@ class Game {
                 cell.appendChild(waterIcon);
             }
 
-            // Add harvest counter indicator
-            if (tree.harvestCount > 0) {
+            // Add harvest counter indicator (always show for mature trees)
+            if ((tree.isMature || tree.harvestCount > 0) && fruit && fruit.maxHarvests) {
                 const harvestCounter = document.createElement('div');
                 harvestCounter.className = 'harvest-counter';
-                harvestCounter.textContent = `${tree.harvestCount}/4`;
+                harvestCounter.textContent = `🧺 ${tree.harvestCount || 0}/${fruit.maxHarvests}`;
                 harvestCounter.style.position = 'absolute';
                 harvestCounter.style.bottom = '5px';
-                harvestCounter.style.right = '5px';
-                harvestCounter.style.fontSize = '12px';
+                harvestCounter.style.left = '5px';
+                harvestCounter.style.fontSize = '11px';
                 harvestCounter.style.fontWeight = 'bold';
-                harvestCounter.style.background = 'rgba(0,0,0,0.6)';
+                harvestCounter.style.background = 'rgba(139, 69, 19, 0.9)';
                 harvestCounter.style.color = '#fff';
-                harvestCounter.style.padding = '2px 5px';
+                harvestCounter.style.padding = '3px 6px';
                 harvestCounter.style.borderRadius = '8px';
+                harvestCounter.style.whiteSpace = 'nowrap';
                 cell.appendChild(harvestCounter);
+            }
+
+            // Add production timer for mature trees (not ready to harvest yet)
+            if (tree.isMature && tree.status === 'mature' && !tree.readyToHarvest && this.gameTime) {
+                // Check if lastProduced is valid (not 0 or undefined)
+                if (tree.lastProduced && tree.lastProduced > 0) {
+                    const timeSinceProduced = this.gameTime - tree.lastProduced;
+                    const timeUntilNext = fruit.productionInterval - timeSinceProduced;
+
+                    // Only show timer if it's positive and reasonable (not corrupted data)
+                    if (timeUntilNext > 0 && timeUntilNext <= fruit.productionInterval) {
+                        const timerEl = document.createElement('div');
+                        timerEl.className = 'production-timer';
+                        timerEl.textContent = `⏱️ ${Math.ceil(timeUntilNext)}s`;
+                        timerEl.style.position = 'absolute';
+                        timerEl.style.top = '5px';
+                        timerEl.style.left = '5px';
+                        timerEl.style.fontSize = '11px';
+                        timerEl.style.fontWeight = 'bold';
+                        timerEl.style.background = 'rgba(34, 139, 34, 0.9)';
+                        timerEl.style.color = '#fff';
+                        timerEl.style.padding = '3px 6px';
+                        timerEl.style.borderRadius = '8px';
+                        timerEl.style.whiteSpace = 'nowrap';
+                        cell.appendChild(timerEl);
+                    }
+                }
             }
 
             // Add sparkle if ready to harvest
@@ -2442,12 +2610,25 @@ class Game {
                 sparkle.style.top = '5px';
                 sparkle.style.left = '5px';
                 sparkle.style.fontSize = '20px';
+                sparkle.style.animation = 'pulse 1s ease-in-out infinite';
                 cell.appendChild(sparkle);
 
-                // Show only the fruit emoji when ready to harvest
+                // Show tree + fruit overlay when ready to harvest
                 const fruitIcons = { apple: '🍎', orange: '🍊', banana: '🍌', pear: '🍐' };
                 const fruitEmoji = fruitIcons[tree.fruitType] || '🍎';
-                plantEl.textContent = fruitEmoji;
+
+                // Add fruit overlay on top of tree
+                const fruitOverlay = document.createElement('div');
+                fruitOverlay.className = 'fruit-overlay';
+                fruitOverlay.textContent = fruitEmoji;
+                fruitOverlay.style.position = 'absolute';
+                fruitOverlay.style.top = '50%';
+                fruitOverlay.style.left = '50%';
+                fruitOverlay.style.transform = 'translate(-50%, -50%)';
+                fruitOverlay.style.fontSize = '32px';
+                fruitOverlay.style.filter = 'drop-shadow(0 0 8px rgba(255, 215, 0, 0.8))';
+                fruitOverlay.style.animation = 'bounce 0.6s ease-in-out infinite';
+                cell.appendChild(fruitOverlay);
             }
         }
     }
@@ -2473,20 +2654,8 @@ class Game {
             remainingTime = Math.max(0, totalGrowthTime - timeSincePlanted);
 
         } else if (type === 'fruit') {
-            const tree = this.fruitGarden.getTree(rowOrIndex);
-            if (!tree || tree.status === 'empty' || tree.status === 'tilled' || tree.readyToHarvest) {
-                return; // Don't show tooltip for empty, tilled, or harvestable trees
-            }
-
-            const fruit = FRUITS[tree.fruitType];
-            if (!fruit) return;
-
-            // Calculate remaining time
-            const adjustedGrowthTime = fruit.growthTime / this.player.upgrades.fasterGrowth;
-            const stageTime = adjustedGrowthTime / fruit.stages;
-            const timeSincePlanted = this.gameTime - tree.plantedAt;
-            const totalGrowthTime = fruit.stages * stageTime;
-            remainingTime = Math.max(0, totalGrowthTime - timeSincePlanted);
+            // Don't show tooltip for fruit trees - they have their own timer display
+            return;
         }
 
         if (remainingTime === null) return;

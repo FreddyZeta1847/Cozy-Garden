@@ -71,24 +71,33 @@
     line-height: 1;
 }
 
-/* Fruit Wrapper */
+/* Fruit Wrapper - Match Vegetable Garden Style */
 .fruit-wrapper {
+    background: rgba(139, 111, 71, 0.4);
+    padding: 15px;
+    border-radius: 15px;
+    border: 4px solid var(--dark-brown);
+    box-shadow: 0 6px 0 var(--dark-brown), 0 8px 16px var(--shadow);
     position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
+    backdrop-filter: blur(5px);
 }
+
+/* Fruit Orchard Sign - Match Vegetable Garden Style (no overrides needed) */
+/* The .garden-sign styles from garden.css will apply automatically */
 
 /* Fruit Grid - Triangular Layout (3 top, 2 bottom) */
 .fruit-grid {
     display: grid;
     grid-template-columns: repeat(3, 120px);
     grid-template-rows: repeat(2, 120px);
-    gap: 30px;
+    gap: 25px;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    /* Match vegetable garden grid background */
+    background: linear-gradient(135deg, rgba(107, 68, 35, 0.6) 0%, rgba(139, 111, 71, 0.6) 100%);
+    padding: 12px;
+    border-radius: 15px;
+    box-shadow: inset 0 4px 12px rgba(0,0,0,0.3);
 }
 
 .fruit-cell:nth-child(1) { grid-column: 1; grid-row: 1; }
@@ -97,28 +106,55 @@
 .fruit-cell:nth-child(4) { grid-column: 1 / 2; grid-row: 2; margin-left: 75px; }
 .fruit-cell:nth-child(5) { grid-column: 2 / 3; grid-row: 2; margin-left: 75px; }
 
-/* Fruit Cell Styling - SAME AS VEGETABLE CELLS */
+/* Fruit Cell Styling - PREMIUM TREATMENT */
 .fruit-cell {
     width: 120px;
     height: 120px;
-    background: linear-gradient(135deg, #8B7355 0%, #6F5436 100%);
-    border: 4px solid var(--dark-brown);
+    /* Premium inner glow effect */
+    background:
+        radial-gradient(circle at center,
+            rgba(255, 248, 220, 0.3) 0%,
+            rgba(139, 115, 85, 0.8) 70%,
+            #6B5D4F 100%
+        );
+    /* Golden brass border */
+    border: 4px solid #C9B037;
     border-radius: 12px;
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2),
-                0 4px 8px rgba(0,0,0,0.15);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    /* Premium shadow with golden aura */
+    box-shadow:
+        inset 0 2px 8px rgba(255,255,255,0.2),
+        inset 0 -2px 8px rgba(0,0,0,0.3),
+        0 4px 12px rgba(0,0,0,0.5),
+        0 0 20px rgba(201, 176, 55, 0.2);
     overflow: visible;
 }
 
+/* Premium corner decoration (brass stud) */
+.fruit-cell::before {
+    content: '✦';
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 10px;
+    color: #C9B037;
+    opacity: 0.6;
+    z-index: 10;
+}
+
 .fruit-cell:hover {
-    transform: translateY(-2px);
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2),
-                0 6px 12px rgba(0,0,0,0.25);
+    transform: translateY(-5px) scale(1.02);
+    /* Enhanced golden glow on hover */
+    box-shadow:
+        inset 0 2px 8px rgba(255,255,255,0.3),
+        inset 0 -2px 8px rgba(0,0,0,0.4),
+        0 8px 20px rgba(0,0,0,0.6),
+        0 0 30px rgba(201, 176, 55, 0.4);
 }
 
 .fruit-cell.empty {
@@ -141,9 +177,33 @@
 
 .fruit-cell.harvestable {
     border-color: #FFD700;
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6),
-                inset 0 2px 4px rgba(0,0,0,0.2);
-    animation: pulse-gold 1.2s ease-in-out infinite;
+    /* Intense golden glow for harvestable state */
+    box-shadow:
+        inset 0 2px 8px rgba(255,255,255,0.4),
+        inset 0 -2px 8px rgba(0,0,0,0.2),
+        0 0 30px rgba(255, 215, 0, 0.8),
+        0 4px 12px rgba(0,0,0,0.5),
+        0 0 40px rgba(255, 215, 0, 0.5);
+    animation: pulse-premium-gold 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-premium-gold {
+    0%, 100% {
+        box-shadow:
+            inset 0 2px 8px rgba(255,255,255,0.4),
+            inset 0 -2px 8px rgba(0,0,0,0.2),
+            0 0 30px rgba(255, 215, 0, 0.8),
+            0 4px 12px rgba(0,0,0,0.5),
+            0 0 40px rgba(255, 215, 0, 0.5);
+    }
+    50% {
+        box-shadow:
+            inset 0 2px 8px rgba(255,255,255,0.5),
+            inset 0 -2px 8px rgba(0,0,0,0.3),
+            0 0 50px rgba(255, 215, 0, 1),
+            0 6px 20px rgba(0,0,0,0.6),
+            0 0 60px rgba(255, 215, 0, 0.7);
+    }
 }
 
 @keyframes pulse-red {
@@ -315,31 +375,54 @@
     transform: scale(1.1);
 }
 
-/* Tree Growth Stages (Emoji-based) */
+/* Premium Tree Growth Stages */
+/* Stage 0: Seedling/sapling - small and muted */
 .fruit-tree.stage-0 {
-    font-size: 48px;
+    font-size: 40px;
+    filter: grayscale(0.3) saturate(0.8);
+    opacity: 0.9;
 }
 
+/* Stage 1: Young tree establishing - growing with sway */
 .fruit-tree.stage-1 {
-    font-size: 56px;
+    font-size: 50px;
+    filter: saturate(0.9);
+    animation: tree-sway 4s ease-in-out infinite;
 }
 
+@keyframes tree-sway {
+    0%, 100% { transform: rotate(-1deg); }
+    50% { transform: rotate(1deg); }
+}
+
+/* Stage 2: Mature tree - full size, ready to fruit */
 .fruit-tree.stage-2 {
-    font-size: 64px;
+    font-size: 58px;
+    filter: saturate(1.1);
+    position: relative;
 }
 
+/* Stage 3: Harvestable - large fruit with premium effects */
 .fruit-tree.stage-3 {
-    font-size: 72px;
-    animation: bounce 0.6s ease-in-out infinite;
+    font-size: 70px;
+    filter: saturate(1.2) drop-shadow(0 0 12px rgba(255, 215, 0, 0.6));
+    animation:
+        premium-pulse 2s ease-in-out infinite,
+        premium-float 3s ease-in-out infinite;
 }
 
-@keyframes bounce {
+@keyframes premium-pulse {
     0%, 100% {
-        transform: translateY(0);
+        filter: saturate(1.2) drop-shadow(0 0 12px rgba(255, 215, 0, 0.6));
     }
     50% {
-        transform: translateY(-5px);
+        filter: saturate(1.4) drop-shadow(0 0 20px rgba(255, 215, 0, 0.9));
     }
+}
+
+@keyframes premium-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
 }
 
 /* Fruit Type Label */
@@ -459,4 +542,25 @@
 
 .orchard-panel.unlocking {
     animation: orchard-unlock 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+/* Harvest and Production Timer Animations */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.1);
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translate(-50%, -50%) translateY(0);
+    }
+    50% {
+        transform: translate(-50%, -50%) translateY(-8px);
+    }
 }

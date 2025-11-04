@@ -17,11 +17,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="styles/main.css?v=2.9">
+    <link rel="stylesheet" href="styles/main.css?v=2.11">
     <link rel="stylesheet" href="styles/garden.css">
     <link rel="stylesheet" href="styles/plants.css">
-    <link rel="stylesheet" href="styles/ui.css?v=2.9">
-    <link rel="stylesheet" href="styles/fruits.css?v=2.8">
+    <link rel="stylesheet" href="styles/ui.css?v=2.11">
+    <link rel="stylesheet" href="styles/fruits.css?v=2.11">
 </head>
 <body>
     <!-- Particle Background -->
@@ -30,25 +30,27 @@
     <!-- Main Garden Screen -->
     <div id="garden-screen" class="screen active">
         <div class="header">
-            <div class="resources">
-                <div class="resource money-display">
-                    <div class="coin-icon"></div>
-                    <span id="money-display">100</span>
+            <div style="display: flex; gap: 30px;">
+                <div class="title">
+                    <span>Cozy Garden</span>      
+                    <div class="season-icon"></div>              
                 </div>
-                <div class="resource season-display" id="season-display">
-                    <div class="season-icon"></div>
-                    <span>Spring</span>
-                </div>
-                <div class="resource harvested-display" id="harvested-display" title="Click to view your harvest!" onclick="game.showHarvestPopup()" style="cursor: pointer;">
-                    <span>🧺</span>
-                    <span id="harvested-count">0</span>
+                <div class="resources">
+                    <div class="resource money-display">
+                        <div class="coin-icon"></div>
+                        <span id="money-display">100</span>
+                    </div>
+                    <div class="resource season-display" id="season-display">
+                        <div style="align-items: center;"><div class="season-icon"></div></div>
+                        <span>Spring</span>
+                    </div>
+                    <div class="resource harvested-display" id="harvested-display" title="Click to view your harvest!" onclick="game.showHarvestPopup()" style="cursor: pointer;">
+                        <span style="font-size: 24px;">🧺</span>
+                        <span id="harvested-count">0</span>
+                    </div>
                 </div>
             </div>
             <div style="display: flex; gap: 10px; align-items: center;">
-                <button class="nav-button market-btn" onclick="game.showMarket()">
-                    <span class="btn-icon">🏪</span>
-                    <span>Market</span>
-                </button>
                 <button class="nav-button reset-btn" onclick="game.resetGame()" title="Reset game and start fresh">
                     <span class="btn-icon">🔄</span>
                     <span>Reset</span>
@@ -141,58 +143,61 @@
         </div>
     </div>
 
-    <!-- Shop Screen -->
+    <!-- Unified Shop Screen with Tabs -->
     <div id="shop-screen" class="screen">
         <div class="screen-header seasonal-header">
             <h2>
                 <span class="header-icon">🏪</span>
-                Seed Shop
+                General Store
                 <span class="season-subtitle"></span>
             </h2>
             <button class="back-button" onclick="game.showGarden()">← Back to Garden</button>
         </div>
 
-        <div class="shop-content">
-            <div class="player-money seasonal-money">
-                <div class="coin-icon" aria-label="Your money"></div>
-                <span id="shop-money" role="status" aria-live="polite">100</span>
-            </div>
-            <div id="shop-items" class="shop-items" role="list"></div>
-        </div>
-    </div>
-
-    <!-- Market Screen -->
-    <div id="market-screen" class="screen">
-        <div class="screen-header seasonal-header">
-            <h2>
-                <span class="header-icon">🛒</span>
-                Farmers Market
-                <span class="season-subtitle"></span>
-            </h2>
-            <button class="back-button" onclick="game.showGarden()">← Back to Garden</button>
+        <!-- Shop Tabs Navigation -->
+        <div class="shop-tabs">
+            <button class="shop-tab active" onclick="game.switchShopTab('buy')" data-tab="buy">
+                <span class="tab-icon">🌱</span>
+                Buy Seeds
+            </button>
+            <button class="shop-tab" onclick="game.switchShopTab('sell')" data-tab="sell">
+                <span class="tab-icon">🧺</span>
+                Sell Harvest
+            </button>
         </div>
 
-        <div class="market-content">
-            <div class="player-money seasonal-money">
-                <div class="coin-icon" aria-label="Your money"></div>
-                <span id="market-money" role="status" aria-live="polite">100</span>
-            </div>
+        <!-- Player Money Display (shared) -->
+        <div class="player-money seasonal-money">
+            <div class="coin-icon" aria-label="Your money"></div>
+            <span id="shop-money" role="status" aria-live="polite">100</span>
+        </div>
 
-            <div class="inventory-display">
-                <h3>Your Harvest:</h3>
-                <div id="inventory-list"></div>
+        <!-- Buy Seeds Tab Content -->
+        <div id="buy-tab" class="shop-tab-content active">
+            <div class="shop-content">
+                <div id="shop-items" class="shop-items" role="list"></div>
             </div>
+        </div>
 
-            <div class="selling-area">
-                <h3>Sell Your Produce:</h3>
-                <div id="sell-slots" class="sell-slots"></div>
-                <div class="sell-summary">
-                    <div class="total-display">
-                        <span>Total:</span>
-                        <div class="coin-icon"></div>
-                        <span id="sell-total">0</span>
+        <!-- Sell Harvest Tab Content -->
+        <div id="sell-tab" class="shop-tab-content">
+            <div class="market-content">
+                <div class="inventory-display">
+                    <h3>Your Harvest:</h3>
+                    <div id="inventory-list"></div>
+                </div>
+
+                <div class="selling-area">
+                    <h3>Sell Your Produce:</h3>
+                    <div id="sell-slots" class="sell-slots"></div>
+                    <div class="sell-summary">
+                        <div class="total-display">
+                            <span>Total:</span>
+                            <div class="coin-icon"></div>
+                            <span id="sell-total">0</span>
+                        </div>
+                        <button class="sell-all-button" onclick="game.sellAll()">Sell All</button>
                     </div>
-                    <button class="sell-all-button" onclick="game.sellAll()">Sell All</button>
                 </div>
             </div>
         </div>
@@ -247,7 +252,7 @@
     <!-- Toast Notification Container -->
     <div id="toast-container"></div>
 
-    <!-- Game Script (Bundled) - v2.9 with compact shop/market/upgrades redesign -->
-    <script src="game-bundle.js?v=2.9"></script>
+    <!-- Game Script (Bundled) - v2.13 with gameTime fix -->
+    <script src="game-bundle.js?v=2.13"></script>
 </body>
 </html>

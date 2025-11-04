@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fix Tree Data</title>
+</head>
+<body>
+    <h1>Fix Corrupted Tree Data</h1>
+    <button onclick="fixTree()">Reset First Tree Slot</button>
+    <pre id="output"></pre>
+
+    <script>
+        function fixTree() {
+            const output = document.getElementById('output');
+
+            // Load saved game
+            const savedGame = localStorage.getItem('cozyGardenSave');
+
+            if (!savedGame) {
+                output.textContent = 'No saved game found!';
+                return;
+            }
+
+            const gameData = JSON.parse(savedGame);
+
+            // Show current state
+            output.textContent = 'Current first tree:\n' + JSON.stringify(gameData.fruitGarden?.trees?.[0], null, 2);
+
+            // Reset first tree to empty state
+            if (gameData.fruitGarden && gameData.fruitGarden.trees) {
+                gameData.fruitGarden.trees[0] = {
+                    status: 'empty',
+                    fruitType: null,
+                    growthStage: 0,
+                    lastWatered: 0,
+                    needsWater: false,
+                    readyToHarvest: false,
+                    plantedAt: 0,
+                    harvestCount: 0,
+                    lastProduced: 0,
+                    isMature: false
+                };
+
+                // Save back to localStorage
+                localStorage.setItem('cozyGardenSave', JSON.stringify(gameData));
+
+                output.textContent += '\n\n✅ First tree slot has been reset!\n\nNew state:\n' +
+                    JSON.stringify(gameData.fruitGarden.trees[0], null, 2);
+
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+            }
+        }
+    </script>
+</body>
+</html>
