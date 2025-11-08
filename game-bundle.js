@@ -166,12 +166,63 @@ const UPGRADES = {
     }
 };
 
+// Level System - Progression and Unlocks
+const LEVEL_SYSTEM = {
+    // XP required for each level (cumulative)
+    levels: [
+        { level: 1, xpRequired: 0, xpToNext: 100 },      // Start - Lettuce, Tomato
+        { level: 2, xpRequired: 100, xpToNext: 150 },    // Unlock Carrot
+        { level: 3, xpRequired: 250, xpToNext: 200 },    // Unlock Auto-Watering
+        { level: 4, xpRequired: 450, xpToNext: 250 },    // Unlock Potato
+        { level: 5, xpRequired: 700, xpToNext: 300 },    // Unlock Faster Growth
+        { level: 6, xpRequired: 1000, xpToNext: 350 },   // Unlock Corn
+        { level: 7, xpRequired: 1350, xpToNext: 400 },   // Unlock Garden Expansion
+        { level: 8, xpRequired: 1750, xpToNext: 500 },   // Unlock Premium Orchard
+        { level: 9, xpRequired: 2250, xpToNext: 600 },   // Unlock all fruits
+        { level: 10, xpRequired: 2850, xpToNext: 0 }     // Max level - Premium Auto Watering
+    ],
+
+    // XP rewards for different actions
+    xpRewards: {
+        plant: 5,           // XP for planting a seed
+        harvest: 10,        // XP for harvesting a crop
+        sellItem: 3,        // XP per item sold
+        buySeed: 2,         // XP for buying a seed
+        waterPlant: 1,      // XP for watering a plant
+        purchaseUpgrade: 50 // XP for buying an upgrade
+    },
+
+    // Unlock requirements per level
+    unlocks: {
+        vegetables: {
+            lettuce: 1,   // Available from start
+            tomato: 1,    // Available from start
+            carrot: 2,    // Unlocks at level 2
+            potato: 4,    // Unlocks at level 4
+            corn: 6       // Unlocks at level 6
+        },
+        fruits: {
+            apple: 8,     // Unlocks at level 8 (requires orchard first)
+            pear: 8,      // Unlocks at level 8
+            orange: 9,    // Unlocks at level 9
+            banana: 9     // Unlocks at level 9
+        },
+        upgrades: {
+            autoWatering: 3,           // Unlocks at level 3
+            fasterGrowth: 5,           // Unlocks at level 5
+            expandedGarden: 7,         // Unlocks at level 7
+            premiumOrchard: 8,         // Unlocks at level 8
+            premiumAutoWatering: 10    // Unlocks at level 10
+        }
+    }
+};
+
 // Seasons - Seasonal background images
 const SEASONS = [
     {
         name: "Spring",
         icon: "🌸",
-        duration: 300,
+        duration: 300, // 5 minutes
         backgroundImage: "assets/images/grass-field/Spring.png",
         colors: {
             sky: "linear-gradient(to bottom, #87CEEB 0%, #7CB342 50%, #558B2F 100%)",
@@ -186,7 +237,7 @@ const SEASONS = [
     {
         name: "Summer",
         icon: "☀️",
-        duration: 300,
+        duration: 300, // 5 minutes
         backgroundImage: "assets/images/grass-field/Summer.png",
         colors: {
             sky: "linear-gradient(to bottom, #FFD700 0%, #9CCC65 40%, #689F38 100%)",
@@ -201,7 +252,7 @@ const SEASONS = [
     {
         name: "Fall",
         icon: "🍂",
-        duration: 300,
+        duration: 300, // 5 minutes
         backgroundImage: "assets/images/grass-field/Autumn.png",
         colors: {
             sky: "linear-gradient(to bottom, #FF8C00 0%, #8BC34A 50%, #558B2F 100%)",
@@ -216,7 +267,7 @@ const SEASONS = [
     {
         name: "Winter",
         icon: "❄️",
-        duration: 300,
+        duration: 300, // 5 minutes
         backgroundImage: "assets/images/grass-field/Winter.png",
         colors: {
             sky: "linear-gradient(to bottom, #E0F7FA 0%, #81C784 50%, #66BB6A 100%)",
@@ -236,6 +287,8 @@ const SEASONS = [
 class Player {
     constructor() {
         this.money = 100;
+        this.level = 1;
+        this.xp = 0;
         this.inventory = {
             seeds: {
                 tomato: 5,
@@ -379,9 +432,86 @@ class Player {
         console.log(`Purchased upgrade: ${upgradeType}`);
     }
 
+    // Level System Methods
+    addXP(amount, actionType = 'general') {
+        const oldXP = this.xp;
+        const oldLevel = this.level;
+        this.xp += amount;
+
+        console.log(`⭐ Gained ${amount} XP from ${actionType}! Total XP: ${this.xp}`);
+
+        // Check for level up
+        const leveledUp = this.checkLevelUp();
+
+        return {
+            xpGained: amount,
+            oldXP,
+            newXP: this.xp,
+            oldLevel,
+            newLevel: this.level,
+            leveledUp
+        };
+    }
+
+    checkLevelUp() {
+        let leveledUp = false;
+
+        // Check if player has enough XP for next level
+        while (this.level < LEVEL_SYSTEM.levels.length) {
+            const currentLevelData = LEVEL_SYSTEM.levels[this.level - 1];
+            const nextLevelData = LEVEL_SYSTEM.levels[this.level];
+
+            if (nextLevelData && this.xp >= nextLevelData.xpRequired) {
+                this.level++;
+                leveledUp = true;
+                console.log(`🎉 LEVEL UP! Now level ${this.level}!`);
+            } else {
+                break;
+            }
+        }
+
+        return leveledUp;
+    }
+
+    getCurrentLevelData() {
+        return LEVEL_SYSTEM.levels[this.level - 1];
+    }
+
+    getXPProgress() {
+        const currentLevelData = this.getCurrentLevelData();
+        const xpIntoCurrentLevel = this.xp - currentLevelData.xpRequired;
+        const xpNeededForNext = currentLevelData.xpToNext;
+
+        return {
+            current: xpIntoCurrentLevel,
+            required: xpNeededForNext,
+            percentage: xpNeededForNext > 0 ? (xpIntoCurrentLevel / xpNeededForNext) * 100 : 100
+        };
+    }
+
+    isUnlocked(type, itemKey) {
+        const unlockLevel = LEVEL_SYSTEM.unlocks[type]?.[itemKey];
+        if (unlockLevel === undefined) return true; // Not in unlock system, assume unlocked
+        return this.level >= unlockLevel;
+    }
+
+    getUnlockedVegetables() {
+        return Object.keys(PLANTS).filter(veg => this.isUnlocked('vegetables', veg));
+    }
+
+    getUnlockedFruits() {
+        return Object.keys(FRUITS).filter(fruit => this.isUnlocked('fruits', fruit));
+    }
+
+    getUnlockedUpgrades() {
+        return Object.keys(UPGRADES).filter(upgrade => this.isUnlocked('upgrades', upgrade));
+    }
+
     getSaveData() {
         return {
             money: this.money,
+            level: this.level,
+            xp: this.xp,
             inventory: JSON.parse(JSON.stringify(this.inventory)),
             upgrades: JSON.parse(JSON.stringify(this.upgrades))
         };
@@ -389,6 +519,8 @@ class Player {
 
     loadSaveData(data) {
         if (data.money !== undefined) this.money = data.money;
+        if (data.level !== undefined) this.level = data.level;
+        if (data.xp !== undefined) this.xp = data.xp;
 
         // Merge inventory to ensure backward compatibility
         if (data.inventory) {
@@ -981,6 +1113,7 @@ class UIManager {
     updateAll() {
         this.updateMoney();
         this.updateHarvestedCount();
+        this.updateLevelDisplay();
         this.updateSeedSelector();
         this.updateSeason();
     }
@@ -1015,6 +1148,29 @@ class UIManager {
         }
     }
 
+    updateLevelDisplay() {
+        const levelNum = document.getElementById('level-number');
+        const xpBar = document.getElementById('xp-bar');
+        const xpText = document.getElementById('xp-text');
+
+        if (!levelNum || !xpBar || !xpText) return;
+
+        const player = this.game.player;
+        const progress = player.getXPProgress();
+
+        levelNum.textContent = player.level;
+        xpBar.style.width = `${progress.percentage}%`;
+
+        // Display XP text
+        if (progress.required > 0) {
+            xpText.textContent = `${progress.current} / ${progress.required} XP`;
+        } else {
+            xpText.textContent = 'MAX LEVEL';
+        }
+
+        console.log(`⭐ Level display updated: Level ${player.level}, ${progress.current}/${progress.required} XP (${progress.percentage.toFixed(1)}%)`);
+    }
+
     updateSeedSelector() {
         const vegetableSection = document.getElementById('vegetable-seeds');
         const fruitSection = document.getElementById('fruit-seeds');
@@ -1040,8 +1196,12 @@ class UIManager {
             pear: '🍐'
         };
 
-        // Render vegetable seeds (always visible)
+        // Render vegetable seeds (only unlocked ones)
+        const unlockedVegetables = this.game.player.getUnlockedVegetables();
         for (const [key, plant] of Object.entries(PLANTS)) {
+            // Skip locked vegetables
+            if (!unlockedVegetables.includes(key)) continue;
+
             const btn = document.createElement('button');
             btn.className = 'seed-button';
             btn.dataset.seed = key;
@@ -1049,6 +1209,11 @@ class UIManager {
             const count = this.game.player.inventory.seeds[key];
             if (count === 0) {
                 btn.classList.add('disabled');
+            }
+
+            // Restore active state if this seed is currently selected
+            if (this.game.selectedSeed === key && this.game.selectedTool === `seed-${key}`) {
+                btn.classList.add('active');
             }
 
             btn.onclick = () => {
@@ -1077,8 +1242,14 @@ class UIManager {
             vegetableSection.appendChild(btn);
         }
 
-        // Render fruit seeds
+        // Render fruit seeds (only if orchard unlocked and fruits unlocked)
+        const unlockedFruits = this.game.player.getUnlockedFruits();
+        const hasOrchard = this.game.player.upgrades.premiumOrchard;
+
         for (const [key, fruit] of Object.entries(FRUITS)) {
+            // Skip if orchard not purchased or fruit not unlocked
+            if (!hasOrchard || !unlockedFruits.includes(key)) continue;
+
             const btn = document.createElement('button');
             btn.className = 'seed-button';
             btn.dataset.seed = key;
@@ -1086,6 +1257,11 @@ class UIManager {
             const count = this.game.player.inventory.fruitSeeds[key] || 0;
             if (count === 0) {
                 btn.classList.add('disabled');
+            }
+
+            // Restore active state if this seed is currently selected
+            if (this.game.selectedSeed === key && this.game.selectedTool === `seed-${key}`) {
+                btn.classList.add('active');
             }
 
             btn.onclick = () => {
@@ -1207,34 +1383,27 @@ class UIManager {
     }
 
     showSeasonChangeNotification(previousSeason, newSeason) {
-        // Create a special toast for season change
-        const toast = document.createElement('div');
-        toast.className = 'toast season-change-toast show';
+        // Update the center-screen season announcement
+        const announcement = document.getElementById('season-announcement');
+        const oldSeasonIcon = document.getElementById('old-season-icon');
+        const oldSeasonName = document.getElementById('old-season-name');
+        const newSeasonIcon = document.getElementById('new-season-icon');
+        const newSeasonName = document.getElementById('new-season-name');
 
-        toast.innerHTML = `
-            <div class="toast-icon season-transition">
-                <span class="season-from">${previousSeason.icon}</span>
-                <span class="season-arrow">→</span>
-                <span class="season-to">${newSeason.icon}</span>
-            </div>
-            <div class="toast-content">
-                <div class="toast-title">Season Changed!</div>
-                <div class="toast-message">${previousSeason.name} → ${newSeason.name}</div>
-            </div>
-        `;
+        if (announcement && oldSeasonIcon && oldSeasonName && newSeasonIcon && newSeasonName) {
+            // Update content
+            oldSeasonIcon.textContent = previousSeason.icon;
+            oldSeasonName.textContent = previousSeason.name;
+            newSeasonIcon.textContent = newSeason.icon;
+            newSeasonName.textContent = newSeason.name;
 
-        const container = document.getElementById('toast-container');
-        if (container) {
-            container.appendChild(toast);
+            // Show announcement
+            announcement.classList.add('show');
 
-            // Trigger animation
-            setTimeout(() => toast.classList.add('show'), 10);
-
-            // Auto remove after 5 seconds (longer for season change)
+            // Hide after 4 seconds
             setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 300);
-            }, 5000);
+                announcement.classList.remove('show');
+            }, 4000);
         }
     }
 
@@ -1398,11 +1567,15 @@ class UIManager {
         // Add vegetable seeds section
         for (const [key, plant] of Object.entries(PLANTS)) {
             const item = document.createElement('div');
-            item.className = 'shop-item';
+            const isUnlocked = this.game.player.isUnlocked('vegetables', key);
+            const requiredLevel = LEVEL_SYSTEM.unlocks.vegetables[key] || 1;
 
-            const canBuy = this.game.player.money >= plant.seedCost;
+            item.className = isUnlocked ? 'shop-item' : 'shop-item locked';
+
+            const canBuy = this.game.player.money >= plant.seedCost && isUnlocked;
 
             item.innerHTML = `
+                ${!isUnlocked ? `<div class="level-requirement">🔒 Level ${requiredLevel}</div>` : ''}
                 <div class="shop-item-icon">${cropIcons[key] || '🌱'}</div>
                 <div class="shop-item-header">
                     <h3>${plant.name} Seeds</h3>
@@ -1419,7 +1592,7 @@ class UIManager {
                 <div class="shop-item-footer">
                     <div class="price"><div class="coin-icon"></div>${plant.seedCost}</div>
                     <button class="buy-button" onclick="game.buySeed('${key}')" ${!canBuy ? 'disabled' : ''}>
-                        Buy Seed
+                        ${isUnlocked ? 'Buy Seed' : 'Locked'}
                     </button>
                 </div>
             `;
@@ -1444,11 +1617,15 @@ class UIManager {
 
             for (const [key, fruit] of Object.entries(FRUITS)) {
                 const item = document.createElement('div');
-                item.className = 'shop-item';
+                const isUnlocked = this.game.player.isUnlocked('fruits', key);
+                const requiredLevel = LEVEL_SYSTEM.unlocks.fruits[key] || 8;
 
-                const canBuy = this.game.player.money >= fruit.seedCost;
+                item.className = isUnlocked ? 'shop-item' : 'shop-item locked';
+
+                const canBuy = this.game.player.money >= fruit.seedCost && isUnlocked;
 
                 item.innerHTML = `
+                    ${!isUnlocked ? `<div class="level-requirement">🔒 Level ${requiredLevel}</div>` : ''}
                     <div class="shop-item-icon">${fruitIcons[key] || '🌳'}</div>
                     <div class="shop-item-header">
                         <h3>${fruit.name} Seeds</h3>
@@ -1465,7 +1642,7 @@ class UIManager {
                     <div class="shop-item-footer">
                         <div class="price"><div class="coin-icon"></div>${fruit.seedCost}</div>
                         <button class="buy-button" onclick="game.buyFruitSeed('${key}')" ${!canBuy ? 'disabled' : ''}>
-                            Buy Seed
+                            ${isUnlocked ? 'Buy Seed' : 'Locked'}
                         </button>
                     </div>
                 `;
@@ -1476,10 +1653,163 @@ class UIManager {
     }
 
     renderMarket() {
-        this.renderInventory();
-        this.renderSellSlots();
+        this.renderProductGrid();
+        this.renderSellCart();
     }
 
+    // NEW: Render product selection grid
+    renderProductGrid() {
+        const productGrid = document.getElementById('product-grid');
+        if (!productGrid) return;
+
+        productGrid.innerHTML = '';
+
+        const hasVegetables = this.game.player.inventory.harvested &&
+            Object.values(this.game.player.inventory.harvested).some(count => count > 0);
+        const hasFruits = this.game.player.inventory.harvestedFruits &&
+            Object.values(this.game.player.inventory.harvestedFruits).some(count => count > 0);
+
+        if (!hasVegetables && !hasFruits) {
+            productGrid.innerHTML = '<p class="empty-message">No harvested produce yet! Go plant and harvest some vegetables!</p>';
+            return;
+        }
+
+        // Vegetable icons
+        const vegIcons = {
+            tomato: '🍅',
+            lettuce: '🥬',
+            carrot: '🥕',
+            corn: '🌽',
+            potato: '🥔'
+        };
+
+        // Add vegetables to grid
+        for (const [key, count] of Object.entries(this.game.player.inventory.harvested)) {
+            if (count > 0) {
+                const plant = PLANTS[key];
+                const productCard = this.createProductCard('veg', key, plant, vegIcons[key], count);
+                productGrid.appendChild(productCard);
+            }
+        }
+
+        // Fruit icons
+        const fruitIcons = {
+            apple: '🍎',
+            orange: '🍊',
+            banana: '🍌',
+            pear: '🍐'
+        };
+
+        // Add fruits if orchard unlocked
+        if (this.game.player.upgrades.premiumOrchard) {
+            for (const [key, count] of Object.entries(this.game.player.inventory.harvestedFruits)) {
+                if (count > 0) {
+                    const fruit = FRUITS[key];
+                    const productCard = this.createProductCard('fruit', key, fruit, fruitIcons[key], count);
+                    productCard.style.border = '3px solid #DAA520';
+                    productCard.classList.add('fruit-product');
+                    productGrid.appendChild(productCard);
+                }
+            }
+        }
+    }
+
+    // NEW: Create product card for selection
+    createProductCard(type, key, item, icon, count) {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.dataset.type = type;
+        card.dataset.key = key;
+
+        // Check if already in cart
+        const isInCart = this.game.sellCart && this.game.sellCart.some(p => p.type === type && p.key === key);
+        if (isInCart) {
+            card.classList.add('in-cart');
+        }
+
+        card.innerHTML = `
+            <div class="product-icon">${icon}</div>
+            <div class="product-name">${item.name}</div>
+            <div class="product-stock">Stock: ${count}</div>
+            <div class="product-price">
+                <div class="coin-icon"></div>
+                <span>${item.sellPrice} each</span>
+            </div>
+            <div class="product-select-overlay">
+                <span class="checkmark">✓</span>
+            </div>
+        `;
+
+        card.onclick = () => this.game.toggleProductSelection(type, key, item, icon, count);
+
+        return card;
+    }
+
+    // NEW: Render sell cart with selected products
+    renderSellCart() {
+        const sellCart = document.getElementById('sell-cart');
+        const cartCount = document.getElementById('cart-count');
+        const sellButton = document.getElementById('sell-button');
+
+        if (!sellCart) return;
+
+        const cart = this.game.sellCart || [];
+
+        // Update cart count
+        if (cartCount) {
+            cartCount.textContent = cart.length;
+        }
+
+        if (cart.length === 0) {
+            sellCart.innerHTML = '<p class="empty-cart-message">No products selected. Click on products above to add them.</p>';
+            if (sellButton) sellButton.disabled = true;
+            this.updateSellTotal();
+            return;
+        }
+
+        // Enable sell button
+        if (sellButton) sellButton.disabled = false;
+
+        sellCart.innerHTML = '';
+
+        cart.forEach((product, index) => {
+            const cartItem = document.createElement('div');
+            cartItem.className = 'cart-item';
+
+            const maxQty = product.type === 'veg'
+                ? this.game.player.inventory.harvested[product.key]
+                : this.game.player.inventory.harvestedFruits[product.key];
+
+            cartItem.innerHTML = `
+                <div class="cart-item-icon">${product.icon}</div>
+                <div class="cart-item-info">
+                    <div class="cart-item-name">${product.item.name}</div>
+                    <div class="cart-item-price">${product.item.sellPrice} per unit</div>
+                </div>
+                <div class="cart-item-quantity">
+                    <button class="qty-btn" onclick="game.decreaseCartQuantity(${index})">-</button>
+                    <input type="number"
+                           class="qty-input"
+                           value="${product.quantity || 0}"
+                           min="0"
+                           max="${maxQty}"
+                           onchange="game.updateCartQuantity(${index}, this.value)">
+                    <button class="qty-btn" onclick="game.increaseCartQuantity(${index})">+</button>
+                </div>
+                <div class="cart-item-total">
+                    <div class="coin-icon"></div>
+                    <span>${(product.quantity || 0) * product.item.sellPrice}</span>
+                </div>
+                <button class="cart-remove-btn" onclick="game.removeFromCart(${index})" title="Remove from cart">✕</button>
+            `;
+
+            sellCart.appendChild(cartItem);
+        });
+
+        this.updateSellTotal();
+    }
+
+    // Keep old renderInventory for backwards compatibility
     renderInventory() {
         const inventoryList = document.getElementById('inventory-list');
         if (!inventoryList) return;
@@ -1652,31 +1982,42 @@ class UIManager {
     updateSellTotal() {
         let total = 0;
 
-        for (let i = 0; i < 5; i++) {
-            const slot = document.getElementById(`sell-slot-${i}`);
-            if (!slot) continue;
+        // NEW: Check if using new cart system or old slot system
+        if (this.game.sellCart && this.game.sellCart.length > 0) {
+            // New cart system
+            for (const product of this.game.sellCart) {
+                if (product.quantity > 0) {
+                    total += product.quantity * product.item.sellPrice;
+                }
+            }
+        } else {
+            // Old slot system (backwards compatibility)
+            for (let i = 0; i < 5; i++) {
+                const slot = document.getElementById(`sell-slot-${i}`);
+                if (!slot) continue;
 
-            const select = slot.querySelector('select');
-            const input = slot.querySelector('input');
+                const select = slot.querySelector('select');
+                const input = slot.querySelector('input');
 
-            const selectedValue = select.value;
-            const quantity = parseInt(input.value) || 0;
+                const selectedValue = select.value;
+                const quantity = parseInt(input.value) || 0;
 
-            if (selectedValue && quantity > 0) {
-                const [type, key] = selectedValue.split(':');
+                if (selectedValue && quantity > 0) {
+                    const [type, key] = selectedValue.split(':');
 
-                if (type === 'veg') {
-                    const plant = PLANTS[key];
-                    const available = this.game.player.inventory.harvested[key];
-                    const slotLimit = 20; // Max 20 vegetables per slot
-                    const actualQty = Math.min(quantity, available, slotLimit);
-                    total += actualQty * plant.sellPrice;
-                } else if (type === 'fruit') {
-                    const fruit = FRUITS[key];
-                    const available = this.game.player.inventory.harvestedFruits[key];
-                    const slotLimit = 5; // Max 5 fruits per slot
-                    const actualQty = Math.min(quantity, available, slotLimit);
-                    total += actualQty * fruit.sellPrice;
+                    if (type === 'veg') {
+                        const plant = PLANTS[key];
+                        const available = this.game.player.inventory.harvested[key];
+                        const slotLimit = 20; // Max 20 vegetables per slot
+                        const actualQty = Math.min(quantity, available, slotLimit);
+                        total += actualQty * plant.sellPrice;
+                    } else if (type === 'fruit') {
+                        const fruit = FRUITS[key];
+                        const available = this.game.player.inventory.harvestedFruits[key];
+                        const slotLimit = 5; // Max 5 fruits per slot
+                        const actualQty = Math.min(quantity, available, slotLimit);
+                        total += actualQty * fruit.sellPrice;
+                    }
                 }
             }
         }
@@ -1693,6 +2034,9 @@ class UIManager {
 
         for (const [key, upgrade] of Object.entries(UPGRADES)) {
             const item = document.createElement('div');
+            const isUnlocked = this.game.player.isUnlocked('upgrades', key);
+            const requiredLevel = LEVEL_SYSTEM.unlocks.upgrades[key] || 1;
+
             item.className = 'upgrade-item';
 
             const isOwned = this.game.player.upgrades[upgrade.effect === 'fasterGrowth' ? 'fasterGrowth' : upgrade.effect];
@@ -1702,9 +2046,14 @@ class UIManager {
                 item.classList.add('owned');
             }
 
-            const canBuy = this.game.player.money >= upgrade.cost && !owned;
+            if (!isUnlocked) {
+                item.classList.add('locked');
+            }
+
+            const canBuy = this.game.player.money >= upgrade.cost && !owned && isUnlocked;
 
             item.innerHTML = `
+                ${!isUnlocked && !owned ? `<div class="level-requirement">🔒 Level ${requiredLevel}</div>` : ''}
                 <div class="upgrade-icon-large">${upgrade.icon}</div>
                 <div class="upgrade-info">
                     <h3>${upgrade.name}</h3>
@@ -1715,7 +2064,7 @@ class UIManager {
                     `<div class="upgrade-footer">
                         <div class="price"><div class="coin-icon"></div>${upgrade.cost}</div>
                         <button class="upgrade-button" onclick="game.buyUpgrade('${key}')" ${!canBuy ? 'disabled' : ''}>
-                            Purchase
+                            ${isUnlocked ? 'Purchase' : 'Locked'}
                         </button>
                     </div>`
                 }
@@ -1949,6 +2298,9 @@ class Game {
         this.autoWateringTimer = 0;
         this.premiumAutoWateringTimer = 0;
 
+        // NEW: Sell cart for new market interface
+        this.sellCart = [];
+
         this.initialize();
     }
 
@@ -1962,6 +2314,51 @@ class Game {
         console.log('  🌱 Seeds:', this.player.inventory.seeds);
         console.log('  🧺 Harvested:', this.player.inventory.harvested);
 
+        // Check if welcome screen should be shown
+        const hasSeenWelcome = localStorage.getItem('cozyGardenWelcomeSeen');
+        if (!hasSeenWelcome) {
+            this.showWelcomeScreen();
+        } else {
+            this.startGameAfterWelcome();
+        }
+
+        console.log('✅ Game initialized successfully!');
+    }
+
+    showWelcomeScreen() {
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const gardenScreen = document.getElementById('garden-screen');
+
+        if (welcomeScreen && gardenScreen) {
+            welcomeScreen.classList.add('active');
+            gardenScreen.classList.remove('active');
+        }
+    }
+
+    startGame() {
+        // Mark welcome as seen
+        localStorage.setItem('cozyGardenWelcomeSeen', 'true');
+
+        // Fade out welcome screen
+        const welcomeScreen = document.getElementById('welcome-screen');
+        if (welcomeScreen) {
+            welcomeScreen.style.animation = 'fadeOut 0.5s ease-out';
+            setTimeout(() => {
+                welcomeScreen.classList.remove('active');
+                welcomeScreen.style.animation = '';
+            }, 500);
+        }
+
+        // Start the actual game
+        this.startGameAfterWelcome();
+    }
+
+    startGameAfterWelcome() {
+        const gardenScreen = document.getElementById('garden-screen');
+        if (gardenScreen) {
+            gardenScreen.classList.add('active');
+        }
+
         this.ui.renderGarden();
         this.ui.updateAll();
 
@@ -1974,9 +2371,10 @@ class Game {
             this.ui.renderOrchard();
         }
 
-        this.startGameLoop();
+        // Initialize tool selection UI to match the default tool
+        this.selectTool(this.selectedTool);
 
-        console.log('✅ Game initialized successfully!');
+        this.startGameLoop();
     }
 
     startGameLoop() {
@@ -2062,6 +2460,13 @@ class Game {
             const seedType = this.selectedTool.replace('seed-', '');
             if (cell.status === 'tilled' && this.player.useSeed(seedType)) {
                 this.garden.plant(row, col, seedType, this.gameTime);
+
+                // Award XP for planting
+                const xpResult = this.player.addXP(LEVEL_SYSTEM.xpRewards.plant, 'plant');
+                if (xpResult.leveledUp) {
+                    this.handleLevelUp(xpResult.oldLevel, xpResult.newLevel);
+                }
+
                 this.ui.updateTile(row, col);
                 this.ui.updateSeedSelector();
                 this.saveGame();
@@ -2076,6 +2481,12 @@ class Game {
 
     waterPlant(row, col) {
         if (this.garden.water(row, col, this.gameTime)) {
+            // Award XP for watering
+            const xpResult = this.player.addXP(LEVEL_SYSTEM.xpRewards.waterPlant, 'water');
+            if (xpResult.leveledUp) {
+                this.handleLevelUp(xpResult.oldLevel, xpResult.newLevel);
+            }
+
             this.ui.updateTile(row, col);
 
             const tile = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
@@ -2095,6 +2506,12 @@ class Game {
         if (result) {
             console.log(`🎯 Calling player.addHarvest(${result.plantType}, ${result.yield})`);
             this.player.addHarvest(result.plantType, result.yield);
+
+            // Award XP for harvesting
+            const xpResult = this.player.addXP(LEVEL_SYSTEM.xpRewards.harvest, 'harvest');
+            if (xpResult.leveledUp) {
+                this.handleLevelUp(xpResult.oldLevel, xpResult.newLevel);
+            }
 
             this.ui.updateTile(row, col);
             this.ui.updateAll();
@@ -2273,6 +2690,13 @@ class Game {
 
         if (this.player.spendMoney(plant.seedCost)) {
             this.player.addSeed(seedType, 1);
+
+            // Award XP for buying a seed
+            const xpResult = this.player.addXP(LEVEL_SYSTEM.xpRewards.buySeed, 'buy seed');
+            if (xpResult.leveledUp) {
+                this.handleLevelUp(xpResult.oldLevel, xpResult.newLevel);
+            }
+
             this.ui.updateAll();
             this.ui.renderShop();
             this.saveGame();
@@ -2326,6 +2750,7 @@ class Game {
 
     sellAll() {
         let totalEarned = 0;
+        let totalItemsSold = 0;
 
         for (let i = 0; i < 5; i++) {
             const slot = document.getElementById(`sell-slot-${i}`);
@@ -2348,6 +2773,7 @@ class Game {
                     if (this.player.sellHarvest(key, actualQty)) {
                         const earnings = actualQty * plant.sellPrice;
                         totalEarned += earnings;
+                        totalItemsSold += actualQty;
                     }
                 } else if (type === 'fruit') {
                     const fruit = FRUITS[key];
@@ -2357,12 +2783,23 @@ class Game {
                     if (this.player.sellFruit(key, actualQty)) {
                         const earnings = actualQty * fruit.sellPrice;
                         totalEarned += earnings;
+                        totalItemsSold += actualQty;
                     }
                 }
             }
         }
 
         this.player.addMoney(totalEarned);
+
+        // Award XP for selling (XP per item sold)
+        if (totalItemsSold > 0) {
+            const xpGained = totalItemsSold * LEVEL_SYSTEM.xpRewards.sellItem;
+            const xpResult = this.player.addXP(xpGained, 'sell');
+            if (xpResult.leveledUp) {
+                this.handleLevelUp(xpResult.oldLevel, xpResult.newLevel);
+            }
+        }
+
         this.ui.updateAll();
         this.ui.renderMarket();
         this.saveGame();
@@ -2380,6 +2817,137 @@ class Game {
         console.log(`💰 Sold produce for $${totalEarned}!`);
     }
 
+    // NEW: Toggle product selection for cart (max 3)
+    toggleProductSelection(type, key, item, icon, count) {
+        const existingIndex = this.sellCart.findIndex(p => p.type === type && p.key === key);
+
+        if (existingIndex !== -1) {
+            // Remove from cart
+            this.sellCart.splice(existingIndex, 1);
+            this.ui.showToast('info', '🛒', 'Removed from Cart', `${item.name} removed`);
+        } else {
+            // Check max limit
+            if (this.sellCart.length >= 3) {
+                this.ui.showToast('error', '⚠️', 'Cart Full!', 'You can only select up to 3 products at a time');
+                return;
+            }
+
+            // Add to cart
+            this.sellCart.push({
+                type: type,
+                key: key,
+                item: item,
+                icon: icon,
+                maxCount: count,
+                quantity: 0  // Start with 0, user must set quantity
+            });
+            this.ui.showToast('success', '✓', 'Added to Cart', `${item.name} added`);
+        }
+
+        // Re-render both grid and cart
+        this.ui.renderProductGrid();
+        this.ui.renderSellCart();
+    }
+
+    // NEW: Remove product from cart
+    removeFromCart(index) {
+        if (index >= 0 && index < this.sellCart.length) {
+            const product = this.sellCart[index];
+            this.sellCart.splice(index, 1);
+            this.ui.showToast('info', '🗑️', 'Removed', `${product.item.name} removed from cart`);
+            this.ui.renderProductGrid();
+            this.ui.renderSellCart();
+        }
+    }
+
+    // NEW: Update cart item quantity
+    updateCartQuantity(index, value) {
+        if (index >= 0 && index < this.sellCart.length) {
+            const product = this.sellCart[index];
+            const qty = Math.max(0, Math.min(parseInt(value) || 0, product.maxCount));
+            product.quantity = qty;
+            this.ui.renderSellCart();
+        }
+    }
+
+    // NEW: Increase cart quantity
+    increaseCartQuantity(index) {
+        if (index >= 0 && index < this.sellCart.length) {
+            const product = this.sellCart[index];
+            if (product.quantity < product.maxCount) {
+                product.quantity++;
+                this.ui.renderSellCart();
+            }
+        }
+    }
+
+    // NEW: Decrease cart quantity
+    decreaseCartQuantity(index) {
+        if (index >= 0 && index < this.sellCart.length) {
+            const product = this.sellCart[index];
+            if (product.quantity > 0) {
+                product.quantity--;
+                this.ui.renderSellCart();
+            }
+        }
+    }
+
+    // NEW: Sell selected products from cart
+    sellSelectedProducts() {
+        let totalEarned = 0;
+        let totalItemsSold = 0;
+
+        // Process each cart item
+        for (const product of this.sellCart) {
+            if (product.quantity > 0) {
+                if (product.type === 'veg') {
+                    const available = this.player.inventory.harvested[product.key];
+                    const actualQty = Math.min(product.quantity, available);
+
+                    if (this.player.sellHarvest(product.key, actualQty)) {
+                        const earnings = actualQty * product.item.sellPrice;
+                        totalEarned += earnings;
+                        totalItemsSold += actualQty;
+                    }
+                } else if (product.type === 'fruit') {
+                    const available = this.player.inventory.harvestedFruits[product.key];
+                    const actualQty = Math.min(product.quantity, available);
+
+                    if (this.player.sellFruit(product.key, actualQty)) {
+                        const earnings = actualQty * product.item.sellPrice;
+                        totalEarned += earnings;
+                        totalItemsSold += actualQty;
+                    }
+                }
+            }
+        }
+
+        if (totalEarned > 0) {
+            this.player.addMoney(totalEarned);
+
+            // Award XP for selling
+            const xpGained = totalItemsSold * LEVEL_SYSTEM.xpRewards.sellItem;
+            const xpResult = this.player.addXP(xpGained, 'sell');
+            if (xpResult.leveledUp) {
+                this.handleLevelUp(xpResult.oldLevel, xpResult.newLevel);
+            }
+
+            // Clear cart after successful sale
+            this.sellCart = [];
+
+            this.ui.updateAll();
+            this.ui.renderMarket();
+            this.saveGame();
+
+            // Show success toast
+            this.ui.showToast('success', '💰', 'Sale Complete!', `Sold ${totalItemsSold} items for $${totalEarned}`);
+
+            console.log(`💰 Sold ${totalItemsSold} items for $${totalEarned}!`);
+        } else {
+            this.ui.showToast('error', '⚠️', 'No Items Selected', 'Please set quantities for items in your cart');
+        }
+    }
+
     showUpgrades() {
         this.ui.showScreen('upgrades-screen');
         this.ui.renderUpgrades();
@@ -2390,6 +2958,12 @@ class Game {
 
         if (this.player.spendMoney(upgrade.cost)) {
             this.player.purchaseUpgrade(upgrade.effect);
+
+            // Award XP for purchasing an upgrade
+            const xpResult = this.player.addXP(LEVEL_SYSTEM.xpRewards.purchaseUpgrade, 'upgrade');
+            if (xpResult.leveledUp) {
+                this.handleLevelUp(xpResult.oldLevel, xpResult.newLevel);
+            }
 
             if (upgrade.effect === 'expandedGarden') {
                 this.garden.expand(4, 8); // Keep 4 rows, expand to 8 columns (horizontal only)
@@ -2412,11 +2986,32 @@ class Game {
         }
     }
 
+    handleLevelUp(oldLevel, newLevel) {
+        console.log(`🎉 LEVEL UP! ${oldLevel} → ${newLevel}`);
+
+        // Show level up celebration toast
+        this.ui.showToast('success', '🎉', `LEVEL ${newLevel}!`, `You reached level ${newLevel}! New content unlocked!`);
+
+        // Update all UI elements (this will show newly unlocked items)
+        this.ui.updateAll();
+        this.ui.renderShop();
+        this.ui.renderUpgrades();
+
+        // Save the game with new level
+        this.saveGame();
+    }
+
     showGarden() {
         this.ui.showScreen('garden-screen');
     }
 
     switchToFruitGarden() {
+        // Check if orchard is unlocked
+        if (!this.player.upgrades.premiumOrchard) {
+            this.ui.showToast('error', '🔒', 'Orchard Locked!', 'Purchase the Premium Orchard upgrade first! (Level 8)');
+            return;
+        }
+
         const slider = document.querySelector('.gardens-slider');
         if (slider) {
             slider.classList.add('show-fruits');
@@ -2479,6 +3074,17 @@ class Game {
         if (!tree) return;
 
         console.log(`🍎 Clicked fruit cell ${index}, tool: ${this.selectedTool}, tree status: ${tree.status}`);
+
+        // Check if clicking on a dead tree (remove it)
+        if (tree.status === 'dead') {
+            console.log(`🍂 Removing dead tree from slot ${index}`);
+            Object.assign(tree, this.fruitGarden.createEmptyTree());
+            this.updateFruitCell(index);
+            this.ui.updateAll();
+            this.saveGame();
+            this.ui.showToast('info', '🍂', 'Tree Removed', 'Dead tree cleared - ready to plant again!');
+            return;
+        }
 
         // If ready to harvest, harvest the fruit
         if (tree.readyToHarvest) {

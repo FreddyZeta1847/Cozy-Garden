@@ -352,6 +352,54 @@
     box-shadow: none;
 }
 
+/* Locked Shop Items */
+.shop-item.locked {
+    opacity: 0.6;
+    filter: grayscale(50%);
+    position: relative;
+}
+
+.shop-item.locked::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 16px;
+    pointer-events: none;
+}
+
+.shop-item.locked:hover {
+    transform: none;
+    box-shadow: 0 4px 0 var(--season-border), 0 6px 12px var(--season-shadow);
+}
+
+.level-requirement {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    border: 3px solid #FF8C00;
+    border-radius: 12px;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #8B4513;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.level-requirement.unlocked {
+    background: linear-gradient(135deg, #90EE90 0%, #7CB342 100%);
+    border-color: #558B2F;
+    color: white;
+}
+
 /* ===========================
    MARKET SCREEN - COMPACT & COLORFUL REDESIGN
    =========================== */
@@ -635,6 +683,392 @@
     box-shadow: 0 3px 0 #CC7000;
 }
 
+.sell-all-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.sell-all-button:disabled:hover {
+    transform: none;
+    box-shadow: 0 5px 0 #CC7000, 0 7px 14px var(--shadow);
+}
+
+/* ===========================
+   NEW MARKET INTERFACE - PRODUCT SELECTION + CART
+   =========================== */
+
+.new-market-content {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    padding: 10px;
+}
+
+/* Product Selection Area */
+.product-selection-area {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        var(--season-accent) 50%,
+        rgba(255, 255, 255, 0.95) 100%);
+    padding: 20px;
+    border-radius: 16px;
+    border: 3px solid var(--season-border);
+    box-shadow: 0 6px 20px var(--season-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Seasonal decoration for product selection area (top-left corner) */
+.product-selection-area::after {
+    content: var(--season-icon);
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    font-size: 60px;
+    opacity: 0.15;
+    transform: rotate(-15deg);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.product-selection-area h3 {
+    font-size: 22px;
+    color: var(--dark-brown);
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.selection-hint {
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    font-style: italic;
+    margin-top: 10px;
+}
+
+/* Product Grid */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+/* Product Card */
+.product-card {
+    /* SEASONAL GRADIENT BACKGROUND like shop items */
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        var(--season-accent) 50%,
+        rgba(255, 255, 255, 0.95) 100%);
+    border: 3px solid var(--season-border);
+    border-radius: 12px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px var(--season-shadow);
+}
+
+/* Seasonal corner decoration for product cards */
+.product-card::before {
+    content: var(--season-icon);
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    font-size: 40px;
+    opacity: 0.1;
+    transform: rotate(15deg);
+    pointer-events: none;
+    z-index: 0;
+    transition: all 0.3s;
+}
+
+.product-card:hover {
+    transform: translateY(-5px) scale(1.03);
+    box-shadow: 0 8px 20px var(--season-shadow);
+    border-color: var(--season-primary);
+}
+
+.product-card:hover::before {
+    opacity: 0.15;
+    transform: rotate(15deg) scale(1.1);
+}
+
+.product-card.in-cart {
+    border-color: #4CAF50;
+    background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+}
+
+.product-card.in-cart .product-select-overlay {
+    opacity: 1;
+    visibility: visible;
+}
+
+.product-icon {
+    font-size: 48px;
+    margin-bottom: 5px;
+    position: relative;
+    z-index: 2;
+}
+
+.product-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--dark-brown);
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.product-stock {
+    font-size: 13px;
+    color: #666;
+    font-style: italic;
+    position: relative;
+    z-index: 2;
+}
+
+.product-price {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #228B22;
+    margin-top: 5px;
+    position: relative;
+    z-index: 2;
+}
+
+.product-select-overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 35px;
+    height: 35px;
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    border-bottom-left-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+}
+
+.product-select-overlay .checkmark {
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Sell Cart Area */
+.sell-cart-area {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        var(--season-accent) 50%,
+        rgba(255, 255, 255, 0.95) 100%);
+    padding: 20px;
+    border-radius: 16px;
+    border: 3px solid var(--season-border);
+    box-shadow: 0 6px 20px var(--season-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Seasonal decoration for cart area (bottom-right corner) */
+.sell-cart-area::after {
+    content: var(--season-icon);
+    position: absolute;
+    bottom: -10px;
+    right: -10px;
+    font-size: 60px;
+    opacity: 0.15;
+    transform: rotate(15deg);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.sell-cart-area h3 {
+    font-size: 22px;
+    color: var(--dark-brown);
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Sell Cart */
+.sell-cart {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 150px;
+    margin-bottom: 20px;
+}
+
+.empty-cart-message {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    padding: 40px;
+}
+
+/* Cart Item */
+.cart-item {
+    background: white;
+    border: 3px solid var(--season-border);
+    border-radius: 12px;
+    padding: 15px;
+    display: grid;
+    grid-template-columns: 60px 1fr auto auto;
+    gap: 15px;
+    align-items: center;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.cart-item:hover {
+    box-shadow: 0 4px 12px var(--season-shadow);
+    transform: translateX(3px);
+}
+
+.cart-item-icon {
+    font-size: 48px;
+    text-align: center;
+}
+
+.cart-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cart-item-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--dark-brown);
+}
+
+.cart-item-price {
+    font-size: 13px;
+    color: #666;
+}
+
+/* Quantity Controls */
+.cart-item-quantity {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.qty-btn {
+    background: linear-gradient(135deg, #90EE90 0%, #7CB342 100%);
+    border: 2px solid #558B2F;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.qty-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.qty-btn:active {
+    transform: scale(0.95);
+}
+
+.qty-input {
+    width: 60px;
+    height: 32px;
+    text-align: center;
+    border: 2px solid var(--season-border);
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'Fredoka', sans-serif;
+}
+
+.qty-input:focus {
+    outline: none;
+    border-color: var(--season-primary);
+    box-shadow: 0 0 0 3px rgba(164, 214, 94, 0.2);
+}
+
+/* Cart Item Total */
+.cart-item-total {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #228B22;
+    min-width: 80px;
+    justify-content: flex-end;
+}
+
+/* Remove Button */
+.cart-remove-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #FF6B6B 0%, #EE5A52 100%);
+    border: 2px solid #C23B22;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.cart-remove-btn:hover {
+    transform: scale(1.15) rotate(90deg);
+    background: linear-gradient(135deg, #FF5252 0%, #D32F2F 100%);
+}
+
+.cart-remove-btn:active {
+    transform: scale(0.9) rotate(90deg);
+}
+
+/* Responsive adjustments for cart items */
+@media (max-width: 768px) {
+    .cart-item {
+        grid-template-columns: 50px 1fr;
+        gap: 10px;
+    }
+
+    .cart-item-quantity {
+        grid-column: 2;
+    }
+
+    .cart-item-total {
+        grid-column: 2;
+        justify-content: flex-start;
+        margin-top: 8px;
+    }
+}
+
 /* ===========================
    UPGRADES SCREEN - COMPACT & COLORFUL REDESIGN
    =========================== */
@@ -691,6 +1125,29 @@
 .upgrade-item.owned::before {
     content: '✅';
     opacity: 0.2;
+}
+
+.upgrade-item.locked {
+    opacity: 0.6;
+    filter: grayscale(50%);
+    position: relative;
+}
+
+.upgrade-item.locked::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 16px;
+    pointer-events: none;
+}
+
+.upgrade-item.locked:hover {
+    transform: none;
+    box-shadow: 0 4px 0 var(--season-border), 0 6px 12px var(--season-shadow);
 }
 
 .upgrade-icon-large {

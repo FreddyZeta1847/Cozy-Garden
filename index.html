@@ -17,18 +17,57 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="styles/main.css?v=2.14">
+    <link rel="stylesheet" href="styles/main.css?v=3.0">
     <link rel="stylesheet" href="styles/garden.css">
     <link rel="stylesheet" href="styles/plants.css">
-    <link rel="stylesheet" href="styles/ui.css?v=2.14">
-    <link rel="stylesheet" href="styles/fruits.css?v=2.14">
+    <link rel="stylesheet" href="styles/ui.css?v=3.0">
+    <link rel="stylesheet" href="styles/fruits.css?v=3.0">
 </head>
 <body>
     <!-- Particle Background -->
     <div id="particles-js"></div>
 
+    <!-- Welcome Screen -->
+    <div id="welcome-screen" class="welcome-screen active">
+        <div class="welcome-content">
+            <h1 class="welcome-title">Welcome to Cozy Garden</h1>
+            <p class="welcome-subtitle">A peaceful farming adventure</p>
+
+            <div class="welcome-features">
+                <div class="feature-item">
+                    <span class="feature-icon">🌾</span>
+                    <span class="feature-text">Plant & Grow Vegetables</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🍎</span>
+                    <span class="feature-text">Cultivate Fruit Trees</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">💧</span>
+                    <span class="feature-text">Water Your Garden</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🛒</span>
+                    <span class="feature-text">Sell Your Harvest</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">⭐</span>
+                    <span class="feature-text">Level Up & Unlock Upgrades</span>
+                </div>
+            </div>
+
+            <button class="welcome-button" onclick="game.startGame()">
+                <span class="button-icon">🌸</span>
+                <span>Start Your Garden</span>
+                <span class="button-icon">🌸</span>
+            </button>
+
+            <p class="welcome-hint">Click to begin your cozy farming journey</p>
+        </div>
+    </div>
+
     <!-- Main Garden Screen -->
-    <div id="garden-screen" class="screen active">
+    <div id="garden-screen" class="screen">
         <div class="header">
             <div style="display: flex; gap: 30px;">
                 <div class="title">
@@ -50,7 +89,18 @@
                     </div>
                 </div>
             </div>
-            <div style="display: flex; gap: 10px; align-items: center;">
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <!-- Level Display with XP Bar -->
+                <div class="level-display" id="level-display">
+                    <div class="level-badge">
+                        <span class="level-icon">⭐</span>
+                        <span class="level-number" id="level-number">1</span>
+                    </div>
+                    <div class="xp-bar-container">
+                        <div class="xp-bar" id="xp-bar"></div>
+                        <span class="xp-text" id="xp-text">0 / 100 XP</span>
+                    </div>
+                </div>
                 <button class="nav-button reset-btn" onclick="game.resetGame()" title="Reset game and start fresh">
                     <span class="btn-icon">🔄</span>
                     <span>Reset</span>
@@ -99,8 +149,8 @@
         <div class="bottom-bar">
             <div class="tools-bar">
                 <div class="tool-section">
-                    <button class="tool-button active" data-tool="hoe" onclick="game.selectTool('hoe')">
-                        <span class="tool-icon">🔨</span>
+                    <button class="tool-button" data-tool="hoe" onclick="game.selectTool('hoe')">
+                        <span class="tool-icon">⛏️</span>
                         <span class="tool-name">Hoe</span>
                     </button>
                     <button class="tool-button" data-tool="water" onclick="game.selectTool('water')">
@@ -181,22 +231,31 @@
 
         <!-- Sell Harvest Tab Content -->
         <div id="sell-tab" class="shop-tab-content">
-            <div class="market-content">
-                <div class="inventory-display">
-                    <h3>Your Harvest:</h3>
-                    <div id="inventory-list"></div>
+            <div class="new-market-content">
+                <!-- Step 1: Product Selection Grid -->
+                <div class="product-selection-area">
+                    <h3>📦 Select Products to Sell (Max 3):</h3>
+                    <div id="product-grid" class="product-grid">
+                        <!-- Products will be populated by JavaScript -->
+                    </div>
+                    <p class="selection-hint">Click on products to add them to your cart</p>
                 </div>
 
-                <div class="selling-area">
-                    <h3>Sell Your Produce:</h3>
-                    <div id="sell-slots" class="sell-slots"></div>
+                <!-- Step 2: Selected Products Cart -->
+                <div class="sell-cart-area">
+                    <h3>🛒 Your Cart (<span id="cart-count">0</span>/3):</h3>
+                    <div id="sell-cart" class="sell-cart">
+                        <p class="empty-cart-message">No products selected. Click on products above to add them.</p>
+                    </div>
+
+                    <!-- Sell Summary -->
                     <div class="sell-summary">
                         <div class="total-display">
-                            <span>Total:</span>
+                            <span>Total Value:</span>
                             <div class="coin-icon"></div>
                             <span id="sell-total">0</span>
                         </div>
-                        <button class="sell-all-button" onclick="game.sellAll()">Sell All</button>
+                        <button class="sell-all-button" onclick="game.sellSelectedProducts()" id="sell-button" disabled>💰 Sell Selected</button>
                     </div>
                 </div>
             </div>
@@ -252,7 +311,22 @@
     <!-- Toast Notification Container -->
     <div id="toast-container"></div>
 
-    <!-- Game Script (Bundled) - v2.14 with smooth season transitions -->
-    <script src="game-bundle.js?v=2.14"></script>
+    <!-- Season Change Announcement -->
+    <div id="season-announcement" class="season-announcement">
+        <div class="season-transition">
+            <div class="old-season">
+                <div class="season-icon-large" id="old-season-icon">🌸</div>
+                <div class="season-name" id="old-season-name">Spring</div>
+            </div>
+            <div class="season-arrow">→</div>
+            <div class="new-season">
+                <div class="season-icon-large" id="new-season-icon">☀️</div>
+                <div class="season-name" id="new-season-name">Summer</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Script (Bundled) - v3.0 with LEVEL SYSTEM -->
+    <script src="game-bundle.js?v=3.0"></script>
 </body>
 </html>

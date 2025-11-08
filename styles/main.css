@@ -320,6 +320,84 @@ button, .tile, .fruit-cell, .garden-cell, a,
     border-color: #FF0000;
 }
 
+/* Level Display System */
+.level-display {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 3px solid var(--season-border);
+    box-shadow: 0 2px 0 var(--season-border), 0 3px 8px var(--season-shadow);
+    transition: all 0.3s ease;
+}
+
+.level-display:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 0 var(--season-border), 0 6px 12px var(--season-shadow);
+}
+
+.level-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding-right: 10px;
+    border-right: 2px solid var(--season-border);
+}
+
+.level-icon {
+    font-size: 22px;
+    animation: levelPulse 2s ease-in-out infinite;
+}
+
+@keyframes levelPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.level-number {
+    font-size: 18px;
+    font-weight: 700;
+    color: black;
+    min-width: 20px;
+    text-align: center;
+}
+
+.xp-bar-container {
+    position: relative;
+    width: 150px;
+    height: 20px;
+    background: #b7ddec; /* Light blue background */
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #5DADE2;
+}
+
+.xp-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: #5DADE2; /* Light blue fill - always this color */
+    border-radius: 0; /* Square fill - no rounding */
+    transition: width 0.5s ease-out;
+    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.4);
+}
+
+.xp-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    z-index: 1;
+    white-space: nowrap;
+}
+
 /* Game Container */
 .game-container {
     flex: 1;
@@ -652,7 +730,8 @@ body[data-season="winter"] .seasonal-header {
 
 /* Seasonal decorative pattern overlay */
 .shop-content::before,
-.market-content::before {
+.market-content::before,
+.new-market-content::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -663,7 +742,8 @@ body[data-season="winter"] .seasonal-header {
 
 /* Spring pattern - floating flowers */
 body[data-season="spring"] .shop-content::before,
-body[data-season="spring"] .market-content::before {
+body[data-season="spring"] .market-content::before,
+body[data-season="spring"] .new-market-content::before {
     background-image:
         radial-gradient(circle at 20% 30%, var(--season-secondary) 2px, transparent 2px),
         radial-gradient(circle at 80% 60%, var(--season-primary) 2px, transparent 2px),
@@ -677,7 +757,8 @@ body[data-season="spring"] .market-content::before {
 
 /* Summer pattern - sun rays */
 body[data-season="summer"] .shop-content::before,
-body[data-season="summer"] .market-content::before {
+body[data-season="summer"] .market-content::before,
+body[data-season="summer"] .new-market-content::before {
     background-image:
         radial-gradient(circle at 15% 25%, var(--season-primary) 2px, transparent 2px),
         radial-gradient(circle at 75% 70%, var(--season-secondary) 2px, transparent 2px),
@@ -688,7 +769,8 @@ body[data-season="summer"] .market-content::before {
 
 /* Fall pattern - falling leaves */
 body[data-season="fall"] .shop-content::before,
-body[data-season="fall"] .market-content::before {
+body[data-season="fall"] .market-content::before,
+body[data-season="fall"] .new-market-content::before {
     background-image:
         radial-gradient(circle at 25% 35%, var(--season-primary) 3px, transparent 3px),
         radial-gradient(circle at 70% 65%, var(--season-secondary) 2px, transparent 2px),
@@ -701,7 +783,8 @@ body[data-season="fall"] .market-content::before {
 
 /* Winter pattern - snowflakes */
 body[data-season="winter"] .shop-content::before,
-body[data-season="winter"] .market-content::before {
+body[data-season="winter"] .market-content::before,
+body[data-season="winter"] .new-market-content::before {
     background-image:
         radial-gradient(circle at 22% 32%, var(--season-primary) 2px, transparent 2px),
         radial-gradient(circle at 78% 58%, var(--season-secondary) 2px, transparent 2px),
@@ -720,7 +803,8 @@ body[data-season="winter"] .market-content::before {
 
 /* Ensure content is above decorative pattern */
 .shop-content > *,
-.market-content > * {
+.market-content > *,
+.new-market-content > * {
     position: relative;
     z-index: 1;
 }
@@ -729,9 +813,9 @@ body[data-season="winter"] .market-content::before {
     background: var(--white);
     border: 3px solid var(--season-border);
     border-radius: 12px;
-    padding: 12px 16px;
+    padding: 20px 16px;
     /* INCREASED FONT SIZE for better visibility */
-    font-size: 28px;
+    font-size: 30px;
     font-weight: 700;
     text-align: center;
     margin-bottom: 20px;
@@ -759,6 +843,87 @@ body[data-season="winter"] .market-content::before {
     font-size: 50px;
     opacity: 0.08;
     pointer-events: none;
+}
+
+/* Season Change Announcement */
+.season-announcement {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.season-announcement.show {
+    opacity: 1;
+    animation: announceSlide 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes announceSlide {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+.season-transition {
+    background: rgba(255, 255, 255, 0.98);
+    border: 5px solid var(--season-border);
+    border-radius: 24px;
+    padding: 40px 60px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+.old-season,
+.new-season {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.season-icon-large {
+    font-size: 80px;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+    animation: seasonBounce 1s ease-in-out infinite;
+}
+
+@keyframes seasonBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.season-arrow {
+    font-size: 60px;
+    color: var(--season-border);
+    font-weight: bold;
+    animation: arrowPulse 1s ease-in-out infinite;
+}
+
+@keyframes arrowPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+.season-name {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--dark-brown);
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
 /* Animations */
@@ -902,6 +1067,335 @@ body[data-season="winter"] .market-content::before {
     justify-content: flex-end;
 }
 
+/* ===========================
+   WELCOME SCREEN
+   =========================== */
+
+.welcome-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('../assets/images/background/Welcome.png') center/cover no-repeat;
+    background-attachment: fixed;
+    display: none;
+    z-index: 10000;
+    /* animation: fadeIn 0.8s ease-out; */
+    overflow: hidden;
+}
+
+.welcome-screen.active {
+    display: block;
+}
+
+.welcome-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    text-align: center;
+    position: relative;
+    animation: fadeIn 0.8s ease-out;
+    overflow-y: auto;
+}
+
+/* Decorative pattern overlay on welcome screen background */
+.welcome-screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.4;
+    z-index: 0;
+}
+
+/* Spring pattern */
+body[data-season="spring"] .welcome-screen::before {
+    background-image:
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.3) 4px, transparent 4px),
+        radial-gradient(circle at 80% 60%, rgba(255, 255, 255, 0.2) 3px, transparent 3px),
+        radial-gradient(circle at 45% 80%, rgba(255, 255, 255, 0.3) 4px, transparent 4px);
+    background-size: 200px 200px;
+    animation: floatPattern 40s linear infinite;
+}
+
+/* Summer pattern */
+body[data-season="summer"] .welcome-screen::before {
+    background-image:
+        radial-gradient(circle at 25% 35%, rgba(255, 255, 255, 0.3) 4px, transparent 4px),
+        radial-gradient(circle at 75% 65%, rgba(255, 255, 255, 0.2) 3px, transparent 3px);
+    background-size: 250px 250px;
+}
+
+/* Fall pattern */
+body[data-season="fall"] .welcome-screen::before {
+    background-image:
+        radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.3) 5px, transparent 5px),
+        radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.2) 4px, transparent 4px);
+    background-size: 180px 180px;
+    animation: floatPattern 50s linear infinite;
+}
+
+/* Winter pattern */
+body[data-season="winter"] .welcome-screen::before {
+    background-image:
+        radial-gradient(circle at 22% 32%, rgba(255, 255, 255, 0.4) 3px, transparent 3px),
+        radial-gradient(circle at 78% 58%, rgba(255, 255, 255, 0.3) 3px, transparent 3px),
+        radial-gradient(circle at 48% 78%, rgba(255, 255, 255, 0.4) 3px, transparent 3px);
+    background-size: 160px 160px;
+    animation: floatPattern 60s linear infinite;
+}
+
+.welcome-content > * {
+    position: relative;
+    z-index: 1;
+}
+
+.welcome-icon {
+    font-size: 100px;
+    margin-bottom: 15px;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.welcome-title {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 64px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 10px;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+.welcome-subtitle {
+    font-family: 'Comfortaa', sans-serif;
+    font-size: 28px;
+    color: rgba(255, 255, 255, 0.95);
+    margin-bottom: 40px;
+    font-style: italic;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.welcome-features {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    margin-bottom: 50px;
+    max-width: 1200px;
+    width: 100%;
+}
+
+.feature-item {
+    background: rgba(255, 255, 255, 0.562);
+    border: 3px solid rgb(231, 231, 231);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;    
+    justify-content: center;
+    gap: 12px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.feature-item:hover {
+    border-color: white;
+    background: rgba(255, 255, 255, 0.95);
+
+}
+
+.feature-icon {
+    font-size: 48px;
+}
+
+.feature-text {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--dark-brown);
+    text-align: center;
+}
+
+.welcome-button {
+    background: rgba(255, 255, 255, 0.95);
+    border: 4px solid white;
+    border-radius: 20px;
+    padding: 25px 60px;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--dark-brown);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin: 0 auto 25px;
+    box-shadow: 0 8px 0 rgba(255, 255, 255, 0.7), 0 10px 30px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s;
+}
+
+.welcome-button:hover {
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 16px 0 rgba(255, 255, 255, 0.7), 0 18px 40px rgba(0, 0, 0, 0.5);
+}
+
+.welcome-button:active {
+    transform: translateY(4px);
+    box-shadow: 0 4px 0 rgba(255, 255, 255, 0.7), 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.button-icon {
+    font-size: 36px;
+    animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
+}
+
+.welcome-hint {
+    font-family: 'Comfortaa', sans-serif;
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.9);
+    font-style: italic;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .welcome-features {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .welcome-content {
+        padding: 30px 20px;
+    }
+
+    .welcome-title {
+        font-size: 48px;
+    }
+
+    .welcome-subtitle {
+        font-size: 22px;
+    }
+
+    .welcome-features {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .welcome-button {
+        font-size: 26px;
+        padding: 20px 45px;
+    }
+}
+
+@media (max-width: 600px) {
+    .welcome-icon {
+        font-size: 70px;
+    }
+
+    .welcome-title {
+        font-size: 36px;
+    }
+
+    .welcome-subtitle {
+        font-size: 18px;
+    }
+
+    .welcome-features {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+    }
+
+    .welcome-button {
+        font-size: 22px;
+        padding: 18px 40px;
+    }
+
+    .welcome-hint {
+        font-size: 14px;
+    }
+}
+
+@media (max-height: 700px) {
+    .welcome-content {
+        padding: 20px;
+    }
+
+    .welcome-icon {
+        font-size: 60px;
+        margin-bottom: 10px;
+    }
+
+    .welcome-title {
+        font-size: 42px;
+        margin-bottom: 5px;
+    }
+
+    .welcome-subtitle {
+        font-size: 18px;
+        margin-bottom: 20px;
+    }
+
+    .welcome-features {
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+
+    .feature-item {
+        padding: 12px;
+    }
+
+    .feature-icon {
+        font-size: 32px;
+    }
+
+    .feature-text {
+        font-size: 13px;
+    }
+
+    .welcome-button {
+        font-size: 24px;
+        padding: 15px 40px;
+        margin-bottom: 15px;
+    }
+}
+
 .modal-button {
     padding: 10px 20px;
     border: 3px solid var(--dark-brown);
@@ -960,8 +1454,8 @@ body[data-season="winter"] .market-content::before {
 
 .harvest-item-icon {
     font-size: 40px;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
