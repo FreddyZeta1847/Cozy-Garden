@@ -8,9 +8,7 @@
 Thumbs.db
 
 # Screenshots and temporary files
-*.png
-*.jpg
-*.jpeg
+Screenshot*.png
 
 # Old/deprecated files
 game.js
