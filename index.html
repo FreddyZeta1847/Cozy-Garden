@@ -308,6 +308,29 @@
         </div>
     </div>
 
+    <!-- Plant Info Popup (Click-triggered) -->
+    <div id="plant-info-popup" class="plant-info-popup hidden">
+        <div class="plant-info-header">
+            <span class="plant-icon" id="plant-info-icon">🌱</span>
+            <span class="plant-name" id="plant-info-name">Tomato</span>
+            <button class="plant-info-close" onclick="game.closePlantInfoPopup()">✕</button>
+        </div>
+        <div class="plant-info-body">
+            <div class="info-row">
+                <div class="info-label">🌱 Growth Progress:</div>
+                <div class="info-value" id="plant-info-growth">Growing...</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">⏰ Ready in:</div>
+                <div class="info-value live-timer" id="plant-info-growth-timer">1m 30s</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">💧 Next water:</div>
+                <div class="info-value live-timer" id="plant-info-water-timer">45s</div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification Container -->
     <div id="toast-container"></div>
 

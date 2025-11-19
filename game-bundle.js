@@ -2301,6 +2301,9 @@ class Game {
         // NEW: Sell cart for new market interface
         this.sellCart = [];
 
+        // Plant info popup tracking
+        this.currentPlantInfoCell = null;
+
         this.initialize();
     }
 
@@ -2374,6 +2377,17 @@ class Game {
         // Initialize tool selection UI to match the default tool
         this.selectTool(this.selectedTool);
 
+        // Setup click-outside handler for plant info popup
+        document.addEventListener('click', (e) => {
+            const popup = document.getElementById('plant-info-popup');
+            if (popup && !popup.classList.contains('hidden')) {
+                // Check if click is outside popup and not on a tile
+                if (!popup.contains(e.target) && !e.target.closest('.tile') && !e.target.closest('.fruit-cell')) {
+                    this.closePlantInfoPopup();
+                }
+            }
+        });
+
         this.startGameLoop();
     }
 
@@ -2394,6 +2408,9 @@ class Game {
             }
 
             this.updateSeasons();
+
+            // Update plant info popup timers (if open)
+            this.updatePlantInfoTimers();
 
             // Auto-watering system
             if (this.player.upgrades.autoWatering) {
@@ -2443,6 +2460,15 @@ class Game {
 
         if (cell.readyToHarvest) {
             this.harvestPlant(row, col);
+            return;
+        }
+
+        // Show plant info popup when clicking on growing plant (and no tool selected)
+        if (!this.selectedTool && (cell.status === 'planted' || cell.status === 'growing')) {
+            const tile = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+            if (tile) {
+                this.showPlantInfoPopup(tile, row, col);
+            }
             return;
         }
 
@@ -3381,6 +3407,128 @@ class Game {
         const tooltip = element.querySelector('.growth-tooltip');
         if (tooltip) {
             tooltip.remove();
+        }
+    }
+
+    showPlantInfoPopup(tileElement, row, col) {
+        const cell = this.garden.getCell(row, col);
+        if (!cell || !cell.plantType) return;
+
+        const plant = PLANTS[cell.plantType];
+        if (!plant) return;
+
+        // Get crop icons mapping
+        const cropIcons = {
+            tomato: '🍅',
+            lettuce: '🥬',
+            carrot: '🥕',
+            corn: '🌽',
+            potato: '🥔'
+        };
+
+        // Get popup element
+        const popup = document.getElementById('plant-info-popup');
+        if (!popup) return;
+
+        // Position popup near the clicked tile
+        const rect = tileElement.getBoundingClientRect();
+        const popupWidth = 300; // Approximate width from CSS
+        const popupHeight = 200; // Approximate height
+
+        // Position to the right of the tile, or left if not enough space
+        let left = rect.right + 10;
+        if (left + popupWidth > window.innerWidth) {
+            left = rect.left - popupWidth - 10;
+        }
+
+        // Center vertically relative to tile
+        let top = rect.top + (rect.height / 2) - (popupHeight / 2);
+
+        // Keep within viewport
+        if (top < 10) top = 10;
+        if (top + popupHeight > window.innerHeight) {
+            top = window.innerHeight - popupHeight - 10;
+        }
+
+        popup.style.left = `${left}px`;
+        popup.style.top = `${top}px`;
+
+        // Update popup content
+        document.getElementById('plant-info-icon').textContent = cropIcons[cell.plantType] || '🌱';
+        document.getElementById('plant-info-name').textContent = plant.name;
+
+        // Calculate growth progress
+        const currentStage = cell.growthStage || 0;
+        const totalStages = plant.stages;
+        const progressText = `Stage ${currentStage + 1} of ${totalStages}`;
+        document.getElementById('plant-info-growth').textContent = progressText;
+
+        // Store cell info for live updates
+        this.currentPlantInfoCell = { row, col };
+
+        // Initial timer update
+        this.updatePlantInfoTimers();
+
+        // Show popup
+        popup.classList.remove('hidden');
+
+        console.log(`🌱 Showing plant info for ${plant.name} at (${row}, ${col})`);
+    }
+
+    closePlantInfoPopup() {
+        const popup = document.getElementById('plant-info-popup');
+        if (popup) {
+            popup.classList.add('hidden');
+            this.currentPlantInfoCell = null;
+        }
+    }
+
+    updatePlantInfoTimers() {
+        if (!this.currentPlantInfoCell) return;
+
+        const { row, col } = this.currentPlantInfoCell;
+        const cell = this.garden.getCell(row, col);
+        if (!cell || !cell.plantType) {
+            this.closePlantInfoPopup();
+            return;
+        }
+
+        const plant = PLANTS[cell.plantType];
+        if (!plant) return;
+
+        // Calculate time until fully grown
+        const adjustedGrowthTime = plant.growthTime / this.player.upgrades.fasterGrowth;
+        const stageTime = adjustedGrowthTime / plant.stages;
+        const timeSincePlanted = this.gameTime - cell.plantedAt;
+        const totalGrowthTime = plant.stages * stageTime;
+        const timeUntilFullyGrown = Math.max(0, totalGrowthTime - timeSincePlanted);
+
+        // Calculate time until next watering needed
+        const timeSinceWatered = this.gameTime - cell.lastWatered;
+        const timeUntilWaterNeeded = Math.max(0, plant.waterInterval - timeSinceWatered);
+
+        // Update UI
+        const growthTimerEl = document.getElementById('plant-info-growth-timer');
+        const waterTimerEl = document.getElementById('plant-info-water-timer');
+
+        if (growthTimerEl) {
+            if (timeUntilFullyGrown === 0) {
+                growthTimerEl.textContent = 'Ready to harvest! ✨';
+                growthTimerEl.style.color = '#FFD700';
+            } else {
+                growthTimerEl.textContent = this.formatTime(timeUntilFullyGrown);
+                growthTimerEl.style.color = '#1565C0';
+            }
+        }
+
+        if (waterTimerEl) {
+            if (timeUntilWaterNeeded === 0) {
+                waterTimerEl.textContent = 'Needs water! 💧';
+                waterTimerEl.style.color = '#FF6B6B';
+            } else {
+                waterTimerEl.textContent = this.formatTime(timeUntilWaterNeeded);
+                waterTimerEl.style.color = '#1565C0';
+            }
         }
     }
 
