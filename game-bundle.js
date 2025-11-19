@@ -2304,6 +2304,9 @@ class Game {
         // Plant info popup tracking
         this.currentPlantInfoCell = null;
 
+        // Mobile UI reference (initialized after DOM ready)
+        this.mobileUI = null;
+
         this.initialize();
     }
 
@@ -2433,6 +2436,12 @@ class Game {
 
             if (this.gameTime % 30 === 0) {
                 this.saveGame();
+            }
+
+            // Update mobile UI floating buttons
+            if (this.mobileUI && this.mobileUI.isMobile) {
+                this.mobileUI.updateFloatingButtons();
+                this.mobileUI.updateMobileUI();
             }
         }, 1000);
     }
@@ -3753,5 +3762,14 @@ window.addEventListener('DOMContentLoaded', () => {
     console.log('🌱 Welcome to Cozy Garden!');
     game = new Game();
     window.game = game;
+
+    // Initialize Mobile UI if available
+    if (window.MobileUI) {
+        game.mobileUI = new MobileUI(game);
+        if (game.mobileUI.isMobile) {
+            console.log('📱 Mobile UI activated!');
+        }
+    }
+
     console.log('✨ Game ready to play!');
 });
