@@ -36,186 +36,279 @@
         background: rgba(139, 111, 71, 0.4);
     }
 
-    /* ----- HEADER MOBILE LAYOUT ----- */
+    /* ----- HEADER MOBILE LAYOUT - COMPACT ----- */
 
     .header {
-        flex-direction: column;
-        gap: 10px;
-        padding: 10px 12px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 4px;
+        padding: 6px 10px;
         min-height: auto;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+        backdrop-filter: blur(10px);
+        align-items: center;
+        justify-content: space-between;
     }
 
-    .header > div:first-child {
-        width: 100%;
-        flex-direction: column;
-        gap: 8px;
+    .header>div:first-child {
+        flex-direction: row;
+        gap: 6px;
+        align-items: center;
     }
 
     .title {
-        font-size: 20px;
-        text-align: center;
-        width: 100%;
+        font-size: 14px;
+        text-align: left;
+    }
+
+    .title .season-icon {
+        display: none;
     }
 
     .resources {
-        width: 100%;
         justify-content: center;
-        gap: 8px;
-        flex-wrap: wrap;
+        gap: 4px;
+        flex-wrap: nowrap;
     }
 
     .resource {
-        padding: 4px 8px;
-        font-size: 12px;
-        border-radius: 12px;
+        padding: 2px 6px;
+        font-size: 11px;
+        border-radius: 10px;
         border-width: 2px;
     }
 
     .coin-icon {
-        width: 18px;
-        height: 18px;
+        width: 14px;
+        height: 14px;
         border-width: 2px;
     }
 
     .coin-icon::after {
-        font-size: 10px;
+        font-size: 8px;
     }
 
     .season-icon {
-        font-size: 18px;
+        font-size: 14px;
     }
 
     /* Level display compact on mobile */
     .level-display {
-        padding: 4px 8px;
-        gap: 8px;
+        padding: 2px 6px;
+        gap: 4px;
     }
 
     .level-badge {
-        padding-right: 8px;
+        padding-right: 4px;
     }
 
     .level-icon {
-        font-size: 18px;
-    }
-
-    .level-number {
         font-size: 14px;
     }
 
+    .level-number {
+        font-size: 12px;
+    }
+
     .xp-bar-container {
-        width: 100px;
-        height: 16px;
+        width: 60px;
+        height: 12px;
     }
 
     .xp-text {
-        font-size: 9px;
+        font-size: 7px;
     }
 
-    /* Header buttons - second row */
-    .header > div:last-child {
-        width: 100%;
-        justify-content: center;
+    /* Header buttons - hide reset on mobile header */
+    .header>div:last-child {
+        display: none;
     }
 
     .nav-button {
-        padding: 6px 10px;
-        font-size: 11px;
-        border-radius: 8px;
+        padding: 4px 8px;
+        font-size: 10px;
+        border-radius: 6px;
     }
 
     .reset-btn {
-        padding: 6px 10px !important;
-        font-size: 11px !important;
+        display: none !important;
     }
 
-    .reset-btn .btn-icon {
-        font-size: 14px !important;
-    }
-
-    /* ----- GAME CONTAINER MOBILE ----- */
+    /* ----- GAME CONTAINER MOBILE - SWIPEABLE GARDENS ----- */
 
     .game-container {
-        padding: 8px;
-        align-items: flex-start;
-        justify-content: center;
-    }
-
-    /* ----- GARDEN GRID MOBILE ----- */
-
-    .gardens-slider {
+        padding: 0;
         width: 100%;
-    }
-
-    .garden-view {
-        width: 100%;
+        flex: 1;
         display: flex;
-        justify-content: center;
-    }
-
-    .garden-wrapper,
-    .fruit-wrapper {
-        padding: 10px;
-        max-width: 100%;
-    }
-
-    .garden-sign {
-        font-size: 11px;
-        padding: 4px 10px;
-        top: -10px;
-    }
-
-    /* Responsive garden grid - shrink tiles on mobile */
-    .garden-grid {
-        grid-template-columns: repeat(6, 1fr);
-        grid-template-rows: repeat(4, 1fr);
-        gap: 4px;
-        padding: 8px;
-        max-width: 100%;
-    }
-
-    .tile {
-        width: 100%;
-        height: 0;
-        padding-bottom: 100%; /* Square aspect ratio */
-        font-size: 24px;
-        border-width: 2px;
-        border-radius: 8px;
+        flex-direction: column;
+        overflow: hidden;
         position: relative;
     }
 
-    .tile > * {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+    /* Gardens slider - horizontal swipe */
+    .gardens-slider {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        touch-action: pan-x;
+        transform: translateX(0);
     }
 
-    /* Garden navigation arrows - touch-friendly */
+    .gardens-slider.show-fruits {
+        transform: translateX(-100%);
+    }
+
+    /* Each garden view takes full container width */
+    .garden-view {
+        min-width: 100%;
+        width: 100%;
+        flex-shrink: 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+        position: relative;
+        box-sizing: border-box;
+    }
+
+    /* Hide arrow buttons on mobile - use swipe instead */
     .garden-nav-arrow {
-        width: 44px;
-        height: 44px;
-        font-size: 20px;
+        display: none !important;
+    }
+
+    /* Garden wrapper - smaller on mobile */
+    .garden-wrapper,
+    .fruit-wrapper {
+        padding: 10px;
+        border-radius: 12px;
+        border-width: 3px;
+        width: 95%;
+        max-width: 350px;
+        background: rgba(139, 111, 71, 0.5);
+        overflow: hidden;
+    }
+
+    .garden-sign {
+        font-size: 12px;
+        padding: 4px 12px;
+        top: -10px;
+    }
+
+    /* Mobile garden grid - 6x4 with horizontal scroll */
+    .garden-grid {
+        grid-template-columns: repeat(6, 55px) !important;
+        grid-template-rows: repeat(4, 55px) !important;
+        gap: 4px;
+        padding: 8px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+        /* Scroll snap for better UX */
+        scroll-snap-type: x proximity;
+    }
+
+    /* Subtle horizontal scrollbar */
+    .garden-grid::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .garden-grid::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 3px;
+    }
+
+    .garden-grid::-webkit-scrollbar-thumb {
+        background: rgba(139, 111, 71, 0.5);
+        border-radius: 3px;
+    }
+
+    .tile {
+        width: 55px;
+        height: 55px;
+        flex-shrink: 0;
+        font-size: 24px;
+        border-width: 2px;
+        border-radius: 8px;
+        scroll-snap-align: start;
+    }
+
+    /* Fruit grid */
+    .fruit-grid {
+        gap: 10px;
+    }
+
+    .fruit-cell {
+        width: 65px;
+        height: 65px;
+        border-width: 2px;
+        border-radius: 12px;
+        font-size: 30px;
+    }
+
+    /* Garden indicator dots - compact */
+    .garden-indicators {
+        display: flex !important;
+        justify-content: center;
+        gap: 8px;
+        padding: 6px 0;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .garden-dot {
+        width: 10px;
+        height: 10px;
         border-radius: 50%;
-        /* Touch target minimum 44px */
+        background: rgba(255, 255, 255, 0.4);
+        border: 2px solid rgba(255, 255, 255, 0.6);
+        cursor: pointer;
+        transition: all 0.3s;
     }
 
-    .garden-nav-arrow.right-arrow {
-        right: 5px;
+    .garden-dot.active {
+        background: var(--season-primary, #7CB342);
+        border-color: white;
+        transform: scale(1.15);
+        box-shadow: 0 0 8px var(--season-primary, #7CB342);
     }
 
-    .garden-nav-arrow.left-arrow {
-        left: 5px;
+    .garden-dot-label {
+        display: none;
+    }
+
+    /* Swipe hint on first load */
+    .swipe-hint {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        animation: swipeHintPulse 2s ease-in-out infinite;
+    }
+
+    .swipe-hint.hidden {
+        display: none;
+    }
+
+    @keyframes swipeHintPulse {
+        0%, 100% { opacity: 0.8; transform: translateX(-50%) scale(1); }
+        50% { opacity: 1; transform: translateX(-50%) scale(1.05); }
     }
 
     /* ----- BOTTOM BAR MOBILE ----- */
-
-    .bottom-bar {
-        flex-direction: column;
-        gap: 8px;
-        padding: 8px 10px;
-        min-height: auto;
-    }
+    /* Desktop bottom bar is completely hidden in mobile mode - see body.mobile-mode rules below */
 
     .tools-bar {
         width: 100%;
@@ -231,10 +324,14 @@
     }
 
     .tool-button {
-        padding: 8px 12px;
-        min-width: 60px;
-        border-radius: 10px;
-        /* Touch-friendly size */
+        padding: 12px 14px;
+        /* Increased padding */
+        min-width: 64px;
+        /* Increased min-width */
+        border-radius: 12px;
+        /* Touch-friendly size - min 44px height */
+        min-height: 60px;
+        justify-content: center;
     }
 
     .tool-icon {
@@ -280,10 +377,14 @@
     }
 
     .seed-button {
-        min-width: 48px;
-        padding: 4px;
-        gap: 2px;
-        border-radius: 8px;
+        min-width: 54px;
+        /* Increased width */
+        min-height: 64px;
+        /* Increased height */
+        padding: 6px;
+        gap: 4px;
+        border-radius: 10px;
+        justify-content: center;
     }
 
     .seed-packet {
@@ -330,51 +431,20 @@
     .upgrade-btn,
     .market-btn {
         flex: 1;
-        max-width: 120px;
-        padding: 8px 12px !important;
-        font-size: 12px !important;
+        max-width: none;
+        /* Allow full width */
+        padding: 12px 16px !important;
+        /* Larger touch target */
+        font-size: 13px !important;
         justify-content: center;
+        height: 48px;
+        /* Min touch height */
+        align-items: center;
     }
 
     .shop-btn .btn-icon,
     .upgrade-btn .btn-icon,
     .market-btn .btn-icon {
-        font-size: 16px !important;
-    }
-
-    /* ----- SCREEN HEADERS MOBILE ----- */
-
-    .screen-header {
-        padding: 12px 15px;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .screen-header h2 {
-        font-size: 18px;
-        text-align: center;
-        justify-content: center;
-    }
-
-    .header-icon {
-        font-size: 22px;
-    }
-
-    .season-subtitle {
-        font-size: 12px;
-    }
-
-    .back-button {
-        padding: 8px 16px;
-        font-size: 12px;
-        width: 100%;
-        text-align: center;
-    }
-
-    /* ----- SHOP TABS MOBILE ----- */
-
-    .shop-tabs {
-        padding: 10px 15px 0 15px;
         gap: 8px;
     }
 
@@ -412,7 +482,10 @@
     /* Shop items grid - single column on mobile */
     .shop-items {
         grid-template-columns: 1fr;
-        gap: 12px;
+        gap: 16px;
+        /* Increased gap */
+        padding-bottom: 80px;
+        /* Space for bottom nav */
     }
 
     .shop-item {
@@ -1113,7 +1186,7 @@
         flex-wrap: wrap;
     }
 
-    .header > div:first-child {
+    .header>div:first-child {
         flex-direction: row;
         gap: 15px;
     }
@@ -1342,21 +1415,40 @@ body.mobile-mode {
     overflow: hidden;
 }
 
+/* Hide desktop bottom bar ONLY in garden screen when in mobile mode */
+body.mobile-mode #garden-screen .bottom-bar {
+    display: none !important;
+}
+
 /* Hide desktop elements in mobile mode */
-body.mobile-mode .tools-bar .tool-section,
-body.mobile-mode .seed-selector-container,
-body.mobile-mode .seed-nav-arrow,
-body.mobile-mode .nav-buttons {
+body.mobile-mode #garden-screen .tools-bar .tool-section,
+body.mobile-mode #garden-screen .seed-selector-container,
+body.mobile-mode #garden-screen .seed-nav-arrow,
+body.mobile-mode #garden-screen .nav-buttons {
     display: none !important;
 }
 
 /* Mobile Header */
+.mobile-header-title {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.mobile-header-title h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--dark-brown);
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 body.mobile-mode .mobile-header-row {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     width: 100%;
-    gap: 10px;
+    gap: 12px;
 }
 
 .mobile-level-display {
@@ -1617,7 +1709,8 @@ body.mobile-mode .mobile-header-row {
 /* Floating Action Buttons */
 .mobile-floating-buttons {
     position: fixed;
-    bottom: 80px; /* Above tab bar */
+    bottom: 80px;
+    /* Above tab bar */
     right: 15px;
     z-index: 4000;
     display: flex;
@@ -1662,49 +1755,100 @@ body.mobile-mode .mobile-header-row {
     color: var(--dark-brown);
 }
 
-/* Mobile Tab Bar */
+/* Mobile Tab Bar - Cozy Garden Style - COMPACT */
 .mobile-tab-bar {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 60px;
-    background: rgba(255, 255, 255, 0.98);
+    height: 52px;
+    background: linear-gradient(180deg, rgba(139, 111, 71, 0.95) 0%, rgba(101, 67, 33, 0.98) 100%);
     border-top: 2px solid var(--season-border);
     display: flex;
     justify-content: space-around;
     align-items: center;
     z-index: 5000;
-    padding-bottom: env(safe-area-inset-bottom);
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    padding: 4px 8px;
+    padding-bottom: calc(4px + env(safe-area-inset-bottom));
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Wood grain effect on tab bar */
+.mobile-tab-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(0, 0, 0, 0.05) 25%,
+            transparent 50%,
+            rgba(0, 0, 0, 0.05) 75%,
+            transparent 100%);
+    pointer-events: none;
 }
 
 .tab-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3px;
-    padding: 8px 12px;
+    gap: 2px;
+    padding: 6px 10px;
     background: none;
     border: none;
     cursor: pointer;
-    color: #666;
-    transition: all 0.2s;
+    color: rgba(255, 255, 255, 0.6);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: 10px;
+    position: relative;
+    z-index: 1;
+    min-width: 50px;
+}
+
+.tab-item:active {
+    transform: scale(0.9);
 }
 
 .tab-item.active {
     color: var(--season-text);
-    background: var(--season-accent);
+    background: var(--season-background);
+    border: 2px solid var(--season-border);
+    box-shadow: 0 2px 8px var(--season-shadow), inset 0 1px 4px rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+/* Active tab indicator glow */
+.tab-item.active::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 3px;
+    background: var(--season-primary);
+    border-radius: 0 0 3px 3px;
+    box-shadow: 0 2px 8px var(--season-primary);
 }
 
 .tab-item .tab-icon {
-    font-size: 22px;
+    font-size: 20px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+    transition: transform 0.3s;
+}
+
+.tab-item.active .tab-icon {
+    transform: scale(1.05);
+    filter: drop-shadow(0 2px 4px var(--season-shadow));
 }
 
 .tab-item .tab-label {
-    font-size: 10px;
-    font-weight: 600;
+    font-size: 9px;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    font-family: 'Fredoka', sans-serif;
 }
 
 /* Inventory in Bottom Sheet */
@@ -1831,20 +1975,20 @@ body.mobile-mode .mobile-header-row {
     color: var(--dark-brown);
 }
 
-/* Adjust bottom bar height for tab bar in mobile mode */
-body.mobile-mode .bottom-bar {
-    padding-bottom: 70px; /* Space for tab bar */
+/* Ensure all screens work properly in mobile mode */
+body.mobile-mode .screen {
+    padding-bottom: 55px;
+    /* Space for compact mobile tab bar */
 }
 
-/* Ensure garden screen has space for tab bar */
-body.mobile-mode #garden-screen {
-    padding-bottom: 60px;
+body.mobile-mode .screen.active {
+    display: flex !important;
 }
 
-/* Mobile mode adjustments for other screens */
-body.mobile-mode #shop-screen,
-body.mobile-mode #upgrades-screen {
-    padding-bottom: 70px;
+/* Garden screen specific adjustments */
+body.mobile-mode #garden-screen .game-container {
+    flex: 1;
+    overflow-y: auto;
 }
 
 /* ===========================================

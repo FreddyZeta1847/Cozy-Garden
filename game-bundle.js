@@ -666,6 +666,7 @@ class Garden {
 
     updateGrowth(currentTime, growthMultiplier = 1.0) {
         let updated = false;
+        const stageChanges = []; // Track cells that changed growth stage
 
         for (let row = 0; row < this.rows; row++) {
             for (let col = 0; col < this.cols; col++) {
@@ -695,6 +696,7 @@ class Garden {
                         cell.growthStage = newStage;
                         cell.status = 'growing';
                         updated = true;
+                        stageChanges.push({ row, col }); // Track this cell for animation
                     }
 
                     if (cell.growthStage === plant.stages - 1 && !cell.readyToHarvest) {
@@ -705,7 +707,7 @@ class Garden {
             }
         }
 
-        return updated;
+        return { updated, stageChanges };
     }
 
     autoWater(currentTime) {
@@ -1458,6 +1460,13 @@ class UIManager {
 
         tile.classList.add(cell.status);
 
+        // Add plant type as data attribute for CSS styling
+        if (cell.plantType) {
+            tile.setAttribute('data-plant', cell.plantType);
+        } else {
+            tile.removeAttribute('data-plant');
+        }
+
         if (cell.needsWater) {
             tile.classList.add('needs-water');
         }
@@ -1468,10 +1477,10 @@ class UIManager {
 
         switch (cell.status) {
             case 'empty':
-                tile.appendChild(this.createEmptyTileVisual());
+                // Empty tiles don't need extra visual - CSS handles it
                 break;
             case 'tilled':
-                tile.appendChild(this.createTilledVisual());
+                // Tilled tiles don't need extra visual - CSS handles it
                 break;
             case 'planted':
             case 'growing':
@@ -1494,49 +1503,83 @@ class UIManager {
 
     createPlantVisual(cell) {
         const container = document.createElement('div');
-        container.className = 'plant-container';
+        container.className = 'plant-svg-container';
 
         const plant = PLANTS[cell.plantType];
         if (!plant) return container;
 
-        // Simple emoji icons for plant stages
-        const stageIcons = {
-            tomato: ['🌱', '🪴', '🍅'],
-            lettuce: ['🌱', '🌿', '🥬'],
-            carrot: ['🌱', '🌿', '🥕'],
-            corn: ['🌱', '🌾', '🌽'],
-            potato: ['🌱', '🌿', '🥔']
-        };
+        // Use SVG plant system if available, fallback to emoji
+        if (window.SVGPlants && window.SVGPlants[cell.plantType]) {
+            const svgWrapper = document.createElement('div');
+            svgWrapper.className = `plant-svg stage-${cell.growthStage}`;
+            svgWrapper.innerHTML = window.SVGPlants.getPlantSVG(cell.plantType, cell.growthStage);
+            container.appendChild(svgWrapper);
+        } else {
+            // Fallback to emoji icons
+            const stageIcons = {
+                tomato: ['🌱', '🪴', '🍅'],
+                lettuce: ['🌱', '🌿', '🥬'],
+                carrot: ['🌱', '🌿', '🥕'],
+                corn: ['🌱', '🌾', '🌽'],
+                potato: ['🌱', '🌿', '🥔']
+            };
+            const plantEl = document.createElement('div');
+            plantEl.className = 'plant';
+            plantEl.textContent = stageIcons[cell.plantType][cell.growthStage] || '🌱';
+            container.appendChild(plantEl);
+        }
 
-        const plantEl = document.createElement('div');
-        plantEl.className = 'plant';
-        plantEl.textContent = stageIcons[cell.plantType][cell.growthStage] || '🌱';
-
+        // Water indicator using SVG
         if (cell.needsWater) {
-            const droplet = document.createElement('div');
-            droplet.className = 'water-droplet-indicator';
-            droplet.textContent = '💧';
-            droplet.style.position = 'absolute';
-            droplet.style.top = '5px';
-            droplet.style.right = '5px';
-            droplet.style.fontSize = '18px';
-            container.appendChild(droplet);
+            const waterIndicator = document.createElement('div');
+            waterIndicator.className = 'water-indicator';
+            if (window.SVGPlants) {
+                waterIndicator.innerHTML = window.SVGPlants.getWaterIndicator();
+            } else {
+                waterIndicator.textContent = '💧';
+                waterIndicator.style.fontSize = '18px';
+            }
+            container.appendChild(waterIndicator);
         }
 
+        // Harvest indicator with sparkle and particles
         if (cell.readyToHarvest) {
-            const sparkle = document.createElement('div');
-            sparkle.className = 'harvest-ready-indicator';
-            container.appendChild(sparkle);
+            // Sparkle star indicator
+            const harvestIndicator = document.createElement('div');
+            harvestIndicator.className = 'harvest-indicator';
+            if (window.SVGPlants) {
+                harvestIndicator.innerHTML = window.SVGPlants.getHarvestIndicator();
+            } else {
+                harvestIndicator.textContent = '✨';
+            }
+            container.appendChild(harvestIndicator);
+
+            // Floating particles
+            if (window.SVGPlants) {
+                const particles = document.createElement('div');
+                particles.innerHTML = window.SVGPlants.createHarvestParticles();
+                container.appendChild(particles.firstElementChild);
+            }
         }
 
-        container.appendChild(plantEl);
         return container;
     }
 
-    updateTile(row, col) {
+    updateTile(row, col, triggerGrowthAnimation = false) {
         const tile = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
         if (tile) {
             this.updateTileVisual(tile, row, col);
+
+            // Trigger growth animation if requested
+            if (triggerGrowthAnimation) {
+                const plantSvg = tile.querySelector('.plant-svg');
+                if (plantSvg) {
+                    plantSvg.classList.add('growing-transition', 'stage-transition');
+                    setTimeout(() => {
+                        plantSvg.classList.remove('growing-transition', 'stage-transition');
+                    }, 600);
+                }
+            }
 
             if (this.game.particles) {
                 this.game.particles.animateTilePulse(tile);
@@ -1574,6 +1617,13 @@ class UIManager {
 
             const canBuy = this.game.player.money >= plant.seedCost && isUnlocked;
 
+            // Calculate max affordable quantity
+            const maxAffordable = Math.floor(this.game.player.money / plant.seedCost);
+            const canBuy1 = maxAffordable >= 1 && isUnlocked;
+            const canBuy10 = maxAffordable >= 10 && isUnlocked;
+            const canBuy50 = maxAffordable >= 50 && isUnlocked;
+            const canBuyMax = maxAffordable >= 1 && isUnlocked;
+
             item.innerHTML = `
                 ${!isUnlocked ? `<div class="level-requirement">🔒 Level ${requiredLevel}</div>` : ''}
                 <div class="shop-item-icon">${cropIcons[key] || '🌱'}</div>
@@ -1590,10 +1640,16 @@ class UIManager {
                     </div>
                 </div>
                 <div class="shop-item-footer">
-                    <div class="price"><div class="coin-icon"></div>${plant.seedCost}</div>
-                    <button class="buy-button" onclick="game.buySeed('${key}')" ${!canBuy ? 'disabled' : ''}>
-                        ${isUnlocked ? 'Buy Seed' : 'Locked'}
-                    </button>
+                    <div class="quantity-buttons">
+                        <button class="qty-select-btn" onclick="game.buySeed('${key}', 1)" ${!canBuy1 ? 'disabled' : ''}>x1</button>
+                        <button class="qty-select-btn" onclick="game.buySeed('${key}', 10)" ${!canBuy10 ? 'disabled' : ''}>x10</button>
+                        <button class="qty-select-btn" onclick="game.buySeed('${key}', 50)" ${!canBuy50 ? 'disabled' : ''}>x50</button>
+                        <button class="qty-select-btn" onclick="game.buySeed('${key}', ${maxAffordable})" ${!canBuyMax ? 'disabled' : ''}>MAX</button>
+                    </div>
+                    <div class="price-row">
+                        <div class="price"><div class="coin-icon"></div>${plant.seedCost}/ea</div>
+                        <div class="buy-qty-display">${isUnlocked ? `Can buy: ${maxAffordable}` : 'Locked'}</div>
+                    </div>
                 </div>
             `;
 
@@ -1622,7 +1678,12 @@ class UIManager {
 
                 item.className = isUnlocked ? 'shop-item' : 'shop-item locked';
 
-                const canBuy = this.game.player.money >= fruit.seedCost && isUnlocked;
+                // Calculate max affordable quantity for fruit trees
+                const maxAffordable = Math.floor(this.game.player.money / fruit.seedCost);
+                const canBuy1 = maxAffordable >= 1 && isUnlocked;
+                const canBuy10 = maxAffordable >= 10 && isUnlocked;
+                const canBuy50 = maxAffordable >= 50 && isUnlocked;
+                const canBuyMax = maxAffordable >= 1 && isUnlocked;
 
                 item.innerHTML = `
                     ${!isUnlocked ? `<div class="level-requirement">🔒 Level ${requiredLevel}</div>` : ''}
@@ -1640,10 +1701,16 @@ class UIManager {
                         </div>
                     </div>
                     <div class="shop-item-footer">
-                        <div class="price"><div class="coin-icon"></div>${fruit.seedCost}</div>
-                        <button class="buy-button" onclick="game.buyFruitSeed('${key}')" ${!canBuy ? 'disabled' : ''}>
-                            ${isUnlocked ? 'Buy Seed' : 'Locked'}
-                        </button>
+                        <div class="quantity-buttons">
+                            <button class="qty-select-btn" onclick="game.buyFruitSeed('${key}', 1)" ${!canBuy1 ? 'disabled' : ''}>x1</button>
+                            <button class="qty-select-btn" onclick="game.buyFruitSeed('${key}', 10)" ${!canBuy10 ? 'disabled' : ''}>x10</button>
+                            <button class="qty-select-btn" onclick="game.buyFruitSeed('${key}', 50)" ${!canBuy50 ? 'disabled' : ''}>x50</button>
+                            <button class="qty-select-btn" onclick="game.buyFruitSeed('${key}', ${maxAffordable})" ${!canBuyMax ? 'disabled' : ''}>MAX</button>
+                        </div>
+                        <div class="price-row">
+                            <div class="price"><div class="coin-icon"></div>${fruit.seedCost}/ea</div>
+                            <div class="buy-qty-display">${isUnlocked ? `Can buy: ${maxAffordable}` : 'Locked'}</div>
+                        </div>
                     </div>
                 `;
 
@@ -1784,7 +1851,12 @@ class UIManager {
                 <div class="cart-item-icon">${product.icon}</div>
                 <div class="cart-item-info">
                     <div class="cart-item-name">${product.item.name}</div>
-                    <div class="cart-item-price">${product.item.sellPrice} per unit</div>
+                    <div class="cart-item-price">${product.item.sellPrice}/ea · Stock: ${maxQty}</div>
+                    <div class="cart-qty-presets">
+                        <button class="cart-qty-preset" onclick="game.addCartQuantity(${index}, 10)">+10</button>
+                        <button class="cart-qty-preset" onclick="game.addCartQuantity(${index}, 50)">+50</button>
+                        <button class="cart-qty-preset max-btn" onclick="game.setCartQuantity(${index}, ${maxQty})">MAX</button>
+                    </div>
                 </div>
                 <div class="cart-item-quantity">
                     <button class="qty-btn" onclick="game.decreaseCartQuantity(${index})">-</button>
@@ -2399,9 +2471,9 @@ class Game {
             this.gameTime++;
 
             // Update vegetable garden growth
-            const updated = this.garden.updateGrowth(this.gameTime, this.player.upgrades.fasterGrowth);
-            if (updated) {
-                this.refreshAllTiles();
+            const growthResult = this.garden.updateGrowth(this.gameTime, this.player.upgrades.fasterGrowth);
+            if (growthResult.updated) {
+                this.refreshAllTiles(growthResult.stageChanges);
             }
 
             // Update fruit garden growth
@@ -2642,10 +2714,15 @@ class Game {
         return false;
     }
 
-    refreshAllTiles() {
+    refreshAllTiles(stageChanges = []) {
+        // Create a set of cells that had stage changes for quick lookup
+        const changedCells = new Set(stageChanges.map(c => `${c.row},${c.col}`));
+
         for (let row = 0; row < this.garden.rows; row++) {
             for (let col = 0; col < this.garden.cols; col++) {
-                this.ui.updateTile(row, col);
+                // Trigger growth animation if this cell changed stage
+                const triggerAnimation = changedCells.has(`${row},${col}`);
+                this.ui.updateTile(row, col, triggerAnimation);
             }
         }
     }
@@ -2720,16 +2797,25 @@ class Game {
         }
     }
 
-    buySeed(seedType) {
+    buySeed(seedType, quantity = 1) {
         const plant = PLANTS[seedType];
+        const totalCost = plant.seedCost * quantity;
 
-        if (this.player.spendMoney(plant.seedCost)) {
-            this.player.addSeed(seedType, 1);
+        // Check if player can afford
+        if (this.player.money < totalCost) {
+            this.ui.showToast('error', '❌', 'Not Enough Money!', `You need $${totalCost} but only have $${this.player.money}`);
+            return;
+        }
 
-            // Award XP for buying a seed
-            const xpResult = this.player.addXP(LEVEL_SYSTEM.xpRewards.buySeed, 'buy seed');
-            if (xpResult.leveledUp) {
-                this.handleLevelUp(xpResult.oldLevel, xpResult.newLevel);
+        if (this.player.spendMoney(totalCost)) {
+            this.player.addSeed(seedType, quantity);
+
+            // Award XP for buying seeds (XP per seed)
+            for (let i = 0; i < quantity; i++) {
+                const xpResult = this.player.addXP(LEVEL_SYSTEM.xpRewards.buySeed, 'buy seed');
+                if (xpResult.leveledUp) {
+                    this.handleLevelUp(xpResult.oldLevel, xpResult.newLevel);
+                }
             }
 
             this.ui.updateAll();
@@ -2751,15 +2837,23 @@ class Game {
             };
 
             // Show success toast
-            this.ui.showToast('success', cropIcons[seedType], 'Seed Purchased!', `Bought 1 ${plant.name} seed for $${plant.seedCost}`);
+            const seedWord = quantity === 1 ? 'seed' : 'seeds';
+            this.ui.showToast('success', cropIcons[seedType], 'Seeds Purchased!', `Bought ${quantity} ${plant.name} ${seedWord} for $${totalCost}`);
         }
     }
 
-    buyFruitSeed(fruitType) {
+    buyFruitSeed(fruitType, quantity = 1) {
         const fruit = FRUITS[fruitType];
+        const totalCost = fruit.seedCost * quantity;
 
-        if (this.player.spendMoney(fruit.seedCost)) {
-            this.player.addFruitSeed(fruitType, 1);
+        // Check if player can afford
+        if (this.player.money < totalCost) {
+            this.ui.showToast('error', '❌', 'Not Enough Money!', `You need $${totalCost} but only have $${this.player.money}`);
+            return;
+        }
+
+        if (this.player.spendMoney(totalCost)) {
+            this.player.addFruitSeed(fruitType, quantity);
             this.ui.updateAll();
             this.ui.renderShop();
             this.saveGame();
@@ -2778,7 +2872,8 @@ class Game {
             };
 
             // Show success toast
-            this.ui.showToast('success', fruitIcons[fruitType], 'Tree Purchased!', `Bought 1 ${fruit.name} tree for $${fruit.seedCost}`);
+            const treeWord = quantity === 1 ? 'tree' : 'trees';
+            this.ui.showToast('success', fruitIcons[fruitType], 'Trees Purchased!', `Bought ${quantity} ${fruit.name} ${treeWord} for $${totalCost}`);
         }
     }
 
@@ -2927,6 +3022,30 @@ class Game {
         }
     }
 
+    // NEW: Set cart quantity to a specific amount (for MAX button)
+    setCartQuantity(index, amount) {
+        if (index >= 0 && index < this.sellCart.length) {
+            const product = this.sellCart[index];
+            const maxQty = product.type === 'veg'
+                ? this.player.inventory.harvested[product.key]
+                : this.player.inventory.harvestedFruits[product.key];
+            product.quantity = Math.min(amount, maxQty);
+            this.ui.renderSellCart();
+        }
+    }
+
+    // NEW: Add to cart quantity (cumulative, for +10, +50 buttons)
+    addCartQuantity(index, amount) {
+        if (index >= 0 && index < this.sellCart.length) {
+            const product = this.sellCart[index];
+            const maxQty = product.type === 'veg'
+                ? this.player.inventory.harvested[product.key]
+                : this.player.inventory.harvestedFruits[product.key];
+            product.quantity = Math.min((product.quantity || 0) + amount, maxQty);
+            this.ui.renderSellCart();
+        }
+    }
+
     // NEW: Sell selected products from cart
     sellSelectedProducts() {
         let totalEarned = 0;
@@ -3050,6 +3169,8 @@ class Game {
         const slider = document.querySelector('.gardens-slider');
         if (slider) {
             slider.classList.add('show-fruits');
+            this.updateGardenIndicators('fruits');
+            this.hideSwipeHint();
             console.log('🍎 Switched to fruit garden');
         }
     }
@@ -3058,7 +3179,38 @@ class Game {
         const slider = document.querySelector('.gardens-slider');
         if (slider) {
             slider.classList.remove('show-fruits');
+            this.updateGardenIndicators('vegetables');
+            this.hideSwipeHint();
             console.log('🥕 Switched to vegetable garden');
+        }
+    }
+
+    // Switch to garden by name (for indicator dots)
+    switchToGarden(gardenName) {
+        if (gardenName === 'fruits') {
+            this.switchToFruitGarden();
+        } else {
+            this.switchToVegetableGarden();
+        }
+    }
+
+    // Update garden indicator dots
+    updateGardenIndicators(activeGarden) {
+        const dots = document.querySelectorAll('.garden-dot');
+        dots.forEach(dot => {
+            if (dot.dataset.garden === activeGarden) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
+    }
+
+    // Hide swipe hint after first swipe
+    hideSwipeHint() {
+        const hint = document.getElementById('swipe-hint');
+        if (hint) {
+            hint.classList.add('hidden');
         }
     }
 
@@ -3221,8 +3373,11 @@ class Game {
         cell.className = 'fruit-cell';
         cell.setAttribute('data-index', index);
 
-        // Add status class
+        // Add status class and fruit type for CSS styling
         cell.classList.add(tree.status);
+        if (tree.fruitType) {
+            cell.setAttribute('data-fruit', tree.fruitType);
+        }
 
         // Add special state classes
         if (tree.needsWater) {
@@ -3237,63 +3392,71 @@ class Game {
 
         // Handle DEAD tree status
         if (tree.status === 'dead') {
-            const deadTreeEl = document.createElement('div');
-            deadTreeEl.className = 'plant-sprite dead-tree';
-            deadTreeEl.textContent = '🍂';
-            deadTreeEl.style.fontSize = '48px';
-            deadTreeEl.style.filter = 'grayscale(0.5)';
-            deadTreeEl.style.opacity = '0.7';
-            cell.appendChild(deadTreeEl);
+            // Use SVG dead tree if available
+            if (window.SVGPlants) {
+                const treeContainer = document.createElement('div');
+                treeContainer.className = 'tree-svg-container';
+                const svgWrapper = document.createElement('div');
+                svgWrapper.className = 'tree-svg dead-tree';
+                svgWrapper.innerHTML = window.SVGPlants.deadTree;
+                treeContainer.appendChild(svgWrapper);
+                cell.appendChild(treeContainer);
+            } else {
+                const deadTreeEl = document.createElement('div');
+                deadTreeEl.className = 'plant-sprite dead-tree';
+                deadTreeEl.textContent = '🍂';
+                deadTreeEl.style.fontSize = '48px';
+                deadTreeEl.style.filter = 'grayscale(0.5)';
+                deadTreeEl.style.opacity = '0.7';
+                cell.appendChild(deadTreeEl);
+            }
 
             // Add "Click to remove" tooltip
             const removeLabel = document.createElement('div');
             removeLabel.className = 'remove-label';
             removeLabel.textContent = 'Click to remove';
-            removeLabel.style.position = 'absolute';
-            removeLabel.style.bottom = '5px';
-            removeLabel.style.left = '50%';
-            removeLabel.style.transform = 'translateX(-50%)';
-            removeLabel.style.fontSize = '10px';
-            removeLabel.style.fontWeight = 'bold';
-            removeLabel.style.background = 'rgba(139, 69, 19, 0.9)';
-            removeLabel.style.color = '#fff';
-            removeLabel.style.padding = '3px 8px';
-            removeLabel.style.borderRadius = '8px';
-            removeLabel.style.whiteSpace = 'nowrap';
             cell.appendChild(removeLabel);
             return;
         }
 
         // Add visual representation based on tree status
-        if (tree.status === 'empty') {
-            // Empty cell - just brown dirt
-            // No content needed, CSS handles it
-        } else if (tree.status === 'tilled') {
-            // Tilled cell - darker soil
-            // No content needed, CSS handles it
+        if (tree.status === 'empty' || tree.status === 'tilled') {
+            // Empty/tilled cell - CSS handles it
         } else if (tree.status === 'planted' || tree.status === 'growing' || tree.status === 'mature') {
             const fruit = FRUITS[tree.fruitType];
 
-            // Show tree with growth stage
-            const stageEmojis = ['🌱', '🪴', '🌳', '🌳'];
-            const emoji = stageEmojis[tree.growthStage] || '🌱';
+            // Use SVG tree system if available
+            if (window.SVGPlants && window.SVGPlants[tree.fruitType]) {
+                const treeContainer = document.createElement('div');
+                treeContainer.className = 'tree-svg-container';
 
-            const plantEl = document.createElement('div');
-            plantEl.className = 'plant-sprite';
-            plantEl.textContent = emoji;
-            plantEl.style.fontSize = '48px';
-            cell.appendChild(plantEl);
+                const svgWrapper = document.createElement('div');
+                svgWrapper.className = `tree-svg stage-${tree.growthStage}`;
+                svgWrapper.innerHTML = window.SVGPlants.getTreeSVG(tree.fruitType, tree.growthStage);
+                treeContainer.appendChild(svgWrapper);
+                cell.appendChild(treeContainer);
+            } else {
+                // Fallback to emoji
+                const stageEmojis = ['🌱', '🪴', '🌳', '🌳'];
+                const emoji = stageEmojis[tree.growthStage] || '🌱';
+                const plantEl = document.createElement('div');
+                plantEl.className = 'plant-sprite';
+                plantEl.textContent = emoji;
+                plantEl.style.fontSize = '48px';
+                cell.appendChild(plantEl);
+            }
 
-            // Add water indicator if needs water
+            // Add water indicator using SVG if available
             if (tree.needsWater) {
-                const waterIcon = document.createElement('div');
-                waterIcon.className = 'water-indicator';
-                waterIcon.textContent = '💧';
-                waterIcon.style.position = 'absolute';
-                waterIcon.style.top = '5px';
-                waterIcon.style.right = '5px';
-                waterIcon.style.fontSize = '20px';
-                cell.appendChild(waterIcon);
+                const waterIndicator = document.createElement('div');
+                waterIndicator.className = 'water-indicator';
+                if (window.SVGPlants) {
+                    waterIndicator.innerHTML = window.SVGPlants.getWaterIndicator();
+                } else {
+                    waterIndicator.textContent = '💧';
+                    waterIndicator.style.fontSize = '20px';
+                }
+                cell.appendChild(waterIndicator);
             }
 
             // Add harvest counter indicator (always show for mature trees)
@@ -3301,74 +3464,42 @@ class Game {
                 const harvestCounter = document.createElement('div');
                 harvestCounter.className = 'harvest-counter';
                 harvestCounter.textContent = `🧺 ${tree.harvestCount || 0}/${fruit.maxHarvests}`;
-                harvestCounter.style.position = 'absolute';
-                harvestCounter.style.bottom = '5px';
-                harvestCounter.style.left = '5px';
-                harvestCounter.style.fontSize = '11px';
-                harvestCounter.style.fontWeight = 'bold';
-                harvestCounter.style.background = 'rgba(139, 69, 19, 0.9)';
-                harvestCounter.style.color = '#fff';
-                harvestCounter.style.padding = '3px 6px';
-                harvestCounter.style.borderRadius = '8px';
-                harvestCounter.style.whiteSpace = 'nowrap';
                 cell.appendChild(harvestCounter);
             }
 
             // Add production timer for mature trees (not ready to harvest yet)
             if (tree.isMature && tree.status === 'mature' && !tree.readyToHarvest && this.gameTime) {
-                // Check if lastProduced is valid (not 0 or undefined)
                 if (tree.lastProduced && tree.lastProduced > 0) {
                     const timeSinceProduced = this.gameTime - tree.lastProduced;
                     const timeUntilNext = fruit.productionInterval - timeSinceProduced;
 
-                    // Only show timer if it's positive and reasonable (not corrupted data)
                     if (timeUntilNext > 0 && timeUntilNext <= fruit.productionInterval) {
                         const timerEl = document.createElement('div');
                         timerEl.className = 'production-timer';
                         timerEl.textContent = `⏱️ ${Math.ceil(timeUntilNext)}s`;
-                        timerEl.style.position = 'absolute';
-                        timerEl.style.top = '5px';
-                        timerEl.style.left = '5px';
-                        timerEl.style.fontSize = '11px';
-                        timerEl.style.fontWeight = 'bold';
-                        timerEl.style.background = 'rgba(34, 139, 34, 0.9)';
-                        timerEl.style.color = '#fff';
-                        timerEl.style.padding = '3px 6px';
-                        timerEl.style.borderRadius = '8px';
-                        timerEl.style.whiteSpace = 'nowrap';
                         cell.appendChild(timerEl);
                     }
                 }
             }
 
-            // Add sparkle if ready to harvest
+            // Add sparkle/harvest indicator if ready to harvest
             if (tree.readyToHarvest) {
-                const sparkle = document.createElement('div');
-                sparkle.className = 'harvest-sparkle';
-                sparkle.textContent = '✨';
-                sparkle.style.position = 'absolute';
-                sparkle.style.top = '5px';
-                sparkle.style.left = '5px';
-                sparkle.style.fontSize = '20px';
-                sparkle.style.animation = 'pulse 1s ease-in-out infinite';
-                cell.appendChild(sparkle);
+                // Harvest sparkle indicator
+                const harvestIndicator = document.createElement('div');
+                harvestIndicator.className = 'harvest-indicator';
+                if (window.SVGPlants) {
+                    harvestIndicator.innerHTML = window.SVGPlants.getHarvestIndicator();
+                } else {
+                    harvestIndicator.textContent = '✨';
+                }
+                cell.appendChild(harvestIndicator);
 
-                // Show tree + fruit overlay when ready to harvest
-                const fruitIcons = { apple: '🍎', orange: '🍊', banana: '🍌', pear: '🍐' };
-                const fruitEmoji = fruitIcons[tree.fruitType] || '🍎';
-
-                // Add fruit overlay on top of tree
-                const fruitOverlay = document.createElement('div');
-                fruitOverlay.className = 'fruit-overlay';
-                fruitOverlay.textContent = fruitEmoji;
-                fruitOverlay.style.position = 'absolute';
-                fruitOverlay.style.top = '50%';
-                fruitOverlay.style.left = '50%';
-                fruitOverlay.style.transform = 'translate(-50%, -50%)';
-                fruitOverlay.style.fontSize = '32px';
-                fruitOverlay.style.filter = 'drop-shadow(0 0 8px rgba(255, 215, 0, 0.8))';
-                fruitOverlay.style.animation = 'bounce 0.6s ease-in-out infinite';
-                cell.appendChild(fruitOverlay);
+                // Floating particles
+                if (window.SVGPlants) {
+                    const particles = document.createElement('div');
+                    particles.innerHTML = window.SVGPlants.createHarvestParticles();
+                    cell.appendChild(particles.firstElementChild);
+                }
             }
         }
     }

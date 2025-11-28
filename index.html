@@ -22,10 +22,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="styles/main.css?v=3.0">
+    <link rel="stylesheet" href="styles/main.css?v=3.1">
     <link rel="stylesheet" href="styles/garden.css">
-    <link rel="stylesheet" href="styles/plants.css">
-    <link rel="stylesheet" href="styles/ui.css?v=3.0">
+    <link rel="stylesheet" href="styles/plants-svg.css?v=1.0">
+    <link rel="stylesheet" href="styles/ui.css?v=3.1">
     <link rel="stylesheet" href="styles/fruits.css?v=3.0">
     <!-- Mobile-specific styles (media queries only - does not affect desktop) -->
     <link rel="stylesheet" href="styles/mobile.css?v=1.0">
@@ -36,40 +36,62 @@
 
     <!-- Welcome Screen -->
     <div id="welcome-screen" class="welcome-screen active">
+        <div class="welcome-overlay"></div>
         <div class="welcome-content">
-            <h1 class="welcome-title">Welcome to Cozy Garden</h1>
-            <p class="welcome-subtitle">A peaceful farming adventure</p>
+            <!-- Floating decorations -->
+            <div class="floating-elements">
+                <span class="float-item float-1">🌻</span>
+                <span class="float-item float-2">🦋</span>
+                <span class="float-item float-3">🌸</span>
+                <span class="float-item float-4">🐝</span>
+                <span class="float-item float-5">🍃</span>
+            </div>
 
-            <div class="welcome-features">
-                <div class="feature-item">
-                    <span class="feature-icon">🌾</span>
-                    <span class="feature-text">Plant & Grow Vegetables</span>
+            <!-- Main Logo Area -->
+            <div class="welcome-logo">
+                <div class="logo-icon">🏡</div>
+                <h1 class="welcome-title">Cozy Garden</h1>
+                <div class="title-decoration">
+                    <span>✿</span>
+                    <span>───────</span>
+                    <span>✿</span>
                 </div>
-                <div class="feature-item">
-                    <span class="feature-icon">🍎</span>
-                    <span class="feature-text">Cultivate Fruit Trees</span>
+                <p class="welcome-tagline">Grow • Harvest • Relax</p>
+            </div>
+
+            <!-- Feature Highlights -->
+            <div class="welcome-highlights">
+                <div class="highlight-card">
+                    <div class="highlight-icon">🌱</div>
+                    <div class="highlight-text">
+                        <strong>Plant</strong>
+                        <span>Grow vegetables & fruits</span>
+                    </div>
                 </div>
-                <div class="feature-item">
-                    <span class="feature-icon">💧</span>
-                    <span class="feature-text">Water Your Garden</span>
+                <div class="highlight-card">
+                    <div class="highlight-icon">💰</div>
+                    <div class="highlight-text">
+                        <strong>Profit</strong>
+                        <span>Sell at the market</span>
+                    </div>
                 </div>
-                <div class="feature-item">
-                    <span class="feature-icon">🛒</span>
-                    <span class="feature-text">Sell Your Harvest</span>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-icon">⭐</span>
-                    <span class="feature-text">Level Up & Unlock Upgrades</span>
+                <div class="highlight-card">
+                    <div class="highlight-icon">⭐</div>
+                    <div class="highlight-text">
+                        <strong>Progress</strong>
+                        <span>Level up & unlock more</span>
+                    </div>
                 </div>
             </div>
 
-            <button class="welcome-button" onclick="game.startGame()">
-                <span class="button-icon">🌸</span>
-                <span>Start Your Garden</span>
-                <span class="button-icon">🌸</span>
+            <!-- Play Button -->
+            <button class="play-button" onclick="game.startGame()">
+                <span class="play-icon">▶</span>
+                <span class="play-text">Play Now</span>
             </button>
 
-            <p class="welcome-hint">Click to begin your cozy farming journey</p>
+            <!-- Version info -->
+            <p class="welcome-version">v3.2 • Made with 💚</p>
         </div>
     </div>
 
@@ -116,29 +138,45 @@
         </div>
 
         <div class="game-container">
+            <!-- Garden Indicators (Mobile) -->
+            <div class="garden-indicators" style="display: none;">
+                <button class="garden-dot active" data-garden="vegetables" onclick="game.switchToGarden('vegetables')">
+                    <span class="garden-dot-label">🥬</span>
+                </button>
+                <button class="garden-dot" data-garden="fruits" onclick="game.switchToGarden('fruits')">
+                    <span class="garden-dot-label">🍎</span>
+                </button>
+            </div>
+
             <!-- Gardens Slider Container -->
-            <div class="gardens-slider">
+            <div class="gardens-slider" id="gardens-slider">
                 <!-- Vegetable Garden -->
                 <div class="garden-view vegetable-garden active">
                     <div class="garden-wrapper">
-                        <div class="garden-sign">My Vegetable Garden</div>
+                        <div class="garden-sign">🥬 Vegetable Garden</div>
                         <div id="garden-grid" class="garden-grid"></div>
                         <div class="garden-shadow"></div>
                     </div>
-                    <!-- Right Arrow to Fruit Garden -->
+                    <!-- Right Arrow to Fruit Garden (Desktop only) -->
                     <button class="garden-nav-arrow right-arrow" onclick="game.switchToFruitGarden()" title="Go to Fruit Garden">
                         <span>➡️</span>
                     </button>
+                    <!-- Swipe hint (Mobile) -->
+                    <div class="swipe-hint" id="swipe-hint">
+                        <span>👆</span>
+                        <span>Swipe to see Orchard</span>
+                        <span>👉</span>
+                    </div>
                 </div>
 
                 <!-- Fruit Garden -->
                 <div class="garden-view fruit-garden">
-                    <!-- Left Arrow back to Vegetables -->
+                    <!-- Left Arrow back to Vegetables (Desktop only) -->
                     <button class="garden-nav-arrow left-arrow" onclick="game.switchToVegetableGarden()" title="Back to Vegetable Garden">
                         <span>⬅️</span>
                     </button>
                     <div class="fruit-wrapper">
-                        <div class="garden-sign">My Fruit Orchard</div>
+                        <div class="garden-sign">🍎 Fruit Orchard</div>
                         <div id="fruit-grid" class="fruit-grid">
                             <!-- 5 fruit cells in triangular layout -->
                             <div class="fruit-cell" data-index="0"></div>
@@ -356,8 +394,10 @@
         </div>
     </div>
 
-    <!-- Game Script (Bundled) - v3.0 with LEVEL SYSTEM -->
-    <script src="game-bundle.js?v=3.0"></script>
+    <!-- SVG Plant Sprites System -->
+    <script src="svg-plants.js?v=1.0"></script>
+    <!-- Game Script (Bundled) - v3.1 with SVG PLANTS -->
+    <script src="game-bundle.js?v=3.1"></script>
     <!-- Mobile UI System - Object-First Interaction -->
     <script src="mobile-ui.js?v=1.0"></script>
 </body>

@@ -352,6 +352,122 @@
     box-shadow: none;
 }
 
+/* ===========================
+   QUANTITY BUTTONS FOR SHOP
+   =========================== */
+
+.quantity-buttons {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.qty-select-btn {
+    background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+    border: 2px solid #81C784;
+    border-radius: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Fredoka', sans-serif;
+    color: #2E7D32;
+    transition: all 0.2s;
+    min-width: 40px;
+}
+
+.qty-select-btn:hover {
+    background: linear-gradient(135deg, #C8E6C9 0%, #A5D6A7 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(76, 175, 80, 0.3);
+}
+
+.qty-select-btn:active {
+    transform: translateY(0);
+}
+
+.qty-select-btn.active {
+    background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+    border-color: #2E7D32;
+    color: white;
+    box-shadow: 0 2px 0 #1B5E20, 0 3px 8px rgba(27, 94, 32, 0.4);
+}
+
+.qty-select-btn:disabled {
+    background: linear-gradient(135deg, #E0E0E0 0%, #BDBDBD 100%);
+    border-color: #9E9E9E;
+    color: #757575;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.shop-item-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.shop-item-footer .price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.buy-qty-display {
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+    font-style: italic;
+}
+
+/* ===========================
+   CART QUANTITY PRESETS
+   =========================== */
+
+.cart-qty-presets {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.cart-qty-preset {
+    background: linear-gradient(135deg, #FFF8E1 0%, #FFE082 100%);
+    border: 2px solid #FFB300;
+    border-radius: 6px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Fredoka', sans-serif;
+    color: #E65100;
+    transition: all 0.2s;
+    min-width: 32px;
+    text-align: center;
+}
+
+.cart-qty-preset:hover {
+    background: linear-gradient(135deg, #FFE082 0%, #FFD54F 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(255, 179, 0, 0.4);
+}
+
+.cart-qty-preset:active {
+    transform: translateY(0);
+}
+
+.cart-qty-preset.max-btn {
+    background: linear-gradient(135deg, #FFCC80 0%, #FF9800 100%);
+    border-color: #E65100;
+    color: white;
+}
+
+.cart-qty-preset.max-btn:hover {
+    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+}
+
 /* Locked Shop Items */
 .shop-item.locked {
     opacity: 0.6;
@@ -946,7 +1062,7 @@
 .cart-item-info {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
 }
 
 .cart-item-name {
@@ -956,8 +1072,12 @@
 }
 
 .cart-item-price {
-    font-size: 13px;
+    font-size: 12px;
     color: #666;
+}
+
+.cart-item-info .cart-qty-presets {
+    margin-top: 4px;
 }
 
 /* Quantity Controls */

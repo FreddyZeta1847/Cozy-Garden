@@ -44,6 +44,88 @@ class MobileUI {
         // Listen for orientation changes
         window.addEventListener('orientationchange', () => this.handleOrientationChange());
         window.addEventListener('resize', () => this.handleResize());
+
+        // Performance: Reduce particles on mobile
+        if (typeof SEASONS !== 'undefined') {
+            SEASONS.forEach(season => {
+                if (season.particles) {
+                    season.particles.count = Math.max(5, Math.floor(season.particles.count / 2));
+                }
+            });
+            // Force update if game is running
+            if (this.game && this.game.updateSeason) {
+                this.game.updateSeason();
+            }
+        }
+
+        // Initialize swipe navigation
+        this.setupSwipeNavigation();
+    }
+
+
+
+    setupSwipeNavigation() {
+        const gardenGrid = document.getElementById('garden-grid');
+        const gardenContainer = document.querySelector('.game-container');
+        if (!gardenContainer) return;
+
+        let touchStartX = 0;
+        let touchStartTime = 0;
+        const minSwipeDistance = 80;
+        const maxSwipeTime = 300; // Fast swipe must be under 300ms
+
+        // Track if we're currently viewing fruits
+        this.viewingFruits = false;
+
+        gardenContainer.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartTime = Date.now();
+        }, { passive: true });
+
+        gardenContainer.addEventListener('touchend', (e) => {
+            const touchEndX = e.changedTouches[0].screenX;
+            const touchEndTime = Date.now();
+            const swipeTime = touchEndTime - touchStartTime;
+            const distance = touchEndX - touchStartX;
+
+            this.handleSwipe(distance, swipeTime, minSwipeDistance, maxSwipeTime, gardenGrid);
+        }, { passive: true });
+    }
+
+    handleSwipe(distance, swipeTime, minDistance, maxTime, gardenGrid) {
+        // Only handle swipes if we are in the garden screen
+        if (this.currentScreen !== 'garden') return;
+
+        const isFastSwipe = swipeTime < maxTime && Math.abs(distance) > minDistance;
+
+        if (!isFastSwipe) return; // Ignore slow swipes - let normal scroll handle it
+
+        // Check if viewing fruits or vegetables
+        const slider = document.querySelector('.gardens-slider');
+        const isViewingFruits = slider && slider.classList.contains('show-fruits');
+
+        if (isViewingFruits) {
+            // Currently on fruit orchard
+            if (distance > 0) {
+                // Fast swipe right -> Go back to vegetables
+                console.log('🥬 Fast swipe right: switching to vegetables');
+                this.game.switchToVegetableGarden();
+            }
+        } else {
+            // Currently on vegetable garden
+            if (gardenGrid) {
+                const isAtRightEdge = gardenGrid.scrollLeft + gardenGrid.clientWidth >= gardenGrid.scrollWidth - 10;
+
+                if (distance < 0 && isAtRightEdge) {
+                    // Fast swipe left at right edge -> Go to fruits
+                    console.log('🍎 Fast swipe left at edge: switching to fruits');
+                    this.game.switchToFruitGarden();
+                }
+            } else if (distance < 0) {
+                // No grid found, just switch
+                this.game.switchToFruitGarden();
+            }
+        }
     }
 
     createMobileLayout() {
@@ -67,47 +149,34 @@ class MobileUI {
     }
 
     convertToMobileGrid() {
-        const gardenGrid = document.getElementById('garden-grid');
-        if (!gardenGrid) return;
-
-        // Change grid to 4 columns, make it scrollable
-        gardenGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
-        gardenGrid.style.gridAutoRows = '1fr';
-        gardenGrid.style.overflowY = 'auto';
-        gardenGrid.style.maxHeight = '60vh';
-        gardenGrid.style.padding = '10px';
-
-        // Enable touch scrolling
-        gardenGrid.style.webkitOverflowScrolling = 'touch';
+        // Grid layout is now handled by CSS in mobile.css
+        // No JS overrides needed - keeping the 6x4 grid but smaller
+        console.log('📱 Mobile grid layout applied via CSS');
     }
 
     compactifyHeader() {
         const header = document.querySelector('.header');
         if (!header) return;
 
-        // Create mobile header layout
+        // Create mobile header layout - Title on first line, resources on second line
         header.innerHTML = `
+            <div class="mobile-header-title">
+                <h1>🌿 Cozy Garden</h1>
+            </div>
             <div class="mobile-header-row">
+                <div class="mobile-resource">
+                    <span class="coin-icon-small">🪙</span>
+                    <span id="mobile-money-display">${this.game.player.money}</span>
+                </div>
+                <div class="mobile-resource" onclick="game.mobileUI.showInventory()">
+                    <span class="season-icon" id="mobile-season-icon">🌸</span>
+                </div>
                 <div class="mobile-level-display">
                     <span class="level-icon">⭐</span>
                     <span class="level-number" id="mobile-level-number">${this.game.player.level}</span>
                     <div class="mobile-xp-bar">
                         <div class="xp-fill" id="mobile-xp-bar"></div>
                     </div>
-                </div>
-                <div class="mobile-resources">
-                    <div class="mobile-resource">
-                        <span class="coin-icon-small">🪙</span>
-                        <span id="mobile-money-display">${this.game.player.money}</span>
-                    </div>
-                    <div class="mobile-resource" onclick="game.mobileUI.showInventory()">
-                        <span>🧺</span>
-                        <span id="mobile-harvested-count">0</span>
-                    </div>
-                </div>
-                <div class="mobile-header-actions">
-                    <span class="season-icon" id="mobile-season-icon">🌸</span>
-                    <button class="settings-btn" onclick="game.mobileUI.showSettings()">⚙️</button>
                 </div>
             </div>
         `;
@@ -167,7 +236,7 @@ class MobileUI {
     }
 
     createFloatingButtons() {
-        // Create QoL floating action buttons
+        // Create QoL floating action buttons (only Water All, no Harvest All)
         const container = document.createElement('div');
         container.id = 'mobile-floating-buttons';
         container.className = 'mobile-floating-buttons';
@@ -175,10 +244,6 @@ class MobileUI {
             <button class="fab water-all-fab hidden" id="water-all-btn" onclick="game.mobileUI.waterAll()">
                 <span>💧</span>
                 <span class="fab-label">Water All</span>
-            </button>
-            <button class="fab harvest-all-fab hidden" id="harvest-all-btn" onclick="game.mobileUI.harvestAll()">
-                <span>🧺</span>
-                <span class="fab-label">Harvest All</span>
             </button>
         `;
         document.body.appendChild(container);
@@ -359,7 +424,21 @@ class MobileUI {
             } else {
                 menu.style.top = `${rect.bottom + 10}px`;
             }
-            menu.style.left = `${rect.left + rect.width / 2}px`;
+
+            // Horizontal positioning with boundary checks
+            let leftPos = rect.left + rect.width / 2;
+            const menuWidth = 200; // Approximate width
+
+            // Prevent going off left edge
+            if (leftPos < menuWidth / 2 + 10) {
+                leftPos = menuWidth / 2 + 10;
+            }
+            // Prevent going off right edge
+            else if (leftPos > window.innerWidth - menuWidth / 2 - 10) {
+                leftPos = window.innerWidth - menuWidth / 2 - 10;
+            }
+
+            menu.style.left = `${leftPos}px`;
             menu.style.transform = 'translateX(-50%)';
         }
 
@@ -463,7 +542,8 @@ class MobileUI {
 
         content.addEventListener('touchend', () => {
             const diff = currentY - startY;
-            if (diff > 100) {
+            // Reduced threshold for easier closing (was 100)
+            if (diff > 60) {
                 this.hideBottomSheet();
             } else {
                 content.style.transform = 'translateY(0)';
@@ -474,17 +554,14 @@ class MobileUI {
     // QoL Floating Buttons
     updateFloatingButtons() {
         const waterBtn = document.getElementById('water-all-btn');
-        const harvestBtn = document.getElementById('harvest-all-btn');
 
         // Check for plants needing water
         let needsWater = false;
-        let readyToHarvest = false;
 
         for (let row = 0; row < this.game.garden.rows; row++) {
             for (let col = 0; col < this.game.garden.cols; col++) {
                 const cell = this.game.garden.getCell(row, col);
                 if (cell.needsWater) needsWater = true;
-                if (cell.readyToHarvest) readyToHarvest = true;
             }
         }
 
@@ -493,16 +570,12 @@ class MobileUI {
             for (let i = 0; i < this.game.fruitGarden.slots; i++) {
                 const tree = this.game.fruitGarden.getTree(i);
                 if (tree.needsWater) needsWater = true;
-                if (tree.readyToHarvest) readyToHarvest = true;
             }
         }
 
-        // Show/hide buttons
+        // Show/hide water button
         if (waterBtn) {
             waterBtn.classList.toggle('hidden', !needsWater);
-        }
-        if (harvestBtn) {
-            harvestBtn.classList.toggle('hidden', !readyToHarvest);
         }
     }
 
