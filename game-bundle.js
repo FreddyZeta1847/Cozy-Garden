@@ -3420,9 +3420,21 @@ class Game {
         }
 
         // Add visual representation based on tree status
-        if (tree.status === 'empty' || tree.status === 'tilled') {
-            // Empty/tilled cell - CSS handles it
+        if (tree.status === 'empty') {
+            // Empty cell - add dirt texture
+            const dirtEl = document.createElement('div');
+            dirtEl.className = 'fruit-dirt';
+            cell.appendChild(dirtEl);
+        } else if (tree.status === 'tilled') {
+            // Tilled cell - add tilled soil texture
+            const tilledEl = document.createElement('div');
+            tilledEl.className = 'fruit-tilled';
+            cell.appendChild(tilledEl);
         } else if (tree.status === 'planted' || tree.status === 'growing' || tree.status === 'mature') {
+            // Add planted soil texture as background
+            const plantedSoilEl = document.createElement('div');
+            plantedSoilEl.className = 'fruit-planted';
+            cell.appendChild(plantedSoilEl);
             const fruit = FRUITS[tree.fruitType];
 
             // Use SVG tree system if available
