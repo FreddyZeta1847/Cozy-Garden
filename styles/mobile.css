@@ -61,10 +61,6 @@
         text-align: left;
     }
 
-    .title .season-icon {
-        display: none;
-    }
-
     .resources {
         justify-content: center;
         gap: 4px;

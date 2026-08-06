@@ -621,6 +621,33 @@ const SVGPlants = {
     </svg>`,
 
     // =====================================
+    // TOOL ICONS (hoe, watering can)
+    // =====================================
+    hoe: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <!-- Wooden handle -->
+        <path d="M48 8 L20 40" stroke="#8B5A2B" stroke-width="7" stroke-linecap="round"/>
+        <path d="M48 8 L20 40" stroke="#6B4423" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+        <!-- Metal blade -->
+        <path d="M12 38 L26 32 L36 48 L20 56 Z" fill="#90A4AE" stroke="#546E7A" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M17 43 L30 38" stroke="#ECEFF1" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+    </svg>`,
+
+    wateringCan: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <!-- Body -->
+        <ellipse cx="28" cy="40" rx="16" ry="14" fill="#4FC3F7" stroke="#0288D1" stroke-width="3"/>
+        <!-- Shine -->
+        <ellipse cx="22" cy="34" rx="4" ry="6" fill="#81D4FA" opacity="0.6"/>
+        <!-- Handle -->
+        <path d="M20 26 Q28 14 36 26" fill="none" stroke="#0288D1" stroke-width="4" stroke-linecap="round"/>
+        <!-- Spout -->
+        <path d="M42 34 L56 24" stroke="#0288D1" stroke-width="6" stroke-linecap="round"/>
+        <ellipse cx="57" cy="23" rx="4" ry="3" fill="#4FC3F7" stroke="#0288D1" stroke-width="2" transform="rotate(-30 57 23)"/>
+        <!-- Droplets -->
+        <circle cx="58" cy="34" r="2.5" fill="#4FC3F7"/>
+        <circle cx="52" cy="40" r="2" fill="#4FC3F7"/>
+    </svg>`,
+
+    // =====================================
     // HELPER METHODS
     // =====================================
     getPlantSVG(plantType, stage) {
@@ -644,6 +671,14 @@ const SVGPlants = {
 
     getWaterIndicator() {
         return this.waterIndicator;
+    },
+
+    getHoeSVG() {
+        return this.hoe;
+    },
+
+    getWateringCanSVG() {
+        return this.wateringCan;
     },
 
     getHarvestIndicator() {

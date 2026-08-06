@@ -1,6 +1,8 @@
-// Mobile UI System - Cozy Garden
-// Object-first contextual interaction for mobile devices
-// This file handles mobile-specific UI logic without modifying desktop behavior
+/*
+ * Mobile UI System - Cozy Garden
+ * Object-first contextual interaction for mobile devices.
+ * This file handles mobile-specific UI logic without modifying desktop behavior.
+ */
 
 class MobileUI {
     constructor(game) {
@@ -242,7 +244,7 @@ class MobileUI {
         container.className = 'mobile-floating-buttons';
         container.innerHTML = `
             <button class="fab water-all-fab hidden" id="water-all-btn" onclick="game.mobileUI.waterAll()">
-                <span>💧</span>
+                <span>${SVGPlants.getWateringCanSVG()}</span>
                 <span class="fab-label">Water All</span>
             </button>
         `;
@@ -320,7 +322,7 @@ class MobileUI {
         switch (cell.status) {
             case 'empty':
                 actions.push({
-                    icon: '⛏️',
+                    icon: SVGPlants.getHoeSVG(),
                     label: 'Till',
                     action: () => {
                         this.game.garden.till(row, col);
@@ -346,7 +348,7 @@ class MobileUI {
             case 'growing':
                 if (cell.needsWater) {
                     actions.push({
-                        icon: '💧',
+                        icon: SVGPlants.getWateringCanSVG(),
                         label: 'Water',
                         action: () => {
                             this.game.garden.water(row, col, this.game.gameTime);
@@ -603,7 +605,7 @@ class MobileUI {
         }
 
         this.game.ui.renderGarden();
-        this.game.ui.showToast('success', '💧', 'Watered All!', 'All plants have been watered');
+        this.game.ui.showToast('success', SVGPlants.getWateringCanSVG(), 'Watered All!', 'All plants have been watered');
         this.updateFloatingButtons();
         this.game.save();
     }
@@ -886,7 +888,7 @@ class MobileUI {
             });
         } else if (tree.needsWater) {
             actions.push({
-                icon: '💧',
+                icon: SVGPlants.getWateringCanSVG(),
                 label: 'Water',
                 action: () => {
                     this.game.fruitGarden.waterTree(slot, this.game.gameTime);

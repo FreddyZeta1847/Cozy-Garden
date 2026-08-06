@@ -726,3 +726,42 @@ Completely rewrote `showScreen()` method:
 ✅ Unified visual language across all game screens
 ✅ Cozy, immersive experience that changes with seasons
 ✅ All CSS-based (no additional image assets required)
+
+### Session 4 - Graphical UI Polish Pass
+**Date**: August 7, 2026
+
+**User Feedback**:
+1. Fruit Orchard's staggered 2-row "triangular" tree layout felt cramped and unclear
+2. Shop money display was an oversized full-width banner, inconsistent with the compact header pill
+3. The Fruit Orchard entry point (arrow + mobile dot) looked fully active even when Premium Orchard wasn't purchased yet - only a toast on click revealed it was locked
+4. Season display in the header felt plain/disconnected from the seasonal theming already used on Shop/Market
+5. Hoe tool icon was actually a pickaxe emoji (⛏️) - Unicode has no real hoe glyph - and the water icon was a generic emoji
+
+**Solutions Implemented**:
+
+1. **Fruit Orchard - Horizontal Scroll** (`styles/fruits.css`): Replaced the `.fruit-grid` 2-row CSS grid (3 top, 2 bottom, offset via `margin-left` hacks) with a single-row flex container (`overflow-x: auto`, scroll-snap). Same 5 `.fruit-cell` elements, same size and states, pure layout change.
+
+2. **Shop Money - Compact Pill** (`index.html`, `styles/main.css`): Removed the full-width `.player-money.seasonal-money` banner (30px font) and replaced it with a `.resource.money-display` pill - the same component already used in the main garden header - placed inline next to "Back to Garden" via a new `.header-actions` wrapper.
+
+3. **Locked Fruit Orchard Entry** (`game-bundle.js`, `styles/fruits.css`): Added `UIManager.updateGardenLockState()`, called from `updateAll()`, which toggles a `.locked` class (greyscale + reduced opacity + a small 🔒 badge) on the right-arrow nav button and the mobile fruit-garden dot based on `player.upgrades.premiumOrchard`. The existing "Orchard Locked!" toast on click stays as a fallback.
+
+4. **Season Display - Seasonal-Themed Pill** (`index.html`, `styles/main.css`): Restyled `.season-display` to pull its background/border from the `--season-primary`/`--season-background` CSS variables already driving the Shop/Market theming, and enlarged the icon (24px → 28px). Also removed a stray, always-empty `.season-icon` div that had been sitting unused next to the title (and its now-orphaned `display:none` mobile override in `styles/mobile.css`).
+
+5. **Hoe/Watering Can - Custom SVG Icons** (`svg-plants.js`, `index.html`, `mobile-ui.js`): Added `SVGPlants.hoe` / `SVGPlants.wateringCan` (hand-drawn inline SVGs in the game's existing earthy palette, built the same way as the plant/tree sprites) plus `getHoeSVG()` / `getWateringCanSVG()` accessors. Replaced all emoji occurrences of the pickaxe/water-drop across the desktop tool buttons and every mobile-ui.js context menu, floating button, and toast that referenced them.
+
+**Files Modified**:
+- `styles/fruits.css`: fruit-grid layout, locked nav-arrow/dot state
+- `styles/main.css`: `.header-actions`, `.season-display` seasonal theming
+- `styles/mobile.css`: removed orphaned `.title .season-icon` rule
+- `styles/ui.css`: `.tool-icon svg` sizing
+- `index.html`: shop header restructure, season-display markup cleanup, inline hoe/water SVGs
+- `game-bundle.js`: `updateGardenLockState()`
+- `svg-plants.js`: `hoe`/`wateringCan` sprites + accessors
+- `mobile-ui.js`: swapped emoji icons for `SVGPlants` calls across context menus/FABs/toasts
+
+**Result**:
+✅ Fruit Orchard reads as a clean single row instead of a cramped triangle
+✅ Shop money display now matches the header's visual language instead of dominating the screen
+✅ Locked Fruit Orchard entry communicates its state before the player taps it, not just after
+✅ Season pill now ties into the same seasonal palette as the rest of the game
+✅ Tool icons are purpose-built and consistent, no more pickaxe standing in for a hoe

@@ -155,6 +155,12 @@
 /* Tool icons (Simple Emoji) */
 .tool-icon {
     font-size: 28px;
+    display: inline-flex;
+}
+
+.tool-icon svg {
+    width: 1em;
+    height: 1em;
 }
 
 /* ===========================

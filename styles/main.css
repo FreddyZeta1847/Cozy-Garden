@@ -231,6 +231,18 @@ body[data-season] {
     transform: translateY(-2px);
 }
 
+/* Season display - tinted with the active season's own palette */
+.season-display {
+    background: var(--season-background);
+    border-color: var(--season-primary);
+    color: var(--season-text);
+    box-shadow: 0 2px 0 var(--season-primary), 0 3px 6px var(--season-shadow);
+}
+
+.season-display .season-icon {
+    font-size: 28px;
+}
+
 .title {
     font-size: 30px;
     align-items: center;
@@ -708,6 +720,12 @@ body[data-season="fall"] .seasonal-header {
 
 body[data-season="winter"] .seasonal-header {
     border-bottom-color: var(--season-border);
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .back-button {
