@@ -322,6 +322,48 @@ const DAY_LENGTH = 10;
 // Water neglect - ticks a vegetable can stay thirsty before it rots (3 days)
 const ROT_THRESHOLD_TICKS = DAY_LENGTH * 3;
 
+// News - market events that temporarily move vegetable sell prices
+const NEWS_CHECK_CHANCE = 0.10; // chance per day to spawn a new event
+const MAX_ACTIVE_NEWS = 2;      // max concurrent events
+
+const NEWS_EVENTS = [
+    {
+        id: 'marketUpswing', headline: 'Market Upswing', icon: '📈',
+        scope: 'all', multiplier: 1.15, durationDays: 5,
+        message: () => `Vegetable prices are trending up across the board this week!`
+    },
+    {
+        id: 'marketDownturn', headline: 'Market Downturn', icon: '📉',
+        scope: 'all', multiplier: 0.85, durationDays: 5,
+        message: () => `Vegetable prices are soft across the board this week.`
+    },
+    {
+        id: 'cropShortage', headline: 'Shortage', icon: '🔥',
+        scope: 'single', multiplier: 1.4, durationDays: 4,
+        message: (target) => `A regional shortage has ${PLANTS[target].name} prices soaring!`
+    },
+    {
+        id: 'cropContamination', headline: 'Contamination Scare', icon: '🦠',
+        scope: 'single', multiplier: 0.6, durationDays: 4,
+        message: (target) => `Excess fertilizer found in ${PLANTS[target].name} batches - prices have crashed.`
+    },
+    {
+        id: 'heatwave', headline: 'Scorching Heatwave', icon: '🥵',
+        scope: 'seasonBlocked', fixedTarget: 'summer', multiplier: 1.25, durationDays: 6,
+        message: () => `A brutal heatwave is making cool-weather produce scarce and pricey.`
+    },
+    {
+        id: 'coldSnap', headline: 'Bitter Cold Snap', icon: '🥶',
+        scope: 'seasonBlocked', fixedTarget: 'winter', multiplier: 1.25, durationDays: 6,
+        message: () => `A harsh cold snap is driving up prices on warm-weather crops that can't be found.`
+    },
+    {
+        id: 'bumperHarvest', headline: 'Bumper Harvest', icon: '🌾',
+        scope: 'seasonBest', multiplier: 0.8, durationDays: 5,
+        message: (target) => `An excellent growing season has flooded the market with ${target}'s best crops, dropping prices.`
+    }
+];
+
 // Seasons - Seasonal background images
 const SEASONS = [
     {
@@ -2556,6 +2598,7 @@ class Game {
         this.gameTime = 0;
         this.autoWateringTimer = 0;
         this.premiumAutoWateringTimer = 0;
+        this.activeNews = [];
 
         // NEW: Sell cart for new market interface
         this.sellCart = [];
@@ -2674,6 +2717,10 @@ class Game {
 
             this.updateSeasons();
 
+            if (this.gameTime % DAY_LENGTH === 0) {
+                this.updateNews();
+            }
+
             // Update plant info popup timers (if open)
             this.updatePlantInfoTimers();
 
@@ -2764,6 +2811,82 @@ class Game {
             return SEASON_BONUS_MULTIPLIER;
         }
         return 1.0;
+    }
+
+    // Combined sell-price multiplier: seasonal bonus x any active news events. Yield only uses the seasonal part.
+    getPriceMultiplier(plantType) {
+        return this.getSeasonalMultiplier(plantType) * this.getNewsMultiplier(plantType);
+    }
+
+    getNewsMultiplier(plantType) {
+        const plant = PLANTS[plantType];
+        let multiplier = 1.0;
+
+        for (const event of this.activeNews) {
+            if (event.scope === 'all') {
+                multiplier *= event.multiplier;
+            } else if (event.scope === 'single' && event.target === plantType) {
+                multiplier *= event.multiplier;
+            } else if (event.scope === 'seasonBlocked' && plant.blockedSeason === event.target) {
+                multiplier *= event.multiplier;
+            } else if (event.scope === 'seasonBest' && plant.bestSeason === event.target) {
+                multiplier *= event.multiplier;
+            }
+        }
+
+        return multiplier;
+    }
+
+    // Expire finished events and roll a chance to spawn a new one. Called once per in-game day.
+    updateNews() {
+        this.activeNews = this.activeNews.filter(event => event.expiresAt > this.gameTime);
+
+        if (this.activeNews.length < MAX_ACTIVE_NEWS && Math.random() < NEWS_CHECK_CHANCE) {
+            this.spawnNewsEvent();
+        }
+    }
+
+    spawnNewsEvent() {
+        const template = NEWS_EVENTS[Math.floor(Math.random() * NEWS_EVENTS.length)];
+
+        let target = null;
+        if (template.scope === 'single') {
+            const keys = Object.keys(PLANTS);
+            target = keys[Math.floor(Math.random() * keys.length)];
+        } else if (template.scope === 'seasonBlocked') {
+            target = template.fixedTarget;
+        } else if (template.scope === 'seasonBest') {
+            const seasons = SEASONS.map(s => s.name.toLowerCase());
+            target = seasons[Math.floor(Math.random() * seasons.length)];
+        }
+
+        const event = {
+            id: template.id,
+            headline: template.headline,
+            icon: template.icon,
+            scope: template.scope,
+            target,
+            multiplier: template.multiplier,
+            message: template.message(target),
+            expiresAt: this.gameTime + template.durationDays * DAY_LENGTH
+        };
+
+        this.activeNews.push(event);
+        this.ui.showToast(
+            event.multiplier >= 1 ? 'success' : 'error',
+            event.icon,
+            `NEWS: ${event.headline}`,
+            event.message
+        );
+        console.log(`📰 News event started: ${event.headline} (expires at tick ${event.expiresAt})`);
+    }
+
+    getActiveNews() {
+        return this.activeNews.map(event => ({
+            headline: event.headline,
+            message: event.message,
+            daysRemaining: Math.ceil((event.expiresAt - this.gameTime) / DAY_LENGTH)
+        }));
     }
 
     // Wither any vegetable whose blockedSeason matches the season just entered.
@@ -3180,7 +3303,7 @@ class Game {
                     const actualQty = Math.min(quantity, available);
 
                     if (this.player.sellHarvest(key, actualQty)) {
-                        const earnings = Math.round(actualQty * plant.sellPrice * this.getSeasonalMultiplier(key));
+                        const earnings = Math.round(actualQty * plant.sellPrice * this.getPriceMultiplier(key));
                         totalEarned += earnings;
                         totalItemsSold += actualQty;
                     }
@@ -3338,7 +3461,7 @@ class Game {
                     const actualQty = Math.min(product.quantity, available);
 
                     if (this.player.sellHarvest(product.key, actualQty)) {
-                        const earnings = Math.round(actualQty * product.item.sellPrice * this.getSeasonalMultiplier(product.key));
+                        const earnings = Math.round(actualQty * product.item.sellPrice * this.getPriceMultiplier(product.key));
                         totalEarned += earnings;
                         totalItemsSold += actualQty;
                     }
@@ -3992,6 +4115,7 @@ class Game {
             currentSeason: this.currentSeason,
             seasonTimer: this.seasonTimer,
             currentYear: this.currentYear,
+            activeNews: this.activeNews,
             selectedTool: this.selectedTool,
             selectedSeed: this.selectedSeed
         };
@@ -4019,6 +4143,7 @@ class Game {
                 this.currentSeason = data.currentSeason || 0;
                 this.seasonTimer = data.seasonTimer || 0;
                 this.currentYear = data.currentYear || 1;
+                this.activeNews = data.activeNews || [];
                 this.selectedTool = data.selectedTool || 'hoe';
                 this.selectedSeed = data.selectedSeed || 'tomato';
 
