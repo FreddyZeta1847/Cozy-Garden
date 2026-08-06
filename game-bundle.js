@@ -1,9 +1,17 @@
-// Cozy Garden Game - Complete Bundle
-// All game code in one file for direct browser loading
+/*
+ * Cozy Garden Game - Complete Bundle
+ * All game code in one file for direct browser loading (no build step, no ES6 modules,
+ * so it works over the file:// protocol). Contains game data, Player/Garden/FruitGarden
+ * state, ParticleEffects, UIManager (DOM rendering), and the Game controller class.
+ */
 
 // ==================== DATA ====================
 
 // Plants Database
+// bestSeason: +SEASON_BONUS_MULTIPLIER to yield (at harvest) and sell price (at sell time)
+// blockedSeason: cannot be planted; an already-growing plant withers if the season shifts into it
+const SEASON_BONUS_MULTIPLIER = 1.3;
+
 const PLANTS = {
     tomato: {
         name: "Tomato",
@@ -13,6 +21,8 @@ const PLANTS = {
         harvestYield: 2,
         sellPrice: 8,
         stages: 3,
+        bestSeason: "summer",
+        blockedSeason: "winter",
         color: "#FF6347",
         secondaryColor: "#8B0000",
         description: "Juicy red tomatoes, perfect for salads"
@@ -25,6 +35,8 @@ const PLANTS = {
         harvestYield: 5,
         sellPrice: 3,
         stages: 3,
+        bestSeason: "spring",
+        blockedSeason: "summer",
         color: "#90EE90",
         secondaryColor: "#228B22",
         description: "Crispy fresh lettuce leaves"
@@ -37,6 +49,8 @@ const PLANTS = {
         harvestYield: 3,
         sellPrice: 6,
         stages: 3,
+        bestSeason: "fall",
+        blockedSeason: "summer",
         color: "#FF8C00",
         secondaryColor: "#FF6347",
         description: "Sweet crunchy carrots"
@@ -49,6 +63,8 @@ const PLANTS = {
         harvestYield: 4,
         sellPrice: 10,
         stages: 3,
+        bestSeason: "summer",
+        blockedSeason: "winter",
         color: "#FFD700",
         secondaryColor: "#FF8C00",
         description: "Golden sweet corn on the cob"
@@ -61,9 +77,53 @@ const PLANTS = {
         harvestYield: 6,
         sellPrice: 4,
         stages: 3,
+        bestSeason: "fall",
+        blockedSeason: "summer",
         color: "#D2B48C",
         secondaryColor: "#8B7355",
         description: "Hearty russet potatoes"
+    },
+    cabbage: {
+        name: "Cabbage",
+        seedCost: 14,
+        growthTime: 140,
+        waterInterval: 32,
+        harvestYield: 4,
+        sellPrice: 7,
+        stages: 3,
+        bestSeason: "winter",
+        blockedSeason: "summer",
+        color: "#A9D18E",
+        secondaryColor: "#4F7942",
+        description: "Hearty cabbage that thrives in cold weather"
+    },
+    pumpkin: {
+        name: "Pumpkin",
+        seedCost: 22,
+        growthTime: 220,
+        waterInterval: 45,
+        harvestYield: 2,
+        sellPrice: 20,
+        stages: 3,
+        bestSeason: "fall",
+        blockedSeason: "winter",
+        color: "#FF7518",
+        secondaryColor: "#A0522D",
+        description: "Plump orange pumpkins, perfect for harvest season"
+    },
+    garlic: {
+        name: "Garlic",
+        seedCost: 18,
+        growthTime: 100,
+        waterInterval: 22,
+        harvestYield: 6,
+        sellPrice: 9,
+        stages: 3,
+        bestSeason: "spring",
+        blockedSeason: "winter",
+        color: "#F5F0E6",
+        secondaryColor: "#D8CFC0",
+        description: "Pungent garlic bulbs with a strong, savory flavor"
     }
 };
 
@@ -163,6 +223,38 @@ const UPGRADES = {
         description: "Automatically waters all fruits plants every 15 seconds. No more manual watering (for real)!",
         cost: 800,
         effect: "premiumAutoWatering"
+    },
+    plotCluster1: {
+        name: "Plot Cluster I",
+        icon: "🌱",
+        description: "Clear and unlock 5 more garden plots.",
+        cost: 50,
+        effect: "plotCluster1",
+        plotsToUnlock: 5
+    },
+    plotCluster2: {
+        name: "Plot Cluster II",
+        icon: "🌿",
+        description: "Clear and unlock 5 more garden plots.",
+        cost: 120,
+        effect: "plotCluster2",
+        plotsToUnlock: 5
+    },
+    plotCluster3: {
+        name: "Plot Cluster III",
+        icon: "🌳",
+        description: "Clear and unlock 5 more garden plots.",
+        cost: 250,
+        effect: "plotCluster3",
+        plotsToUnlock: 5
+    },
+    plotCluster4: {
+        name: "Plot Cluster IV",
+        icon: "🏞️",
+        description: "Clear and unlock the last 4 plots, filling your garden.",
+        cost: 400,
+        effect: "plotCluster4",
+        plotsToUnlock: 4
     }
 };
 
@@ -199,7 +291,10 @@ const LEVEL_SYSTEM = {
             tomato: 1,    // Available from start
             carrot: 2,    // Unlocks at level 2
             potato: 4,    // Unlocks at level 4
-            corn: 6       // Unlocks at level 6
+            cabbage: 5,   // Unlocks at level 5
+            corn: 6,      // Unlocks at level 6
+            pumpkin: 7,   // Unlocks at level 7
+            garlic: 9     // Unlocks at level 9
         },
         fruits: {
             apple: 8,     // Unlocks at level 8 (requires orchard first)
@@ -212,10 +307,20 @@ const LEVEL_SYSTEM = {
             fasterGrowth: 5,           // Unlocks at level 5
             expandedGarden: 7,         // Unlocks at level 7
             premiumOrchard: 8,         // Unlocks at level 8
-            premiumAutoWatering: 10    // Unlocks at level 10
+            premiumAutoWatering: 10,   // Unlocks at level 10
+            plotCluster1: 2,           // Unlocks at level 2
+            plotCluster2: 3,           // Unlocks at level 3
+            plotCluster3: 5,           // Unlocks at level 5
+            plotCluster4: 6            // Unlocks at level 6
         }
     }
 };
+
+// Calendar - ticks per in-game day (season duration 300 / DAY_LENGTH 10 = 30 days/season)
+const DAY_LENGTH = 10;
+
+// Water neglect - ticks a vegetable can stay thirsty before it rots (3 days)
+const ROT_THRESHOLD_TICKS = DAY_LENGTH * 3;
 
 // Seasons - Seasonal background images
 const SEASONS = [
@@ -322,7 +427,11 @@ class Player {
             fasterGrowth: 1.0,
             expandedGarden: false,
             premiumOrchard: false,
-            premiumAutoWatering: false
+            premiumAutoWatering: false,
+            plotCluster1: false,
+            plotCluster2: false,
+            plotCluster3: false,
+            plotCluster4: false
         };
     }
 
@@ -427,6 +536,18 @@ class Player {
                 break;
             case 'premiumAutoWatering':
                 this.upgrades.premiumAutoWatering = true;
+                break;
+            case 'plotCluster1':
+                this.upgrades.plotCluster1 = true;
+                break;
+            case 'plotCluster2':
+                this.upgrades.plotCluster2 = true;
+                break;
+            case 'plotCluster3':
+                this.upgrades.plotCluster3 = true;
+                break;
+            case 'plotCluster4':
+                this.upgrades.plotCluster4 = true;
                 break;
         }
         console.log(`Purchased upgrade: ${upgradeType}`);
@@ -551,18 +672,25 @@ class Player {
 
 // Garden Class
 class Garden {
-    constructor(rows = 4, cols = 6) {
+    constructor(rows = 4, cols = 6, startingUnlockedPlots = 5) {
         this.rows = rows;
         this.cols = cols;
         this.grid = [];
+        this.unlockedCount = startingUnlockedPlots;
         this.initializeGrid();
     }
 
     initializeGrid() {
+        let index = 0;
         for (let row = 0; row < this.rows; row++) {
             this.grid[row] = [];
             for (let col = 0; col < this.cols; col++) {
-                this.grid[row][col] = this.createEmptyCell();
+                const cell = this.createEmptyCell();
+                if (index >= this.unlockedCount) {
+                    cell.status = 'locked';
+                }
+                this.grid[row][col] = cell;
+                index++;
             }
         }
     }
@@ -575,7 +703,9 @@ class Garden {
             lastWatered: 0,
             needsWater: false,
             readyToHarvest: false,
-            plantedAt: 0
+            plantedAt: 0,
+            thirstySince: null,   // game time when the current dry streak began, null if not thirsty
+            totalDryTicks: 0      // cumulative ticks spent thirsty over this plant's life - locks the growth clock
         };
     }
 
@@ -598,7 +728,24 @@ class Garden {
 
         this.rows = newRows;
         this.cols = newCols;
+        this.unlockedCount += (newRows * newCols) - (oldRows * oldCols);
         console.log(`Garden expanded to ${newRows}x${newCols}`);
+    }
+
+    // Unlocks up to `count` locked plots, in reading order. Returns how many were actually unlocked.
+    unlockNextPlots(count) {
+        let unlocked = 0;
+        for (let row = 0; row < this.rows && unlocked < count; row++) {
+            for (let col = 0; col < this.cols && unlocked < count; col++) {
+                if (this.grid[row][col].status === 'locked') {
+                    this.grid[row][col] = this.createEmptyCell();
+                    unlocked++;
+                }
+            }
+        }
+        this.unlockedCount += unlocked;
+        console.log(`Unlocked ${unlocked} plot(s), total unlocked: ${this.unlockedCount}`);
+        return unlocked;
     }
 
     getCell(row, col) {
@@ -627,6 +774,8 @@ class Garden {
             cell.lastWatered = currentTime;
             cell.needsWater = false;
             cell.readyToHarvest = false;
+            cell.thirstySince = null;
+            cell.totalDryTicks = 0;
             console.log(`Planted ${plantType} at ${row},${col}`);
             return true;
         }
@@ -638,6 +787,7 @@ class Garden {
         if (cell && (cell.status === 'planted' || cell.status === 'growing')) {
             cell.lastWatered = currentTime;
             cell.needsWater = false;
+            cell.thirstySince = null;
             console.log(`Watered plant at ${row},${col}`);
             return true;
         }
@@ -667,6 +817,7 @@ class Garden {
     updateGrowth(currentTime, growthMultiplier = 1.0) {
         let updated = false;
         const stageChanges = []; // Track cells that changed growth stage
+        const rottedCells = []; // Track cells lost to prolonged neglect
 
         for (let row = 0; row < this.rows; row++) {
             for (let col = 0; col < this.cols; col++) {
@@ -674,6 +825,7 @@ class Garden {
 
                 if (cell.status === 'planted' || cell.status === 'growing') {
                     const plant = PLANTS[cell.plantType];
+                    cell.totalDryTicks = cell.totalDryTicks || 0;
 
                     const timeSinceWatered = currentTime - cell.lastWatered;
                     if (timeSinceWatered > plant.waterInterval) {
@@ -681,12 +833,24 @@ class Garden {
                             cell.needsWater = true;
                             updated = true;
                         }
+                        if (cell.thirstySince === null || cell.thirstySince === undefined) {
+                            cell.thirstySince = currentTime;
+                        }
+
+                        cell.totalDryTicks++; // growth clock stays locked while thirsty
+
+                        if (currentTime - cell.thirstySince >= ROT_THRESHOLD_TICKS) {
+                            rottedCells.push({ row, col, plantName: plant.name });
+                            this.grid[row][col] = this.createEmptyCell();
+                            updated = true;
+                        }
+
                         continue;
                     }
 
                     const adjustedGrowthTime = plant.growthTime / growthMultiplier;
                     const stageTime = adjustedGrowthTime / plant.stages;
-                    const timeSincePlanted = currentTime - cell.plantedAt;
+                    const timeSincePlanted = Math.max(0, (currentTime - cell.plantedAt) - cell.totalDryTicks);
                     const newStage = Math.min(
                         Math.floor(timeSincePlanted / stageTime),
                         plant.stages - 1
@@ -707,7 +871,7 @@ class Garden {
             }
         }
 
-        return { updated, stageChanges };
+        return { updated, stageChanges, rottedCells };
     }
 
     autoWater(currentTime) {
@@ -717,6 +881,7 @@ class Garden {
                 if (cell.status === 'planted' || cell.status === 'growing') {
                     cell.lastWatered = currentTime;
                     cell.needsWater = false;
+                    cell.thirstySince = null;
                 }
             }
         }
@@ -727,6 +892,7 @@ class Garden {
         return {
             rows: this.rows,
             cols: this.cols,
+            unlockedCount: this.unlockedCount,
             grid: JSON.parse(JSON.stringify(this.grid))
         };
     }
@@ -734,6 +900,10 @@ class Garden {
     loadSaveData(data) {
         if (data.rows) this.rows = data.rows;
         if (data.cols) this.cols = data.cols;
+
+        // Backward compatibility: saves from before plot-locking existed had every
+        // plot free to use - don't retroactively lock plots a returning player already had.
+        this.unlockedCount = data.unlockedCount !== undefined ? data.unlockedCount : this.rows * this.cols;
 
         // Backward compatibility: Fix old 5x8 expansion to 4x8
         if (this.rows === 5 && this.cols === 8) {
@@ -1118,6 +1288,22 @@ class UIManager {
         this.updateLevelDisplay();
         this.updateSeedSelector();
         this.updateSeason();
+        this.updateGardenLockState();
+    }
+
+    // Grey out + lock-badge the Fruit Garden entry points until Premium Orchard is purchased
+    updateGardenLockState() {
+        const unlocked = this.game.player.upgrades.premiumOrchard;
+        const rightArrow = document.querySelector('.garden-nav-arrow.right-arrow');
+        const fruitDot = document.querySelector('.garden-dot[data-garden="fruits"]');
+
+        if (rightArrow) {
+            rightArrow.classList.toggle('locked', !unlocked);
+            rightArrow.title = unlocked ? 'Go to Fruit Garden' : 'Locked - Purchase Premium Orchard (Level 8)';
+        }
+        if (fruitDot) {
+            fruitDot.classList.toggle('locked', !unlocked);
+        }
     }
 
     updateMoney() {
@@ -2366,6 +2552,7 @@ class Game {
         this.selectedSeed = 'tomato';
         this.currentSeason = 0;
         this.seasonTimer = 0;
+        this.currentYear = 1;
         this.gameTime = 0;
         this.autoWateringTimer = 0;
         this.premiumAutoWateringTimer = 0;
@@ -2475,6 +2662,9 @@ class Game {
             if (growthResult.updated) {
                 this.refreshAllTiles(growthResult.stageChanges);
             }
+            if (growthResult.rottedCells.length > 0) {
+                this.announceRottedCrops(growthResult.rottedCells);
+            }
 
             // Update fruit garden growth
             const fruitUpdated = this.fruitGarden.updateGrowth(this.gameTime, this.player.upgrades.fasterGrowth);
@@ -2525,19 +2715,99 @@ class Game {
         if (this.seasonTimer >= currentSeasonDuration) {
             this.seasonTimer = 0;
             const previousSeason = SEASONS[this.currentSeason];
+            const wrappedToSpring = this.currentSeason === SEASONS.length - 1;
             this.currentSeason = (this.currentSeason + 1) % SEASONS.length;
             const newSeason = SEASONS[this.currentSeason];
+
+            if (wrappedToSpring) {
+                this.currentYear++;
+            }
+
+            // Wither any vegetables that can't survive the new season
+            const witheredCounts = this.witherOutOfSeasonCrops();
+            if (Object.keys(witheredCounts).length > 0) {
+                this.refreshAllTiles();
+                const summary = Object.entries(witheredCounts)
+                    .map(([name, count]) => `${count} ${name}`)
+                    .join(', ');
+                this.ui.showToast('error', '🥀', 'Crops Withered!', `${summary} couldn't survive ${newSeason.name} and were lost.`);
+            }
 
             // Trigger smooth season transition
             this.ui.transitionSeason(previousSeason, newSeason);
 
-            console.log(`🌸 Season changed: ${previousSeason.name} → ${newSeason.name}`);
+            console.log(`🌸 Season changed: ${previousSeason.name} → ${newSeason.name} (Year ${this.currentYear})`);
         }
+    }
+
+    // Calendar day within the current season, 1-30
+    getCurrentDay() {
+        return Math.floor(this.seasonTimer / DAY_LENGTH) + 1;
+    }
+
+    getCalendarInfo() {
+        return {
+            year: this.currentYear,
+            season: SEASONS[this.currentSeason].name,
+            day: this.getCurrentDay()
+        };
+    }
+
+    getCurrentSeasonName() {
+        return SEASONS[this.currentSeason].name.toLowerCase();
+    }
+
+    // +SEASON_BONUS_MULTIPLIER if plantType's bestSeason is the current season, else no bonus
+    getSeasonalMultiplier(plantType) {
+        const plant = PLANTS[plantType];
+        if (plant && plant.bestSeason === this.getCurrentSeasonName()) {
+            return SEASON_BONUS_MULTIPLIER;
+        }
+        return 1.0;
+    }
+
+    // Wither any vegetable whose blockedSeason matches the season just entered.
+    // Returns a map of plantType -> count withered (empty if none).
+    witherOutOfSeasonCrops() {
+        const seasonName = this.getCurrentSeasonName();
+        const witheredCounts = {};
+
+        for (let row = 0; row < this.garden.rows; row++) {
+            for (let col = 0; col < this.garden.cols; col++) {
+                const cell = this.garden.grid[row][col];
+                if (!cell || (cell.status !== 'planted' && cell.status !== 'growing')) continue;
+
+                const plant = PLANTS[cell.plantType];
+                if (plant && plant.blockedSeason === seasonName) {
+                    witheredCounts[plant.name] = (witheredCounts[plant.name] || 0) + 1;
+                    this.garden.grid[row][col] = this.garden.createEmptyCell();
+                }
+            }
+        }
+
+        return witheredCounts;
+    }
+
+    // Summarize rotted cells (from Garden.updateGrowth) into a single toast
+    announceRottedCrops(rottedCells) {
+        const counts = {};
+        for (const { plantName } of rottedCells) {
+            counts[plantName] = (counts[plantName] || 0) + 1;
+        }
+        const summary = Object.entries(counts)
+            .map(([name, count]) => `${count} ${name}`)
+            .join(', ');
+        this.ui.showToast('error', '🥀', 'Crops Rotted!', `${summary} went too long without water and rotted.`);
     }
 
     handleTileClick(row, col) {
         const cell = this.garden.getCell(row, col);
         if (!cell) return;
+
+        if (cell.status === 'locked') {
+            this.ui.showToast('error', '🔒', 'Plot Locked!', 'Unlock this plot from the Upgrade Hut first.');
+            return;
+        }
 
         if (cell.readyToHarvest) {
             this.harvestPlant(row, col);
@@ -2565,22 +2835,30 @@ class Game {
             }
         } else if (this.selectedTool.startsWith('seed-')) {
             const seedType = this.selectedTool.replace('seed-', '');
-            if (cell.status === 'tilled' && this.player.useSeed(seedType)) {
-                this.garden.plant(row, col, seedType, this.gameTime);
-
-                // Award XP for planting
-                const xpResult = this.player.addXP(LEVEL_SYSTEM.xpRewards.plant, 'plant');
-                if (xpResult.leveledUp) {
-                    this.handleLevelUp(xpResult.oldLevel, xpResult.newLevel);
+            if (cell.status === 'tilled') {
+                const plant = PLANTS[seedType];
+                if (plant && plant.blockedSeason === this.getCurrentSeasonName()) {
+                    this.ui.showToast('error', '🚫', 'Wrong Season!', `${plant.name} can't be planted in ${SEASONS[this.currentSeason].name}.`);
+                    return;
                 }
 
-                this.ui.updateTile(row, col);
-                this.ui.updateSeedSelector();
-                this.saveGame();
+                if (this.player.useSeed(seedType)) {
+                    this.garden.plant(row, col, seedType, this.gameTime);
 
-                const tile = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-                if (tile && this.particles) {
-                    this.particles.animatePlantGrowth(tile);
+                    // Award XP for planting
+                    const xpResult = this.player.addXP(LEVEL_SYSTEM.xpRewards.plant, 'plant');
+                    if (xpResult.leveledUp) {
+                        this.handleLevelUp(xpResult.oldLevel, xpResult.newLevel);
+                    }
+
+                    this.ui.updateTile(row, col);
+                    this.ui.updateSeedSelector();
+                    this.saveGame();
+
+                    const tile = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+                    if (tile && this.particles) {
+                        this.particles.animatePlantGrowth(tile);
+                    }
                 }
             }
         }
@@ -2611,8 +2889,9 @@ class Game {
         console.log('🎯 Garden.harvest result:', result);
 
         if (result) {
-            console.log(`🎯 Calling player.addHarvest(${result.plantType}, ${result.yield})`);
-            this.player.addHarvest(result.plantType, result.yield);
+            const bonusYield = Math.round(result.yield * this.getSeasonalMultiplier(result.plantType));
+            console.log(`🎯 Calling player.addHarvest(${result.plantType}, ${bonusYield})`);
+            this.player.addHarvest(result.plantType, bonusYield);
 
             // Award XP for harvesting
             const xpResult = this.player.addXP(LEVEL_SYSTEM.xpRewards.harvest, 'harvest');
@@ -2629,7 +2908,7 @@ class Game {
             }
 
             this.saveGame();
-            console.log(`✅ Harvested ${result.yield} ${result.plantType}!`);
+            console.log(`✅ Harvested ${bonusYield} ${result.plantType}!`);
         } else {
             console.error('❌ harvest() returned null - plant not ready or not found');
         }
@@ -2901,7 +3180,7 @@ class Game {
                     const actualQty = Math.min(quantity, available);
 
                     if (this.player.sellHarvest(key, actualQty)) {
-                        const earnings = actualQty * plant.sellPrice;
+                        const earnings = Math.round(actualQty * plant.sellPrice * this.getSeasonalMultiplier(key));
                         totalEarned += earnings;
                         totalItemsSold += actualQty;
                     }
@@ -3059,7 +3338,7 @@ class Game {
                     const actualQty = Math.min(product.quantity, available);
 
                     if (this.player.sellHarvest(product.key, actualQty)) {
-                        const earnings = actualQty * product.item.sellPrice;
+                        const earnings = Math.round(actualQty * product.item.sellPrice * this.getSeasonalMultiplier(product.key));
                         totalEarned += earnings;
                         totalItemsSold += actualQty;
                     }
@@ -3127,6 +3406,11 @@ class Game {
             if (upgrade.effect === 'premiumOrchard') {
                 this.ui.showOrchard();
                 this.ui.renderOrchard();
+            }
+
+            if (upgrade.plotsToUnlock) {
+                this.garden.unlockNextPlots(upgrade.plotsToUnlock);
+                this.ui.renderGarden();
             }
 
             this.ui.updateAll();
@@ -3707,6 +3991,7 @@ class Game {
             gameTime: this.gameTime,
             currentSeason: this.currentSeason,
             seasonTimer: this.seasonTimer,
+            currentYear: this.currentYear,
             selectedTool: this.selectedTool,
             selectedSeed: this.selectedSeed
         };
@@ -3733,6 +4018,7 @@ class Game {
                 this.gameTime = data.gameTime || 0;
                 this.currentSeason = data.currentSeason || 0;
                 this.seasonTimer = data.seasonTimer || 0;
+                this.currentYear = data.currentYear || 1;
                 this.selectedTool = data.selectedTool || 'hoe';
                 this.selectedSeed = data.selectedSeed || 'tomato';
 
