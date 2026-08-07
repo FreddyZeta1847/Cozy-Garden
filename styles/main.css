@@ -340,36 +340,35 @@ body[data-season] {
 
 /* ===== Nav strip - between the topbar and the garden/seeds area ===== */
 
+/* Just a row of buttons, no toolbar strip behind them */
 .nav-strip {
     display: flex;
     justify-content: center;
-    gap: 8px;
-    padding: 8px 15px;
-    background: var(--toolbar-base, rgba(139, 111, 71, 0.65));
-    background-image: var(--toolbar-bg);
-    background-blend-mode: overlay;
-    border-bottom: 3px solid var(--season-border);
+    gap: 10px;
+    padding: 10px 15px;
+    background: none;
     flex-shrink: 0;
 }
 
 .nav-strip-btn {
-    background: none;
-    border: none;
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.5);
+    border: 2px solid var(--season-border);
+    border-radius: 10px;
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 16px;
+    padding: 7px 16px;
     font-family: var(--font-body);
     font-weight: 600;
     font-size: 14px;
     color: var(--season-text);
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.2s, transform 0.2s;
 }
 
 .nav-strip-btn:hover {
-    background: rgba(255, 255, 255, 0.35);
+    background: var(--white);
+    transform: translateY(-2px);
 }
 
 .nav-strip-icon {
@@ -570,16 +569,16 @@ h1, h2, h3,
     gap: 20px;
 }
 
-/* ===== Left: live stats panel ===== */
+/* ===== Left column: stats + tools + seed menu, all together ===== */
 
 .stats-panel {
-    width: 220px;
+    width: 240px;
     flex-shrink: 0;
     padding: 18px;
     margin-left: 40px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 18px;
     align-self: center;
 }
 
@@ -587,21 +586,34 @@ h1, h2, h3,
     font-family: var(--font-heading);
     font-size: 26px;
     color: var(--season-text);
-    margin-bottom: 4px;
+    margin-bottom: -6px;
 }
 
-.stat-row {
+/* Compact 2x2 stat tiles, instead of a tall list of full-width rows */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.stat-tile {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    text-align: center;
     gap: 2px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid var(--season-border);
-    opacity: 0.9;
+    padding: 8px 4px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 10px;
+}
+
+.stat-tile-icon {
+    font-size: 18px;
 }
 
 .stat-label {
     font-family: var(--font-body);
-    font-size: 13px;
+    font-size: 10px;
     font-weight: 600;
     color: var(--season-text);
     opacity: 0.75;
@@ -609,9 +621,11 @@ h1, h2, h3,
 
 .stat-value {
     font-family: var(--font-body);
-    font-size: 18px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--season-text);
+    line-height: 1.2;
+    word-break: break-word;
 }
 
 /* ===== Right: garden area ===== */
@@ -672,23 +686,6 @@ h1, h2, h3,
 
 /* Bottom Bar */
 /* No toolbar chrome - just the two buttons and the seed menu floating near the bottom */
-.bottom-bar {
-    background: none;
-    padding: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-shrink: 0;
-    position: relative;
-}
-
-.tools-bar {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    position: relative;
-}
-
 .tool-section {
     display: flex;
     gap: 12px;
@@ -731,7 +728,6 @@ h1, h2, h3,
 
 .seed-menu-container {
     position: relative;
-    flex: 1;
 }
 
 .seed-menu-toggle {
@@ -762,7 +758,7 @@ h1, h2, h3,
 
 .seed-menu-panel {
     position: absolute;
-    bottom: calc(100% + 10px);
+    top: calc(100% + 10px);
     left: 0;
     right: 0;
     max-height: 340px;

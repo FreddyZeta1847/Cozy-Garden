@@ -22,7 +22,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="styles/main.css?v=3.4">
+    <link rel="stylesheet" href="styles/main.css?v=3.5">
     <link rel="stylesheet" href="styles/garden.css?v=1.1">
     <link rel="stylesheet" href="styles/plants-svg.css?v=1.0">
     <link rel="stylesheet" href="styles/ui.css?v=3.3">
@@ -155,24 +155,77 @@
         </nav>
 
         <div class="game-container">
-            <!-- LEFT: live stats panel -->
+            <!-- LEFT: stats + tools + seed menu, all together -->
             <aside class="stats-panel" id="stats-panel">
                 <h3 class="stats-panel-title">Farm Stats</h3>
-                <div class="stat-row">
-                    <span class="stat-label">💰 Total Earned</span>
-                    <span class="stat-value" id="stat-total-earned">0</span>
+                <div class="stats-grid">
+                    <div class="stat-tile">
+                        <span class="stat-tile-icon">💰</span>
+                        <span class="stat-value" id="stat-total-earned">0</span>
+                        <span class="stat-label">Earned</span>
+                    </div>
+                    <div class="stat-tile">
+                        <span class="stat-tile-icon">🏆</span>
+                        <span class="stat-value" id="stat-best-seller">-</span>
+                        <span class="stat-label">Best Seller</span>
+                    </div>
+                    <div class="stat-tile">
+                        <span class="stat-tile-icon">🌾</span>
+                        <span class="stat-value" id="stat-top-harvest">-</span>
+                        <span class="stat-label">Top Harvest</span>
+                    </div>
+                    <div class="stat-tile">
+                        <span class="stat-tile-icon">⏱️</span>
+                        <span class="stat-value" id="stat-play-time">0s</span>
+                        <span class="stat-label">Play Time</span>
+                    </div>
                 </div>
-                <div class="stat-row">
-                    <span class="stat-label">🏆 Best Seller</span>
-                    <span class="stat-value" id="stat-best-seller">-</span>
+
+                <div class="tool-section">
+                    <button class="tool-button" data-tool="hoe" onclick="game.selectTool('hoe')">
+                        <span class="tool-icon">
+                            <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M48 8 L20 40" stroke="#8B5A2B" stroke-width="7" stroke-linecap="round"/>
+                                <path d="M48 8 L20 40" stroke="#6B4423" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+                                <path d="M12 38 L26 32 L36 48 L20 56 Z" fill="#90A4AE" stroke="#546E7A" stroke-width="2.5" stroke-linejoin="round"/>
+                                <path d="M17 43 L30 38" stroke="#ECEFF1" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+                            </svg>
+                        </span>
+                        <span class="tool-name">Hoe</span>
+                    </button>
+                    <button class="tool-button" data-tool="water" onclick="game.selectTool('water')">
+                        <span class="tool-icon">
+                            <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                                <ellipse cx="28" cy="40" rx="16" ry="14" fill="#4FC3F7" stroke="#0288D1" stroke-width="3"/>
+                                <ellipse cx="22" cy="34" rx="4" ry="6" fill="#81D4FA" opacity="0.6"/>
+                                <path d="M20 26 Q28 14 36 26" fill="none" stroke="#0288D1" stroke-width="4" stroke-linecap="round"/>
+                                <path d="M42 34 L56 24" stroke="#0288D1" stroke-width="6" stroke-linecap="round"/>
+                                <ellipse cx="57" cy="23" rx="4" ry="3" fill="#4FC3F7" stroke="#0288D1" stroke-width="2" transform="rotate(-30 57 23)"/>
+                                <circle cx="58" cy="34" r="2.5" fill="#4FC3F7"/>
+                                <circle cx="52" cy="40" r="2" fill="#4FC3F7"/>
+                            </svg>
+                        </span>
+                        <span class="tool-name">Water</span>
+                    </button>
                 </div>
-                <div class="stat-row">
-                    <span class="stat-label">🌾 Top Harvest</span>
-                    <span class="stat-value" id="stat-top-harvest">-</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">⏱️ Play Time</span>
-                    <span class="stat-value" id="stat-play-time">0s</span>
+
+                <!-- Expandable seed menu - shows every seed, including locked ones -->
+                <div class="seed-menu-container">
+                    <button class="seed-menu-toggle" id="seed-menu-toggle" onclick="game.toggleSeedMenu()">
+                        <span class="seed-menu-toggle-icon" id="seed-menu-toggle-icon">🌱</span>
+                        <span id="seed-menu-toggle-label">Select a Seed</span>
+                        <span class="seed-menu-toggle-caret">▲</span>
+                    </button>
+                    <div class="seed-menu-panel hidden" id="seed-menu-panel">
+                        <div class="seed-menu-section">
+                            <h4>Vegetables</h4>
+                            <div class="seed-menu-grid" id="vegetable-seeds"></div>
+                        </div>
+                        <div class="seed-menu-section">
+                            <h4>Fruits</h4>
+                            <div class="seed-menu-grid" id="fruit-seeds"></div>
+                        </div>
+                    </div>
                 </div>
             </aside>
 
@@ -230,57 +283,6 @@
                     <button class="garden-switch-option" data-garden="fruits" onclick="game.switchToGarden('fruits')">
                         <span>🍎</span> Fruits
                     </button>
-                </div>
-            </div>
-        </div>
-
-        <div class="bottom-bar">
-            <div class="tools-bar">
-                <div class="tool-section">
-                    <button class="tool-button" data-tool="hoe" onclick="game.selectTool('hoe')">
-                        <span class="tool-icon">
-                            <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M48 8 L20 40" stroke="#8B5A2B" stroke-width="7" stroke-linecap="round"/>
-                                <path d="M48 8 L20 40" stroke="#6B4423" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
-                                <path d="M12 38 L26 32 L36 48 L20 56 Z" fill="#90A4AE" stroke="#546E7A" stroke-width="2.5" stroke-linejoin="round"/>
-                                <path d="M17 43 L30 38" stroke="#ECEFF1" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
-                            </svg>
-                        </span>
-                        <span class="tool-name">Hoe</span>
-                    </button>
-                    <button class="tool-button" data-tool="water" onclick="game.selectTool('water')">
-                        <span class="tool-icon">
-                            <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                                <ellipse cx="28" cy="40" rx="16" ry="14" fill="#4FC3F7" stroke="#0288D1" stroke-width="3"/>
-                                <ellipse cx="22" cy="34" rx="4" ry="6" fill="#81D4FA" opacity="0.6"/>
-                                <path d="M20 26 Q28 14 36 26" fill="none" stroke="#0288D1" stroke-width="4" stroke-linecap="round"/>
-                                <path d="M42 34 L56 24" stroke="#0288D1" stroke-width="6" stroke-linecap="round"/>
-                                <ellipse cx="57" cy="23" rx="4" ry="3" fill="#4FC3F7" stroke="#0288D1" stroke-width="2" transform="rotate(-30 57 23)"/>
-                                <circle cx="58" cy="34" r="2.5" fill="#4FC3F7"/>
-                                <circle cx="52" cy="40" r="2" fill="#4FC3F7"/>
-                            </svg>
-                        </span>
-                        <span class="tool-name">Water</span>
-                    </button>
-                </div>
-
-                <!-- Expandable seed menu - shows every seed, including locked ones -->
-                <div class="seed-menu-container">
-                    <button class="seed-menu-toggle" id="seed-menu-toggle" onclick="game.toggleSeedMenu()">
-                        <span class="seed-menu-toggle-icon" id="seed-menu-toggle-icon">🌱</span>
-                        <span id="seed-menu-toggle-label">Select a Seed</span>
-                        <span class="seed-menu-toggle-caret">▲</span>
-                    </button>
-                    <div class="seed-menu-panel hidden" id="seed-menu-panel">
-                        <div class="seed-menu-section">
-                            <h4>Vegetables</h4>
-                            <div class="seed-menu-grid" id="vegetable-seeds"></div>
-                        </div>
-                        <div class="seed-menu-section">
-                            <h4>Fruits</h4>
-                            <div class="seed-menu-grid" id="fruit-seeds"></div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
