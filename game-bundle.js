@@ -3230,11 +3230,11 @@ class Game {
     }
 
     toggleSeedMenu() {
-        document.getElementById('seed-menu-panel')?.classList.toggle('hidden');
+        document.getElementById('seed-modal')?.classList.toggle('active');
     }
 
     closeSeedMenu() {
-        document.getElementById('seed-menu-panel')?.classList.add('hidden');
+        document.getElementById('seed-modal')?.classList.remove('active');
     }
 
     showShop() {

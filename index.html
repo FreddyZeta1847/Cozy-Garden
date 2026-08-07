@@ -22,7 +22,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="styles/main.css?v=3.5">
+    <link rel="stylesheet" href="styles/main.css?v=3.6">
     <link rel="stylesheet" href="styles/garden.css?v=1.1">
     <link rel="stylesheet" href="styles/plants-svg.css?v=1.0">
     <link rel="stylesheet" href="styles/ui.css?v=3.3">
@@ -209,14 +209,21 @@
                     </button>
                 </div>
 
-                <!-- Expandable seed menu - shows every seed, including locked ones -->
-                <div class="seed-menu-container">
-                    <button class="seed-menu-toggle" id="seed-menu-toggle" onclick="game.toggleSeedMenu()">
-                        <span class="seed-menu-toggle-icon" id="seed-menu-toggle-icon">🌱</span>
-                        <span id="seed-menu-toggle-label">Select a Seed</span>
-                        <span class="seed-menu-toggle-caret">▲</span>
-                    </button>
-                    <div class="seed-menu-panel hidden" id="seed-menu-panel">
+                <!-- Seed menu - shows every seed, including locked ones -->
+                <button class="seed-menu-toggle" id="seed-menu-toggle" onclick="game.toggleSeedMenu()">
+                    <span class="seed-menu-toggle-icon" id="seed-menu-toggle-icon">🌱</span>
+                    <span id="seed-menu-toggle-label">Select a Seed</span>
+                </button>
+            </aside>
+
+            <!-- Seed selection - centered overlay, closes itself once you pick one -->
+            <div id="seed-modal" class="modal" onclick="if(event.target === this) game.closeSeedMenu()">
+                <div class="modal-content seed-modal-content">
+                    <div class="modal-header">
+                        <h2>🌱 Select a Seed</h2>
+                        <button class="modal-close" onclick="game.closeSeedMenu()">✕</button>
+                    </div>
+                    <div class="modal-body">
                         <div class="seed-menu-section">
                             <h4>Vegetables</h4>
                             <div class="seed-menu-grid" id="vegetable-seeds"></div>
@@ -227,7 +234,7 @@
                         </div>
                     </div>
                 </div>
-            </aside>
+            </div>
 
             <!-- RIGHT: garden area -->
             <div class="garden-area">
@@ -447,7 +454,7 @@
     <!-- SVG Plant Sprites System -->
     <script src="svg-plants.js?v=1.1"></script>
     <!-- Game Script (Bundled) - v3.2 -->
-    <script src="game-bundle.js?v=3.4"></script>
+    <script src="game-bundle.js?v=3.5"></script>
     <!-- Mobile UI System - Object-First Interaction -->
     <script src="mobile-ui.js?v=1.1"></script>
 </body>

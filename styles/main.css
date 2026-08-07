@@ -635,9 +635,12 @@ h1, h2, h3,
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    gap: 18px;
+    padding: 12px 0;
     position: relative;
-    overflow: hidden; /* keeps the mobile slider contained */
+    overflow-x: hidden; /* keeps the mobile slider contained */
+    overflow-y: auto; /* never clip the switch below the garden - scroll instead */
     min-width: 0;
 }
 
@@ -646,7 +649,7 @@ h1, h2, h3,
 .garden-switch {
     display: flex;
     gap: 4px;
-    margin-top: 18px;
+    flex-shrink: 0;
     background: rgba(255, 255, 255, 0.4);
     border-radius: 10px;
     padding: 4px;
@@ -726,14 +729,11 @@ h1, h2, h3,
 
 /* ===== Expandable seed menu - replaces the old always-visible scrolling seed strip ===== */
 
-.seed-menu-container {
-    position: relative;
-}
-
 .seed-menu-toggle {
     width: 100%;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
     background: var(--white);
     border: 3px solid var(--season-border);
@@ -750,29 +750,10 @@ h1, h2, h3,
     font-size: 28px;
 }
 
-.seed-menu-toggle-caret {
-    margin-left: auto;
-    font-size: 12px;
-    opacity: 0.6;
-}
-
-.seed-menu-panel {
-    position: absolute;
-    top: calc(100% + 10px);
-    left: 0;
-    right: 0;
-    max-height: 340px;
+.seed-modal-content {
+    max-width: 640px;
+    max-height: 80vh;
     overflow-y: auto;
-    background: var(--white);
-    border: 3px solid var(--season-border);
-    border-radius: 12px;
-    padding: 14px;
-    box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.2);
-    z-index: 200;
-}
-
-.seed-menu-panel.hidden {
-    display: none;
 }
 
 .seed-menu-section h4 {
