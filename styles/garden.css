@@ -160,7 +160,7 @@
 
 .garden-sign {
     position: absolute;
-    top: -12px;
+    top: -26px;
     left: 50%;
     transform: translateX(-50%);
     background: linear-gradient(135deg, #D2691E 0%, #A0522D 100%);
