@@ -707,23 +707,24 @@ h1, h2, h3,
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 28px 0 12px;
+    justify-content: flex-start; /* top-aligned, same as .stats-panel, so the topbar gap matches on both sides */
+    padding: 14px 0;
     position: relative;
     overflow-x: hidden; /* keeps the mobile slider contained */
     overflow-y: auto; /* never clip the garden card - scroll instead */
     min-width: 0;
 }
 
-/* The white card wrapping a garden view's header, grid and legend */
+/* The card wrapping a garden view's header, grid and legend - same style as .side-card */
 .garden-panel {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    background: var(--season-background);
-    border-radius: 18px;
-    padding: 16px;
-    box-shadow: 0 4px 16px var(--season-shadow);
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid var(--season-border);
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: 0 3px 10px var(--season-shadow);
 }
 
 .garden-card-header {
