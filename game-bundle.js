@@ -1887,136 +1887,155 @@ class UIManager {
         }
     }
 
+    // Icons shared by the shop, the seed overview popup and product cards
+    shopCropIcons() {
+        return { tomato: '🍅', lettuce: '🥬', carrot: '🥕', corn: '🌽', potato: '🥔', cabbage: '🥬', pumpkin: '🎃', garlic: '🧄' };
+    }
+
+    shopFruitIcons() {
+        return { apple: '🍎', orange: '🍊', banana: '🍌', pear: '🍐' };
+    }
+
+    seasonIcon(seasonName) {
+        return { spring: '🌸', summer: '☀️', fall: '🍂', winter: '❄️' }[seasonName] || '';
+    }
+
     renderShop() {
         const shopItems = document.getElementById('shop-items');
         if (!shopItems) return;
-        const fruitTitle = document.createElement('div');
-        fruitTitle.style.cssText = 'grid-column: 1/-1; text-align: center; margin: 20px 0; font-size: 24px; font-weight: bold; color: #5d5d5dff;';
-        fruitTitle.innerHTML = '🥬 Vegetables Seeds';
-
         shopItems.innerHTML = '';
 
-        // Crop emoji icons (fully grown)
-        const cropIcons = {
-            tomato: '🍅',
-            lettuce: '🥬',
-            carrot: '🥕',
-            corn: '🌽',
-            potato: '🥔'
-        };
+        const vegLabel = document.createElement('div');
+        vegLabel.className = 'shop-section-label';
+        vegLabel.textContent = 'Vegetables';
+        shopItems.appendChild(vegLabel);
 
-        shopItems.appendChild(fruitTitle);
+        const vegGrid = document.createElement('div');
+        vegGrid.className = 'shop-seed-grid';
+        shopItems.appendChild(vegGrid);
 
-        // Add vegetable seeds section
+        const cropIcons = this.shopCropIcons();
         for (const [key, plant] of Object.entries(PLANTS)) {
-            const item = document.createElement('div');
             const isUnlocked = this.game.player.isUnlocked('vegetables', key);
             const requiredLevel = LEVEL_SYSTEM.unlocks.vegetables[key] || 1;
-
-            item.className = isUnlocked ? 'shop-item' : 'shop-item locked';
-
-            const canBuy = this.game.player.money >= plant.seedCost && isUnlocked;
-
-            // Calculate max affordable quantity
-            const maxAffordable = Math.floor(this.game.player.money / plant.seedCost);
-            const canBuy1 = maxAffordable >= 1 && isUnlocked;
-            const canBuy10 = maxAffordable >= 10 && isUnlocked;
-            const canBuy50 = maxAffordable >= 50 && isUnlocked;
-            const canBuyMax = maxAffordable >= 1 && isUnlocked;
-
-            item.innerHTML = `
-                ${!isUnlocked ? `<div class="level-requirement">🔒 Level ${requiredLevel}</div>` : ''}
-                <div class="shop-item-icon">${cropIcons[key] || '🌱'}</div>
-                <div class="shop-item-header">
-                    <h3>${plant.name} Seeds</h3>
-                </div>
-                <div class="shop-item-details">
-                    <p>${plant.description}</p>
-                    <div class="stats">
-                        <div class="stat"><span>⏱️</span> ${plant.growthTime}s</div>
-                        <div class="stat"><span>💧</span> ${plant.waterInterval}s</div>
-                        <div class="stat"><span>🌾</span> Yield: ${plant.harvestYield}</div>
-                        <div class="stat"><span>💰</span> Sells for: $${plant.sellPrice}</div>
-                    </div>
-                </div>
-                <div class="shop-item-footer">
-                    <div class="quantity-buttons">
-                        <button class="qty-select-btn" onclick="game.buySeed('${key}', 1)" ${!canBuy1 ? 'disabled' : ''}>x1</button>
-                        <button class="qty-select-btn" onclick="game.buySeed('${key}', 10)" ${!canBuy10 ? 'disabled' : ''}>x10</button>
-                        <button class="qty-select-btn" onclick="game.buySeed('${key}', 50)" ${!canBuy50 ? 'disabled' : ''}>x50</button>
-                        <button class="qty-select-btn" onclick="game.buySeed('${key}', ${maxAffordable})" ${!canBuyMax ? 'disabled' : ''}>MAX</button>
-                    </div>
-                    <div class="price-row">
-                        <div class="price"><div class="coin-icon"></div>${plant.seedCost}/ea</div>
-                        <div class="buy-qty-display">${isUnlocked ? `Can buy: ${maxAffordable}` : 'Locked'}</div>
-                    </div>
-                </div>
-            `;
-
-            shopItems.appendChild(item);
+            vegGrid.appendChild(this.createShopSeedCard('veg', key, plant, cropIcons[key] || '🌱', isUnlocked, requiredLevel));
         }
 
-        // Add fruit seeds section if orchard is unlocked
-        if (this.game.player.upgrades.premiumOrchard) {
-            // Add section divider
-            const divider = document.createElement('div');
-            divider.style.cssText = 'grid-column: 1/-1; text-align: center; margin: 20px 0; font-size: 24px; font-weight: bold; color: #DAA520;';
-            divider.innerHTML = '🌳 Fruit Seeds';
-            shopItems.appendChild(divider);
+        const fruitLabel = document.createElement('div');
+        fruitLabel.className = 'shop-section-label';
+        fruitLabel.textContent = 'Fruit Trees';
+        shopItems.appendChild(fruitLabel);
 
-            const fruitIcons = {
-                apple: '🍎',
-                orange: '🍊',
-                banana: '🍌',
-                pear: '🍐'
-            };
+        const fruitGrid = document.createElement('div');
+        fruitGrid.className = 'shop-seed-grid';
+        shopItems.appendChild(fruitGrid);
 
-            for (const [key, fruit] of Object.entries(FRUITS)) {
-                const item = document.createElement('div');
-                const isUnlocked = this.game.player.isUnlocked('fruits', key);
-                const requiredLevel = LEVEL_SYSTEM.unlocks.fruits[key] || 8;
+        const hasOrchard = this.game.player.upgrades.premiumOrchard;
+        const fruitIcons = this.shopFruitIcons();
+        for (const [key, fruit] of Object.entries(FRUITS)) {
+            const isUnlocked = hasOrchard && this.game.player.isUnlocked('fruits', key);
+            const requiredLevel = LEVEL_SYSTEM.unlocks.fruits[key] || 8;
+            const lockReason = hasOrchard ? null : `Requires the Premium Orchard upgrade (Level ${LEVEL_SYSTEM.unlocks.upgrades.premiumOrchard})`;
+            fruitGrid.appendChild(this.createShopSeedCard('fruit', key, fruit, fruitIcons[key] || '🌳', isUnlocked, requiredLevel, lockReason));
+        }
+    }
 
-                item.className = isUnlocked ? 'shop-item' : 'shop-item locked';
+    // A small clickable card - the compact "front" that opens the full seed overview popup
+    createShopSeedCard(category, key, item, icon, isUnlocked, requiredLevel, lockReason) {
+        const card = document.createElement('button');
+        card.className = 'shop-seed-card';
+        card.dataset.key = key;
+        if (!isUnlocked) card.classList.add('locked');
 
-                // Calculate max affordable quantity for fruit trees
-                const maxAffordable = Math.floor(this.game.player.money / fruit.seedCost);
-                const canBuy1 = maxAffordable >= 1 && isUnlocked;
-                const canBuy10 = maxAffordable >= 10 && isUnlocked;
-                const canBuy50 = maxAffordable >= 50 && isUnlocked;
-                const canBuyMax = maxAffordable >= 1 && isUnlocked;
+        const seasonBadge = category === 'veg' && item.bestSeason
+            ? `<span class="shop-seed-season-badge" title="Best in ${item.bestSeason}">${this.seasonIcon(item.bestSeason)}</span>`
+            : '';
 
-                item.innerHTML = `
-                    ${!isUnlocked ? `<div class="level-requirement">🔒 Level ${requiredLevel}</div>` : ''}
-                    <div class="shop-item-icon">${fruitIcons[key] || '🌳'}</div>
-                    <div class="shop-item-header">
-                        <h3>${fruit.name} Seeds</h3>
-                    </div>
-                    <div class="shop-item-details">
-                        <p>${fruit.description}</p>
-                        <div class="stats">
-                            <div class="stat"><span>⏱️</span> ${fruit.growthTime}s</div>
-                            <div class="stat"><span>💧</span> ${fruit.waterInterval}s</div>
-                            <div class="stat"><span>🌾</span> Yield: ${fruit.harvestYield}</div>
-                            <div class="stat"><span>💰</span> Sells for: $${fruit.sellPrice}</div>
-                        </div>
-                    </div>
-                    <div class="shop-item-footer">
-                        <div class="quantity-buttons">
-                            <button class="qty-select-btn" onclick="game.buyFruitSeed('${key}', 1)" ${!canBuy1 ? 'disabled' : ''}>x1</button>
-                            <button class="qty-select-btn" onclick="game.buyFruitSeed('${key}', 10)" ${!canBuy10 ? 'disabled' : ''}>x10</button>
-                            <button class="qty-select-btn" onclick="game.buyFruitSeed('${key}', 50)" ${!canBuy50 ? 'disabled' : ''}>x50</button>
-                            <button class="qty-select-btn" onclick="game.buyFruitSeed('${key}', ${maxAffordable})" ${!canBuyMax ? 'disabled' : ''}>MAX</button>
-                        </div>
-                        <div class="price-row">
-                            <div class="price"><div class="coin-icon"></div>${fruit.seedCost}/ea</div>
-                            <div class="buy-qty-display">${isUnlocked ? `Can buy: ${maxAffordable}` : 'Locked'}</div>
-                        </div>
-                    </div>
-                `;
+        card.innerHTML = `
+            <span class="shop-seed-icon">${icon}</span>
+            <span class="shop-seed-name">${item.name}</span>
+            <span class="shop-seed-price"><span class="coin-icon shop-seed-coin"></span>${item.seedCost}</span>
+            ${seasonBadge}
+        `;
 
-                shopItems.appendChild(item);
+        card.onclick = () => {
+            if (!isUnlocked) {
+                this.showToast('error', '🔒', 'Locked', lockReason || `Unlocks at Level ${requiredLevel}`);
+                return;
             }
+            this.openSeedOverview(category, key);
+        };
+
+        return card;
+    }
+
+    // Full-detail popup for one seed/tree: stats, seasonal fit, and quantity purchase (shortcuts or a typed amount)
+    openSeedOverview(category, key) {
+        const isVeg = category === 'veg';
+        const item = isVeg ? PLANTS[key] : FRUITS[key];
+        const icon = (isVeg ? this.shopCropIcons() : this.shopFruitIcons())[key] || (isVeg ? '🌱' : '🌳');
+        const count = isVeg ? this.game.player.inventory.seeds[key] : this.game.player.inventory.fruitSeeds[key];
+        const buyFn = isVeg ? 'buySeed' : 'buyFruitSeed';
+
+        document.getElementById('seed-overview-name').textContent = `${item.name} ${isVeg ? 'Seeds' : 'Tree'}`;
+        document.getElementById('seed-overview-icon').textContent = icon;
+        document.getElementById('seed-overview-description').textContent = item.description;
+        document.getElementById('seed-overview-price').textContent = item.seedCost;
+
+        document.getElementById('seed-overview-stats').innerHTML = `
+            <div class="stat"><span>⏱️</span> ${item.growthTime}s to grow</div>
+            <div class="stat"><span>💧</span> Water every ${item.waterInterval}s</div>
+            <div class="stat"><span>🌾</span> Yield: ${item.harvestYield}</div>
+            <div class="stat"><span>💰</span> Sells for $${item.sellPrice}</div>
+            <div class="stat"><span>🎒</span> You have: ${count}</div>
+        `;
+
+        const seasonsBox = document.getElementById('seed-overview-seasons');
+        if (isVeg) {
+            const currentSeason = this.game.getCurrentSeasonName();
+            const isBestNow = item.bestSeason === currentSeason;
+            const isBlockedNow = item.blockedSeason === currentSeason;
+            seasonsBox.innerHTML = `
+                <div class="season-tag season-best${isBestNow ? ' season-active' : ''}">${this.seasonIcon(item.bestSeason)} Best in ${item.bestSeason}${isBestNow ? ' - bonus active now!' : ''}</div>
+                <div class="season-tag season-blocked${isBlockedNow ? ' season-active' : ''}">🚫 Won't grow in ${item.blockedSeason}${isBlockedNow ? ' - blocked right now' : ''}</div>
+            `;
+        } else {
+            seasonsBox.innerHTML = `<div class="season-tag">🌳 Fruit trees grow in any season</div>`;
         }
+
+        const maxAffordable = Math.floor(this.game.player.money / item.seedCost);
+        const qtyButtons = document.getElementById('seed-overview-qty-buttons');
+        qtyButtons.innerHTML = '';
+        [1, 10, 50].forEach(qty => {
+            const btn = document.createElement('button');
+            btn.className = 'qty-select-btn';
+            btn.textContent = `x${qty}`;
+            btn.disabled = maxAffordable < qty;
+            btn.onclick = () => { this.game[buyFn](key, qty); this.game.closeSeedOverview(); };
+            qtyButtons.appendChild(btn);
+        });
+        const maxBtn = document.createElement('button');
+        maxBtn.className = 'qty-select-btn';
+        maxBtn.textContent = 'Max';
+        maxBtn.disabled = maxAffordable < 1;
+        maxBtn.onclick = () => { this.game[buyFn](key, maxAffordable); this.game.closeSeedOverview(); };
+        qtyButtons.appendChild(maxBtn);
+
+        document.getElementById('seed-overview-afford').textContent = `Can afford: ${maxAffordable}`;
+
+        const customInput = document.getElementById('seed-overview-custom-qty');
+        customInput.value = '';
+        document.getElementById('seed-overview-custom-buy').onclick = () => {
+            const qty = parseInt(customInput.value, 10);
+            if (!qty || qty < 1) {
+                this.showToast('error', '❌', 'Invalid Quantity', 'Enter a number of 1 or more.');
+                return;
+            }
+            this.game[buyFn](key, qty);
+            this.game.closeSeedOverview();
+        };
+
+        document.getElementById('seed-overview-modal').classList.add('active');
     }
 
     renderMarket() {
@@ -2094,13 +2113,21 @@ class UIManager {
             card.classList.add('in-cart');
         }
 
+        const priceMultiplier = type === 'veg' ? this.game.getPriceMultiplier(key) : 1;
+        const bonusPrice = Math.round(item.sellPrice * priceMultiplier);
+        const isBonus = priceMultiplier > 1.001;
+        const isPenalty = priceMultiplier < 0.999;
+        const bonusPct = Math.round(Math.abs(priceMultiplier - 1) * 100);
+
         card.innerHTML = `
+            ${isBonus ? `<div class="product-season-badge">▲ +${bonusPct}% today</div>` : ''}
+            ${isPenalty ? `<div class="product-season-badge product-season-penalty">▼ -${bonusPct}% today</div>` : ''}
             <div class="product-icon">${icon}</div>
             <div class="product-name">${item.name}</div>
             <div class="product-stock">Stock: ${count}</div>
             <div class="product-price">
                 <div class="coin-icon"></div>
-                <span>${item.sellPrice} each</span>
+                <span>${bonusPrice} each</span>
             </div>
             <div class="product-select-overlay">
                 <span class="checkmark">✓</span>
@@ -2146,12 +2173,14 @@ class UIManager {
             const maxQty = product.type === 'veg'
                 ? this.game.player.inventory.harvested[product.key]
                 : this.game.player.inventory.harvestedFruits[product.key];
+            const multiplier = product.type === 'veg' ? this.game.getPriceMultiplier(product.key) : 1;
+            const unitPrice = Math.round(product.item.sellPrice * multiplier);
 
             cartItem.innerHTML = `
                 <div class="cart-item-icon">${product.icon}</div>
                 <div class="cart-item-info">
                     <div class="cart-item-name">${product.item.name}</div>
-                    <div class="cart-item-price">${product.item.sellPrice}/ea · Stock: ${maxQty}</div>
+                    <div class="cart-item-price">${unitPrice}/ea${multiplier !== 1 ? ` (${multiplier > 1 ? '+' : ''}${Math.round((multiplier - 1) * 100)}%)` : ''} · Stock: ${maxQty}</div>
                     <div class="cart-qty-presets">
                         <button class="cart-qty-preset" onclick="game.addCartQuantity(${index}, 10)">+10</button>
                         <button class="cart-qty-preset" onclick="game.addCartQuantity(${index}, 50)">+50</button>
@@ -2170,7 +2199,7 @@ class UIManager {
                 </div>
                 <div class="cart-item-total">
                     <div class="coin-icon"></div>
-                    <span>${(product.quantity || 0) * product.item.sellPrice}</span>
+                    <span>${(product.quantity || 0) * unitPrice}</span>
                 </div>
                 <button class="cart-remove-btn" onclick="game.removeFromCart(${index})" title="Remove from cart">✕</button>
             `;
@@ -2359,7 +2388,8 @@ class UIManager {
             // New cart system
             for (const product of this.game.sellCart) {
                 if (product.quantity > 0) {
-                    total += product.quantity * product.item.sellPrice;
+                    const multiplier = product.type === 'veg' ? this.game.getPriceMultiplier(product.key) : 1;
+                    total += Math.round(product.quantity * product.item.sellPrice * multiplier);
                 }
             }
         } else {
@@ -3356,6 +3386,10 @@ class Game {
 
     closeStatsPanel() {
         document.getElementById('stats-modal')?.classList.remove('active');
+    }
+
+    closeSeedOverview() {
+        document.getElementById('seed-overview-modal')?.classList.remove('active');
     }
 
     showShop() {

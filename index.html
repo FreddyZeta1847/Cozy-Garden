@@ -25,7 +25,7 @@
     <link rel="stylesheet" href="styles/main.css?v=3.17">
     <link rel="stylesheet" href="styles/garden.css?v=1.4">
     <link rel="stylesheet" href="styles/plants-svg.css?v=1.0">
-    <link rel="stylesheet" href="styles/ui.css?v=3.6">
+    <link rel="stylesheet" href="styles/ui.css?v=3.8">
     <link rel="stylesheet" href="styles/fruits.css?v=3.5">
     <!-- Mobile-specific styles (media queries only - does not affect desktop) -->
     <link rel="stylesheet" href="styles/mobile.css?v=1.2">
@@ -262,15 +262,6 @@
             <!-- RIGHT: garden area -->
             <div class="garden-area">
                 <nav class="nav-strip">
-                    <button class="nav-strip-btn" onclick="game.showMarket()">
-                        <span class="nav-strip-icon">
-                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M3 17 9 11 13 15 21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M15 6h6v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </span>
-                        <span>Market</span>
-                    </button>
                     <button class="nav-strip-btn" onclick="game.showShop()">
                         <span class="nav-strip-icon">
                             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -484,6 +475,40 @@
         </div>
     </div>
 
+    <!-- Seed Overview Popup - opens when a compact seed card in the Buy tab is clicked -->
+    <div id="seed-overview-modal" class="modal" onclick="if(event.target === this) game.closeSeedOverview()">
+        <div class="modal-content seed-overview-content">
+            <div class="modal-header">
+                <h2 id="seed-overview-name">Seed Name</h2>
+                <button class="modal-close" onclick="game.closeSeedOverview()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="seed-overview-top">
+                    <div class="seed-overview-icon" id="seed-overview-icon">🌱</div>
+                    <p class="seed-overview-description" id="seed-overview-description"></p>
+                </div>
+
+                <div class="stats seed-overview-stats" id="seed-overview-stats"></div>
+
+                <div class="seed-overview-seasons" id="seed-overview-seasons"></div>
+
+                <div class="seed-overview-buy">
+                    <div class="seed-overview-buy-row">
+                        <div class="quantity-buttons" id="seed-overview-qty-buttons"></div>
+                        <div class="seed-overview-custom">
+                            <input type="number" id="seed-overview-custom-qty" min="1" placeholder="#" aria-label="Custom quantity">
+                            <button class="qty-select-btn" id="seed-overview-custom-buy">Buy</button>
+                        </div>
+                    </div>
+                    <div class="price-row">
+                        <div class="price"><div class="coin-icon"></div><span id="seed-overview-price">0</span>/ea</div>
+                        <div class="buy-qty-display" id="seed-overview-afford"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Upgrade Hut Screen -->
     <div id="upgrades-screen" class="screen">
         <div class="screen-header seasonal-header">
@@ -558,7 +583,7 @@
             </div>
             <div class="modal-footer">
                 <button class="modal-button secondary" onclick="game.closeHarvestPopup()">Close</button>
-                <button class="modal-button primary" onclick="game.closeHarvestPopup(); game.showMarket();">Go to Market 🛒</button>
+                <button class="modal-button primary" onclick="game.closeHarvestPopup(); game.showMarket();">Sell Harvest 🛒</button>
             </div>
         </div>
     </div>
@@ -607,7 +632,7 @@
     <!-- SVG Plant Sprites System -->
     <script src="svg-plants.js?v=1.1"></script>
     <!-- Game Script (Bundled) - v3.2 -->
-    <script src="game-bundle.js?v=3.12"></script>
+    <script src="game-bundle.js?v=3.13"></script>
     <!-- Mobile UI System - Object-First Interaction -->
     <script src="mobile-ui.js?v=1.1"></script>
 </body>
