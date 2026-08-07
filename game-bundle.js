@@ -1522,7 +1522,11 @@ class UIManager {
         }
 
         btn.onclick = () => {
-            if (isUnlocked && count > 0) onSelect();
+            if (!isUnlocked) {
+                this.showToast('error', '🔒', 'Locked', lockReason || `Unlocks at Level ${requiredLevel}`);
+                return;
+            }
+            if (count > 0) onSelect();
         };
 
         const seedVisual = document.createElement('div');
@@ -1541,13 +1545,6 @@ class UIManager {
         btn.appendChild(seedVisual);
         btn.appendChild(countLabel);
         btn.appendChild(nameLabel);
-
-        if (!isUnlocked) {
-            const lockBadge = document.createElement('div');
-            lockBadge.className = 'level-requirement';
-            lockBadge.textContent = lockReason || `🔒 Level ${requiredLevel}`;
-            btn.appendChild(lockBadge);
-        }
 
         return btn;
     }

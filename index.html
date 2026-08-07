@@ -22,11 +22,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="styles/main.css?v=3.7">
-    <link rel="stylesheet" href="styles/garden.css?v=1.1">
+    <link rel="stylesheet" href="styles/main.css?v=3.10">
+    <link rel="stylesheet" href="styles/garden.css?v=1.2">
     <link rel="stylesheet" href="styles/plants-svg.css?v=1.0">
-    <link rel="stylesheet" href="styles/ui.css?v=3.3">
-    <link rel="stylesheet" href="styles/fruits.css?v=3.2">
+    <link rel="stylesheet" href="styles/ui.css?v=3.4">
+    <link rel="stylesheet" href="styles/fruits.css?v=3.4">
     <!-- Mobile-specific styles (media queries only - does not affect desktop) -->
     <link rel="stylesheet" href="styles/mobile.css?v=1.1">
 </head>
@@ -125,7 +125,13 @@
                     <div class="coin-icon"></div>
                     <span id="money-display">100</span>
                 </div>
-                <button class="gear-btn" onclick="game.showStatsPanel()" title="Farm stats">⚙️</button>
+                <button class="gear-btn" onclick="game.showStatsPanel()" title="Farm stats" aria-label="Farm stats">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="4" y="13" width="4" height="7" rx="1" fill="currentColor"/>
+                        <rect x="10" y="8" width="4" height="12" rx="1" fill="currentColor"/>
+                        <rect x="16" y="4" width="4" height="16" rx="1" fill="currentColor"/>
+                    </svg>
+                </button>
                 <button class="dev-reset-btn" onclick="game.resetGame()" title="Reset game and start fresh (developer tool)">🔄</button>
             </div>
         </div>
@@ -202,7 +208,7 @@
             <div id="stats-modal" class="modal" onclick="if(event.target === this) game.closeStatsPanel()">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h2>⚙️ Farm Stats</h2>
+                        <h2>Your Farm</h2>
                         <button class="modal-close" onclick="game.closeStatsPanel()">✕</button>
                     </div>
                     <div class="modal-body">
@@ -244,7 +250,8 @@
                     </button>
                 </div>
 
-                <!-- Gardens Slider Container -->
+                <!-- Garden card - the garden view and its switch, grouped as one unit -->
+                <div class="garden-card">
                 <div class="gardens-slider" id="gardens-slider">
                     <!-- Vegetable Garden -->
                     <div class="garden-view vegetable-garden active">
@@ -286,6 +293,7 @@
                     <button class="garden-switch-option" data-garden="fruits" onclick="game.switchToGarden('fruits')">
                         <span>🍎</span> Fruits
                     </button>
+                </div>
                 </div>
             </div>
         </div>
@@ -450,7 +458,7 @@
     <!-- SVG Plant Sprites System -->
     <script src="svg-plants.js?v=1.1"></script>
     <!-- Game Script (Bundled) - v3.2 -->
-    <script src="game-bundle.js?v=3.6"></script>
+    <script src="game-bundle.js?v=3.7"></script>
     <!-- Mobile UI System - Object-First Interaction -->
     <script src="mobile-ui.js?v=1.1"></script>
 </body>

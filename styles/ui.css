@@ -96,10 +96,13 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 2px; /* Reduced from 3px */
     transition: all 0.2s;
     box-shadow: 0 2px 0 var(--dark-brown), 0 3px 6px var(--shadow);
-    min-width: 50px; /* Reduced from 55px */
+    width: 58px;
+    height: 64px;
+    position: relative;
 }
 
 .seed-button:hover {
@@ -116,6 +119,27 @@
 .seed-button.disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+.seed-button.locked {
+    opacity: 0.55;
+    filter: grayscale(80%);
+    cursor: not-allowed;
+}
+
+.seed-button.locked .seed-icon,
+.seed-button.locked .seed-count,
+.seed-button.locked .seed-name {
+    visibility: hidden;
+}
+
+.seed-button.locked::after {
+    content: '🔒';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 22px;
 }
 
 .seed-packet {

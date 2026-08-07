@@ -17,7 +17,7 @@
     display: none;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 10px 20px;
     box-sizing: border-box;
 }
 
@@ -33,7 +33,7 @@
 /* Fruit Wrapper - Match Vegetable Garden Style */
 .fruit-wrapper {
     background: rgba(139, 111, 71, 0.4);
-    padding: 15px;
+    padding: 12px;
     border-radius: 15px;
     border: 4px solid var(--dark-brown);
     box-shadow: 0 6px 0 var(--dark-brown), 0 8px 16px var(--shadow);
