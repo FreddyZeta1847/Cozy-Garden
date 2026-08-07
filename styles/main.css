@@ -576,6 +576,7 @@ h1, h2, h3,
     width: 220px;
     flex-shrink: 0;
     padding: 18px;
+    margin-left: 40px;
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -670,94 +671,15 @@ h1, h2, h3,
 }
 
 /* Bottom Bar */
+/* No toolbar chrome - just the two buttons and the seed menu floating near the bottom */
 .bottom-bar {
-    /* SEASONAL GRADIENT BACKGROUND - MORE TRANSPARENT */
-    background: var(--toolbar-base, rgba(139, 111, 71, 0.65));
-    background-image: var(--toolbar-bg);
-    background-blend-mode: overlay;
-    /* INCREASED PADDING to fit seed selector */
-    padding: 10px 12px;
-    padding-top: 18px;
-    padding-bottom: 12px;
+    background: none;
+    padding: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 -2px 8px var(--shadow);
-    backdrop-filter: blur(10px);
     flex-shrink: 0;
     position: relative;
-    min-height: 90px; /* Ensure enough height for seed buttons */
-    /* PERFORMANCE OPTIMIZATION */
-    will-change: background;
-    contain: layout style;
-    transform: translateZ(0);
-    transition: background 0.6s ease-in-out;
-}
-
-/* Wood bark border effect for bottom bar top - SCALED DOWN */
-.bottom-bar::before {
-    content: '';
-    position: absolute;
-    top: -6px; /* Was -8px */
-    left: 0;
-    right: 0;
-    height: 12px; /* Was 16px - 25% reduction */
-    background: linear-gradient(90deg,
-        var(--dark-brown) 0%,
-        #6B4423 12%,
-        var(--dark-brown) 25%,
-        #6B4423 38%,
-        var(--dark-brown) 50%,
-        #6B4423 65%,
-        var(--dark-brown) 80%,
-        #6B4423 92%,
-        var(--dark-brown) 100%);
-    clip-path: path('M0,0 L1920,0 L1920,8 Q1910,13 1900,8 Q1890,4 1878,8 Q1868,12 1855,8 Q1845,5 1832,8 Q1822,11 1810,8 Q1798,6 1785,8 Q1775,13 1762,8 Q1750,5 1738,8 Q1728,10 1715,8 Q1703,6 1690,8 Q1678,12 1665,8 Q1655,5 1642,8 Q1630,11 1618,8 Q1608,6 1595,8 Q1583,13 1570,8 Q1558,5 1545,8 Q1535,10 1522,8 Q1510,6 1498,8 Q1488,12 1475,8 Q1463,5 1450,8 Q1438,11 1425,8 Q1415,6 1402,8 Q1390,13 1378,8 Q1368,5 1355,8 Q1343,10 1330,8 Q1318,6 1305,8 Q1295,12 1282,8 Q1270,5 1258,8 Q1248,11 1235,8 Q1223,6 1210,8 Q1198,13 1185,8 Q1175,5 1162,8 Q1150,10 1138,8 T1113,8 T1088,8 T1063,8 T1038,8 T1013,8 T988,8 T963,8 T938,8 T913,8 T888,8 T863,8 T838,8 T813,8 T788,8 T763,8 T738,8 T713,8 T688,8 T663,8 T638,8 T613,8 T588,8 T563,8 T538,8 T513,8 T488,8 T463,8 T438,8 T413,8 T388,8 T363,8 T338,8 T313,8 T288,8 T263,8 T238,8 T213,8 T188,8 T163,8 T138,8 T113,8 T88,8 T63,8 T38,8 Q28,4 18,8 Q10,12 0,8 Z');
-    box-shadow: 0 -2px 4px rgba(0,0,0,0.3),
-                inset 0 -2px 0 rgba(139, 111, 71, 0.5),
-                inset 3px 0 2px rgba(0,0,0,0.2),
-                inset -3px 0 2px rgba(0,0,0,0.2);
-    background-size: 45px 12px; /* Scaled down from 16px */
-}
-
-/* Add wood knot details to bottom bar - Multiple knots */
-.bottom-bar::after {
-    content: '';
-    position: absolute;
-    top: 2px;
-    right: 30%;
-    width: 14px;
-    height: 10px;
-    background: radial-gradient(ellipse, rgba(101, 67, 33, 0.9), rgba(139, 111, 71, 0.6) 40%, transparent 60%);
-    border-radius: 50%;
-    z-index: 1;
-    box-shadow:
-        -250px -1px 0 -3px rgba(101, 67, 33, 0.75),
-        -500px 2px 0 -2px rgba(101, 67, 33, 0.65),
-        -750px -2px 0 -1px rgba(101, 67, 33, 0.7),
-        -950px 1px 0 -2px rgba(101, 67, 33, 0.8),
-        250px 1px 0 -3px rgba(101, 67, 33, 0.7);
-}
-
-/* Wood grain lines on bottom bar border */
-.tools-bar::before {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 12%;
-    width: 1px;
-    height: 8px;
-    background: linear-gradient(to top, transparent, rgba(101, 67, 33, 0.4), transparent);
-    z-index: 2;
-    box-shadow:
-        70px -1px 0 0 rgba(101, 67, 33, 0.35),
-        140px 1px 0 0 rgba(101, 67, 33, 0.3),
-        220px 0px 0 0 rgba(101, 67, 33, 0.4),
-        310px -1px 0 0 rgba(101, 67, 33, 0.35),
-        400px 1px 0 0 rgba(101, 67, 33, 0.3),
-        490px 0px 0 0 rgba(101, 67, 33, 0.4),
-        580px -1px 0 0 rgba(101, 67, 33, 0.3),
-        670px 1px 0 0 rgba(101, 67, 33, 0.35);
 }
 
 .tools-bar {
