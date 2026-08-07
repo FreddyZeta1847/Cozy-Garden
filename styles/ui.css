@@ -713,24 +713,23 @@
 }
 
 .cart-qty-preset {
-    background: linear-gradient(135deg, #FFF8E1 0%, #FFE082 100%);
-    border: 2px solid #FFB300;
-    border-radius: 6px;
-    padding: 4px 8px;
+    background: var(--white);
+    border: 2px solid var(--season-border);
+    border-radius: 8px;
+    padding: 5px 10px;
     cursor: pointer;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
-    font-family: 'Fredoka', sans-serif;
-    color: #E65100;
-    transition: all 0.2s;
+    font-family: var(--font-body);
+    color: var(--dark-brown);
+    transition: transform 0.15s, box-shadow 0.15s;
     min-width: 32px;
     text-align: center;
 }
 
 .cart-qty-preset:hover {
-    background: linear-gradient(135deg, #FFE082 0%, #FFD54F 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(255, 179, 0, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px var(--season-shadow);
 }
 
 .cart-qty-preset:active {
@@ -738,13 +737,9 @@
 }
 
 .cart-qty-preset.max-btn {
-    background: linear-gradient(135deg, #FFCC80 0%, #FF9800 100%);
-    border-color: #E65100;
+    background: linear-gradient(135deg, #90EE90 0%, #7CB342 100%);
+    border-color: var(--dark-green);
     color: white;
-}
-
-.cart-qty-preset.max-btn:hover {
-    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
 }
 
 /* Locked Shop Items */
@@ -1056,16 +1051,24 @@
 
 .sell-all-button {
     background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-    border: 4px solid #FF8C00;
+    border: 3px solid #FF8C00;
     border-radius: 15px;
     padding: 15px 35px;
     cursor: pointer;
     font-size: 20px;
     font-weight: 700;
-    font-family: 'Fredoka', sans-serif;
+    font-family: var(--font-body);
     color: var(--dark-brown);
-    box-shadow: 0 5px 0 #CC7000, 0 7px 14px var(--shadow);
+    box-shadow: 0 4px 0 #CC7000, 0 6px 12px var(--shadow);
     transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sell-all-button .coin-icon {
+    width: 24px;
+    height: 24px;
 }
 
 .sell-all-button:hover {
@@ -1131,7 +1134,19 @@
     font-size: 22px;
     color: var(--dark-brown);
     margin-bottom: 15px;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.section-title-icon {
+    display: inline-flex;
+}
+
+.section-title-icon svg {
+    width: 22px;
+    height: 22px;
 }
 
 .selection-hint {
@@ -1314,7 +1329,10 @@
     font-size: 22px;
     color: var(--dark-brown);
     margin-bottom: 15px;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 /* Sell Cart */

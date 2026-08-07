@@ -25,7 +25,7 @@
     <link rel="stylesheet" href="styles/main.css?v=3.18">
     <link rel="stylesheet" href="styles/garden.css?v=1.4">
     <link rel="stylesheet" href="styles/plants-svg.css?v=1.0">
-    <link rel="stylesheet" href="styles/ui.css?v=3.12">
+    <link rel="stylesheet" href="styles/ui.css?v=3.13">
     <link rel="stylesheet" href="styles/fruits.css?v=3.5">
     <!-- Mobile-specific styles (media queries only - does not affect desktop) -->
     <link rel="stylesheet" href="styles/mobile.css?v=1.2">
@@ -458,7 +458,16 @@
             <div class="new-market-content">
                 <!-- Step 1: Product Selection Grid -->
                 <div class="product-selection-area">
-                    <h3>📦 Select Products to Sell (Max 3):</h3>
+                    <h3>
+                        <span class="section-title-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4 8 12 4l8 4-8 4-8-4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M4 8v8l8 4 8-4V8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 12v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </span>
+                        Select Products to Sell (Max 3)
+                    </h3>
                     <div id="product-grid" class="product-grid">
                         <!-- Products will be populated by JavaScript -->
                     </div>
@@ -467,7 +476,16 @@
 
                 <!-- Step 2: Selected Products Cart -->
                 <div class="sell-cart-area">
-                    <h3>🛒 Your Cart (<span id="cart-count">0</span>/3):</h3>
+                    <h3>
+                        <span class="section-title-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="10" cy="21" r="1.4" fill="currentColor"/>
+                                <circle cx="17" cy="21" r="1.4" fill="currentColor"/>
+                            </svg>
+                        </span>
+                        Your Cart (<span id="cart-count">0</span>/3)
+                    </h3>
                     <div id="sell-cart" class="sell-cart">
                         <p class="empty-cart-message">No products selected. Click on products above to add them.</p>
                     </div>
@@ -479,7 +497,9 @@
                             <div class="coin-icon"></div>
                             <span id="sell-total">0</span>
                         </div>
-                        <button class="sell-all-button" onclick="game.sellSelectedProducts()" id="sell-button" disabled>💰 Sell Selected</button>
+                        <button class="sell-all-button" onclick="game.sellSelectedProducts()" id="sell-button" disabled>
+                            <div class="coin-icon"></div> Sell Selected
+                        </button>
                     </div>
                 </div>
             </div>
