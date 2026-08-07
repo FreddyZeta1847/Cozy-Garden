@@ -69,7 +69,15 @@
 }
 
 .shop-tab-content.active {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+.shop-tab-content.active .shop-content,
+.shop-tab-content.active .new-market-content {
+    flex: 1;
 }
 
 @keyframes fadeIn {
@@ -197,15 +205,15 @@
 .shop-items {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 16px;
 }
 
 .shop-section-label {
     font-family: var(--font-heading);
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 700;
     color: var(--season-text);
-    margin-top: 12px;
+    margin-top: 20px;
 }
 
 .shop-section-label:first-child {
@@ -215,7 +223,7 @@
 .shop-seed-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 16px;
     margin-bottom: 8px;
 }
 
@@ -223,9 +231,9 @@
 .shop-seed-card {
     background: var(--white);
     border: 3px solid var(--season-border);
-    border-radius: 14px;
-    padding: 12px 8px;
-    width: 108px;
+    border-radius: 16px;
+    padding: 18px 10px;
+    width: 132px;
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -248,11 +256,11 @@
 }
 
 .shop-seed-icon {
-    font-size: 38px;
+    font-size: 48px;
 }
 
 .shop-seed-name {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--dark-brown);
     text-align: center;
@@ -261,26 +269,26 @@
 .shop-seed-price {
     display: flex;
     align-items: center;
-    gap: 4px;
-    font-size: 12px;
+    gap: 5px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--dark-brown);
     opacity: 0.8;
 }
 
 .shop-seed-coin {
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
 }
 
 .shop-seed-season-badge {
     position: absolute;
-    top: -6px;
-    right: -6px;
-    font-size: 15px;
+    top: -8px;
+    right: -8px;
+    font-size: 19px;
     background: var(--white);
     border-radius: 50%;
-    padding: 2px;
+    padding: 3px;
     box-shadow: 0 1px 3px var(--shadow);
 }
 
