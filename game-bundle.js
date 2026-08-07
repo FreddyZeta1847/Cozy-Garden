@@ -436,6 +436,10 @@ class Player {
         this.money = 100;
         this.level = 1;
         this.xp = 0;
+        // Lifetime stats (never decrease, unlike money/inventory) - for the stats panel
+        this.totalMoneyEarned = 0;
+        this.totalSoldByType = {};
+        this.totalHarvestedByType = {};
         this.inventory = {
             seeds: {
                 tomato: 5,
@@ -479,6 +483,7 @@ class Player {
 
     addMoney(amount) {
         this.money += amount;
+        this.totalMoneyEarned += amount;
         console.log(`Added ${amount} money. Total: ${this.money}`);
     }
 
@@ -512,6 +517,7 @@ class Player {
         }
         const oldTotal = this.inventory.harvested[type];
         this.inventory.harvested[type] += amount;
+        this.totalHarvestedByType[type] = (this.totalHarvestedByType[type] || 0) + amount;
         console.log(`🌾 Harvested ${amount} ${type}. Old total: ${oldTotal}, New total: ${this.inventory.harvested[type]}`);
         console.log('🌾 Full harvested inventory:', this.inventory.harvested);
     }
@@ -519,6 +525,7 @@ class Player {
     sellHarvest(type, amount) {
         if (this.inventory.harvested[type] >= amount) {
             this.inventory.harvested[type] -= amount;
+            this.totalSoldByType[type] = (this.totalSoldByType[type] || 0) + amount;
             console.log(`Sold ${amount} ${type}. Remaining: ${this.inventory.harvested[type]}`);
             return true;
         }
@@ -549,6 +556,7 @@ class Player {
         }
         const oldTotal = this.inventory.harvestedFruits[type];
         this.inventory.harvestedFruits[type] += amount;
+        this.totalHarvestedByType[type] = (this.totalHarvestedByType[type] || 0) + amount;
         console.log(`🍎 Harvested ${amount} ${type}. Old total: ${oldTotal}, New total: ${this.inventory.harvestedFruits[type]}`);
         console.log('🍎 Full harvested fruits inventory:', this.inventory.harvestedFruits);
     }
@@ -556,10 +564,33 @@ class Player {
     sellFruit(type, amount) {
         if (this.inventory.harvestedFruits[type] >= amount) {
             this.inventory.harvestedFruits[type] -= amount;
+            this.totalSoldByType[type] = (this.totalSoldByType[type] || 0) + amount;
             console.log(`Sold ${amount} ${type} fruit. Remaining: ${this.inventory.harvestedFruits[type]}`);
             return true;
         }
         return false;
+    }
+
+    // Highest cumulative count in a { type: count } map, resolved to a display name via PLANTS/FRUITS
+    static topEntry(counts) {
+        let bestType = null, bestCount = 0;
+        for (const [type, count] of Object.entries(counts)) {
+            if (count > bestCount) {
+                bestType = type;
+                bestCount = count;
+            }
+        }
+        if (!bestType) return null;
+        const name = (PLANTS[bestType] || FRUITS[bestType] || {}).name || bestType;
+        return { type: bestType, name, count: bestCount };
+    }
+
+    getBestSeller() {
+        return Player.topEntry(this.totalSoldByType);
+    }
+
+    getTopHarvest() {
+        return Player.topEntry(this.totalHarvestedByType);
     }
 
     purchaseUpgrade(upgradeType) {
@@ -675,6 +706,9 @@ class Player {
             money: this.money,
             level: this.level,
             xp: this.xp,
+            totalMoneyEarned: this.totalMoneyEarned,
+            totalSoldByType: this.totalSoldByType,
+            totalHarvestedByType: this.totalHarvestedByType,
             inventory: JSON.parse(JSON.stringify(this.inventory)),
             upgrades: JSON.parse(JSON.stringify(this.upgrades))
         };
@@ -684,6 +718,9 @@ class Player {
         if (data.money !== undefined) this.money = data.money;
         if (data.level !== undefined) this.level = data.level;
         if (data.xp !== undefined) this.xp = data.xp;
+        this.totalMoneyEarned = data.totalMoneyEarned || 0;
+        this.totalSoldByType = data.totalSoldByType || {};
+        this.totalHarvestedByType = data.totalHarvestedByType || {};
 
         // Merge inventory to ensure backward compatibility
         if (data.inventory) {
@@ -2778,6 +2815,15 @@ class Game {
             year: this.currentYear,
             season: SEASONS[this.currentSeason].name,
             day: this.getCurrentDay()
+        };
+    }
+
+    getLifetimeStats() {
+        return {
+            totalMoneyEarned: this.player.totalMoneyEarned,
+            bestSeller: this.player.getBestSeller(),
+            topHarvest: this.player.getTopHarvest(),
+            playTime: this.formatTime(this.gameTime)
         };
     }
 
