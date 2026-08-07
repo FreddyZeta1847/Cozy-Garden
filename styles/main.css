@@ -323,16 +323,28 @@ body[data-season] {
 .topbar-money {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     font-family: var(--font-body);
     font-weight: 700;
-    font-size: 20px;
+    font-size: 16px;
     color: var(--season-text);
     background: var(--white);
     border: 2px solid var(--season-border);
-    border-radius: 14px;
-    padding: 6px 16px;
+    border-radius: 12px;
+    padding: 5px 12px;
     box-shadow: 0 2px 0 var(--season-border), 0 3px 6px var(--season-shadow);
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.topbar-money .coin-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.topbar-money:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 0 var(--season-border), 0 6px 10px var(--season-shadow);
 }
 
 /* Reset is a developer tool, not a gameplay action - kept small and visually apart */
@@ -1093,6 +1105,267 @@ body[data-season="winter"] .seasonal-header {
     overflow-y: auto;
     background: var(--season-background);
     position: relative;
+}
+
+/* ===== News screen ===== */
+
+.news-page-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: var(--season-background);
+}
+
+.news-list {
+    max-width: 640px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.news-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: var(--white);
+    border: 2px solid var(--season-border);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 3px 10px var(--season-shadow);
+}
+
+.news-card-icon {
+    font-size: 32px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.news-card-headline {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--dark-brown);
+}
+
+.news-card-message {
+    font-size: 13px;
+    color: var(--dark-brown);
+    opacity: 0.8;
+    margin: 4px 0 8px;
+}
+
+.news-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.news-badge {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 8px;
+}
+
+.news-bonus .news-badge {
+    background: rgba(124, 179, 66, 0.2);
+    color: #33691E;
+}
+
+.news-penalty .news-badge {
+    background: rgba(216, 67, 21, 0.15);
+    color: #BF360C;
+}
+
+.news-bonus {
+    border-color: #7CB342;
+}
+
+.news-penalty {
+    border-color: #D84315;
+}
+
+.news-days {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--dark-brown);
+    opacity: 0.6;
+}
+
+.news-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--dark-brown);
+}
+
+.news-empty-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+    opacity: 0.7;
+}
+
+.news-empty h3 {
+    font-family: var(--font-heading);
+    font-size: 22px;
+    margin-bottom: 6px;
+}
+
+.news-empty p {
+    font-size: 14px;
+    opacity: 0.7;
+    max-width: 360px;
+    margin: 0 auto;
+}
+
+/* ===== Level roadmap screen ===== */
+
+.level-page-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: var(--season-background);
+}
+
+.level-page-summary {
+    max-width: 640px;
+    margin: 0 auto 20px;
+}
+
+.level-page-badge {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--white);
+    border: 2px solid var(--season-border);
+    border-radius: 16px;
+    padding: 14px 18px;
+    box-shadow: 0 3px 10px var(--season-shadow);
+}
+
+.level-page-badge .level-icon {
+    font-size: 32px;
+}
+
+.level-page-current {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--dark-brown);
+}
+
+.level-page-xp {
+    font-size: 13px;
+    color: var(--dark-brown);
+    opacity: 0.75;
+}
+
+.level-roadmap {
+    max-width: 640px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.level-node {
+    display: flex;
+    gap: 16px;
+    position: relative;
+    padding-bottom: 24px;
+}
+
+.level-node:last-child {
+    padding-bottom: 0;
+}
+
+.level-node::before {
+    /* connecting line down to the next node */
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 40px;
+    bottom: 0;
+    width: 3px;
+    background: var(--season-border);
+    opacity: 0.35;
+}
+
+.level-node:last-child::before {
+    display: none;
+}
+
+.level-node-marker {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    background: var(--white);
+    border: 3px solid var(--season-border);
+    color: var(--dark-brown);
+    z-index: 1;
+}
+
+.level-node-done .level-node-marker {
+    background: linear-gradient(135deg, #90EE90 0%, #7CB342 100%);
+    border-color: var(--dark-green);
+    color: white;
+}
+
+.level-node-current .level-node-marker {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    border-color: #FF8C00;
+    color: white;
+    box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.25);
+}
+
+.level-node-locked .level-node-marker {
+    opacity: 0.5;
+}
+
+.level-node-body {
+    flex: 1;
+    background: var(--white);
+    border: 1px solid var(--season-border);
+    border-radius: 14px;
+    padding: 12px 16px;
+    box-shadow: 0 2px 8px var(--season-shadow);
+}
+
+.level-node-locked .level-node-body {
+    opacity: 0.6;
+}
+
+.level-node-title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--dark-brown);
+    margin-bottom: 6px;
+}
+
+.level-node-unlocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.level-unlock-chip {
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--season-accent);
+    color: var(--dark-brown);
+    border-radius: 8px;
+    padding: 3px 9px;
+}
+
+.level-unlock-chip.level-unlock-none {
+    opacity: 0.5;
+    font-style: italic;
 }
 
 /* Seasonal decorative pattern overlay */

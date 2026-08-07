@@ -22,7 +22,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="styles/main.css?v=3.16">
+    <link rel="stylesheet" href="styles/main.css?v=3.17">
     <link rel="stylesheet" href="styles/garden.css?v=1.4">
     <link rel="stylesheet" href="styles/plants-svg.css?v=1.0">
     <link rel="stylesheet" href="styles/ui.css?v=3.6">
@@ -121,7 +121,7 @@
             </div>
 
             <div class="topbar-right">
-                <div class="topbar-money">
+                <div class="topbar-money" onclick="game.showStatsPanel()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();game.showStatsPanel();}" title="See your farm overview" role="button" tabindex="0">
                     <div class="coin-icon"></div>
                     <span id="money-display">100</span>
                 </div>
@@ -504,6 +504,39 @@
         </div>
     </div>
 
+    <!-- News Screen -->
+    <div id="news-screen" class="screen">
+        <div class="screen-header seasonal-header">
+            <h2>
+                <span class="header-icon">📰</span>
+                Farm Gazette
+                <span class="season-subtitle"></span>
+            </h2>
+            <button class="back-button" onclick="game.showGarden()">← Back to Garden</button>
+        </div>
+
+        <div class="news-page-content">
+            <div id="news-list" class="news-list"></div>
+        </div>
+    </div>
+
+    <!-- Level Screen -->
+    <div id="level-screen" class="screen">
+        <div class="screen-header seasonal-header">
+            <h2>
+                <span class="header-icon">⭐</span>
+                Level Roadmap
+                <span class="season-subtitle"></span>
+            </h2>
+            <button class="back-button" onclick="game.showGarden()">← Back to Garden</button>
+        </div>
+
+        <div class="level-page-content">
+            <div id="level-page-summary" class="level-page-summary"></div>
+            <div id="level-roadmap" class="level-roadmap"></div>
+        </div>
+    </div>
+
     <!-- Harvest Inventory Popup -->
     <div id="harvest-popup" class="modal" onclick="if(event.target === this) game.closeHarvestPopup()">
         <div class="modal-content harvest-modal">
@@ -574,7 +607,7 @@
     <!-- SVG Plant Sprites System -->
     <script src="svg-plants.js?v=1.1"></script>
     <!-- Game Script (Bundled) - v3.2 -->
-    <script src="game-bundle.js?v=3.11"></script>
+    <script src="game-bundle.js?v=3.12"></script>
     <!-- Mobile UI System - Object-First Interaction -->
     <script src="mobile-ui.js?v=1.1"></script>
 </body>

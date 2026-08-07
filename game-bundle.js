@@ -2446,6 +2446,107 @@ class UIManager {
         }
     }
 
+    renderNews() {
+        const newsList = document.getElementById('news-list');
+        if (!newsList) return;
+
+        newsList.innerHTML = '';
+
+        const events = this.game.activeNews;
+        if (events.length === 0) {
+            newsList.innerHTML = `
+                <div class="news-empty">
+                    <div class="news-empty-icon">📰</div>
+                    <h3>All Quiet on the Farm</h3>
+                    <p>No market events right now - prices are at their normal rates. Check back another day.</p>
+                </div>
+            `;
+            return;
+        }
+
+        for (const event of events) {
+            const card = document.createElement('div');
+            const isBonus = event.multiplier >= 1;
+            card.className = `news-card ${isBonus ? 'news-bonus' : 'news-penalty'}`;
+
+            const daysRemaining = Math.max(1, Math.ceil((event.expiresAt - this.game.gameTime) / DAY_LENGTH));
+            const percent = Math.round(Math.abs(event.multiplier - 1) * 100);
+
+            card.innerHTML = `
+                <div class="news-card-icon">${event.icon}</div>
+                <div class="news-card-body">
+                    <div class="news-card-headline">${event.headline}</div>
+                    <p class="news-card-message">${event.message}</p>
+                    <div class="news-card-meta">
+                        <span class="news-badge">${isBonus ? '▲' : '▼'} ${percent}% ${isBonus ? 'up' : 'down'}</span>
+                        <span class="news-days">${daysRemaining} day${daysRemaining === 1 ? '' : 's'} left</span>
+                    </div>
+                </div>
+            `;
+            newsList.appendChild(card);
+        }
+    }
+
+    // Every vegetable, fruit and upgrade that unlocks at a given level, for the level roadmap
+    getLevelUnlocks(level) {
+        const unlocks = [];
+        const cropIcons = { tomato: '🍅', lettuce: '🥬', carrot: '🥕', corn: '🌽', potato: '🥔', cabbage: '🥬', pumpkin: '🎃', garlic: '🧄' };
+        const fruitIcons = { apple: '🍎', orange: '🍊', banana: '🍌', pear: '🍐' };
+
+        for (const [key, requiredLevel] of Object.entries(LEVEL_SYSTEM.unlocks.vegetables)) {
+            if (requiredLevel === level) unlocks.push({ icon: cropIcons[key] || '🌱', name: PLANTS[key].name });
+        }
+        for (const [key, requiredLevel] of Object.entries(LEVEL_SYSTEM.unlocks.fruits)) {
+            if (requiredLevel === level) unlocks.push({ icon: fruitIcons[key] || '🌳', name: FRUITS[key].name });
+        }
+        for (const [key, requiredLevel] of Object.entries(LEVEL_SYSTEM.unlocks.upgrades)) {
+            if (requiredLevel === level) unlocks.push({ icon: UPGRADES[key].icon, name: UPGRADES[key].name });
+        }
+
+        return unlocks;
+    }
+
+    renderLevelPage() {
+        const summary = document.getElementById('level-page-summary');
+        const roadmap = document.getElementById('level-roadmap');
+        if (!summary || !roadmap) return;
+
+        const player = this.game.player;
+        const progress = player.getXPProgress();
+
+        summary.innerHTML = `
+            <div class="level-page-badge">
+                <span class="level-icon">⭐</span>
+                <div>
+                    <div class="level-page-current">Level ${player.level}</div>
+                    <div class="level-page-xp">${progress.required > 0 ? `${progress.current} / ${progress.required} XP to next level` : 'Max level reached'}</div>
+                </div>
+            </div>
+        `;
+
+        roadmap.innerHTML = '';
+
+        for (const levelData of LEVEL_SYSTEM.levels) {
+            const node = document.createElement('div');
+            const state = levelData.level < player.level ? 'done' : levelData.level === player.level ? 'current' : 'locked';
+            node.className = `level-node level-node-${state}`;
+
+            const unlocks = this.getLevelUnlocks(levelData.level);
+            const unlocksHTML = unlocks.length > 0
+                ? unlocks.map(u => `<span class="level-unlock-chip">${u.icon} ${u.name}</span>`).join('')
+                : `<span class="level-unlock-chip level-unlock-none">Nothing new</span>`;
+
+            node.innerHTML = `
+                <div class="level-node-marker">${state === 'done' ? '✓' : levelData.level}</div>
+                <div class="level-node-body">
+                    <div class="level-node-title">Level ${levelData.level}${levelData.level === 1 ? ' - Start' : ''}</div>
+                    <div class="level-node-unlocks">${unlocksHTML}</div>
+                </div>
+            `;
+            roadmap.appendChild(node);
+        }
+    }
+
     showScreen(screenId) {
         // Fade out current screen
         const currentActive = document.querySelector('.screen.active');
@@ -3657,14 +3758,14 @@ class Game {
         this.ui.showScreen('garden-screen');
     }
 
-    // TODO(interface redesign task 17): replace with the real Level page
     showLevelPage() {
-        this.ui.showToast('info', '⭐', 'Level Page', 'Coming soon - the full level roadmap.');
+        this.ui.showScreen('level-screen');
+        this.ui.renderLevelPage();
     }
 
-    // TODO(interface redesign task 16): replace with the real News page
     showNews() {
-        this.ui.showToast('info', '📰', 'News Page', 'Coming soon - active market events.');
+        this.ui.showScreen('news-screen');
+        this.ui.renderNews();
     }
 
     switchToFruitGarden() {
