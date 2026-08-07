@@ -2004,6 +2004,8 @@ class UIManager {
         }
 
         const maxAffordable = Math.floor(this.game.player.money / item.seedCost);
+        const buyAndClose = qty => { this.game[buyFn](key, qty); this.game.closeSeedOverview(); };
+
         const qtyButtons = document.getElementById('seed-overview-qty-buttons');
         qtyButtons.innerHTML = '';
         [1, 10, 50].forEach(qty => {
@@ -2011,29 +2013,44 @@ class UIManager {
             btn.className = 'qty-select-btn';
             btn.textContent = `x${qty}`;
             btn.disabled = maxAffordable < qty;
-            btn.onclick = () => { this.game[buyFn](key, qty); this.game.closeSeedOverview(); };
+            btn.onclick = () => buyAndClose(qty);
             qtyButtons.appendChild(btn);
         });
         const maxBtn = document.createElement('button');
         maxBtn.className = 'qty-select-btn';
         maxBtn.textContent = 'Max';
         maxBtn.disabled = maxAffordable < 1;
-        maxBtn.onclick = () => { this.game[buyFn](key, maxAffordable); this.game.closeSeedOverview(); };
+        maxBtn.onclick = () => buyAndClose(maxAffordable);
         qtyButtons.appendChild(maxBtn);
 
-        document.getElementById('seed-overview-afford').textContent = `Can afford: ${maxAffordable}`;
+        // Custom amount - same row as the quantity shortcuts, same styling
+        const customInput = document.createElement('input');
+        customInput.type = 'number';
+        customInput.min = '1';
+        customInput.placeholder = '#';
+        customInput.className = 'seed-overview-custom-input';
+        customInput.setAttribute('aria-label', 'Custom quantity');
+        qtyButtons.appendChild(customInput);
 
-        const customInput = document.getElementById('seed-overview-custom-qty');
-        customInput.value = '';
-        document.getElementById('seed-overview-custom-buy').onclick = () => {
+        const customBtn = document.createElement('button');
+        customBtn.className = 'qty-select-btn';
+        customBtn.textContent = 'Buy';
+        customBtn.onclick = () => {
             const qty = parseInt(customInput.value, 10);
             if (!qty || qty < 1) {
                 this.showToast('error', '❌', 'Invalid Quantity', 'Enter a number of 1 or more.');
                 return;
             }
-            this.game[buyFn](key, qty);
-            this.game.closeSeedOverview();
+            buyAndClose(qty);
         };
+        qtyButtons.appendChild(customBtn);
+
+        document.getElementById('seed-overview-afford').textContent = `Can afford: ${maxAffordable}`;
+
+        // Clicking the price itself is a one-click "buy 1"
+        const priceBtn = document.getElementById('seed-overview-price-btn');
+        priceBtn.disabled = maxAffordable < 1;
+        priceBtn.onclick = () => buyAndClose(1);
 
         document.getElementById('seed-overview-modal').classList.add('active');
     }

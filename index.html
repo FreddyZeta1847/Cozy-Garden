@@ -25,7 +25,7 @@
     <link rel="stylesheet" href="styles/main.css?v=3.17">
     <link rel="stylesheet" href="styles/garden.css?v=1.4">
     <link rel="stylesheet" href="styles/plants-svg.css?v=1.0">
-    <link rel="stylesheet" href="styles/ui.css?v=3.8">
+    <link rel="stylesheet" href="styles/ui.css?v=3.9">
     <link rel="stylesheet" href="styles/fruits.css?v=3.5">
     <!-- Mobile-specific styles (media queries only - does not affect desktop) -->
     <link rel="stylesheet" href="styles/mobile.css?v=1.2">
@@ -493,15 +493,9 @@
                 <div class="seed-overview-seasons" id="seed-overview-seasons"></div>
 
                 <div class="seed-overview-buy">
-                    <div class="seed-overview-buy-row">
-                        <div class="quantity-buttons" id="seed-overview-qty-buttons"></div>
-                        <div class="seed-overview-custom">
-                            <input type="number" id="seed-overview-custom-qty" min="1" placeholder="#" aria-label="Custom quantity">
-                            <button class="qty-select-btn" id="seed-overview-custom-buy">Buy</button>
-                        </div>
-                    </div>
+                    <div class="quantity-buttons" id="seed-overview-qty-buttons"></div>
                     <div class="price-row">
-                        <div class="price"><div class="coin-icon"></div><span id="seed-overview-price">0</span>/ea</div>
+                        <button class="price" id="seed-overview-price-btn" title="Buy 1"><div class="coin-icon"></div><span id="seed-overview-price">0</span>/ea</button>
                         <div class="buy-qty-display" id="seed-overview-afford"></div>
                     </div>
                 </div>
@@ -632,7 +626,7 @@
     <!-- SVG Plant Sprites System -->
     <script src="svg-plants.js?v=1.1"></script>
     <!-- Game Script (Bundled) - v3.2 -->
-    <script src="game-bundle.js?v=3.13"></script>
+    <script src="game-bundle.js?v=3.14"></script>
     <!-- Mobile UI System - Object-First Interaction -->
     <script src="mobile-ui.js?v=1.1"></script>
 </body>
