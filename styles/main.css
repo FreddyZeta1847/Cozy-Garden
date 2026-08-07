@@ -324,6 +324,19 @@ body[data-season] {
 }
 
 /* Reset is a developer tool, not a gameplay action - kept small and visually apart */
+.gear-btn {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 4px;
+    transition: transform 0.2s;
+}
+
+.gear-btn:hover {
+    transform: rotate(30deg);
+}
+
 .dev-reset-btn {
     background: none;
     border: none;
@@ -636,8 +649,8 @@ h1, h2, h3,
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    gap: 18px;
-    padding: 12px 0;
+    gap: 8px;
+    padding: 28px 0 12px;
     position: relative;
     overflow-x: hidden; /* keeps the mobile slider contained */
     overflow-y: auto; /* never clip the switch below the garden - scroll instead */
@@ -750,21 +763,11 @@ h1, h2, h3,
     font-size: 28px;
 }
 
-.seed-modal-content {
-    max-width: 640px;
-    max-height: 80vh;
-    overflow-y: auto;
-}
-
 .seed-menu-section h4 {
     font-family: var(--font-heading);
     font-size: 20px;
     color: var(--season-text);
     margin-bottom: 8px;
-}
-
-.seed-menu-section + .seed-menu-section {
-    margin-top: 16px;
 }
 
 .seed-menu-grid {

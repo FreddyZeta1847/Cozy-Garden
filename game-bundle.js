@@ -1553,30 +1553,6 @@ class UIManager {
     }
 
     // Updates the collapsed seed-menu button to summarize what's currently selected
-    updateSeedMenuToggle() {
-        const iconEl = document.getElementById('seed-menu-toggle-icon');
-        const labelEl = document.getElementById('seed-menu-toggle-label');
-        if (!iconEl || !labelEl) return;
-
-        const cropIcons = {
-            tomato: '🍅', lettuce: '🥬', carrot: '🥕', corn: '🌽', potato: '🥔',
-            cabbage: '🥬', pumpkin: '🎃', garlic: '🧄'
-        };
-        const fruitIcons = { apple: '🍎', orange: '🍊', banana: '🍌', pear: '🍐' };
-
-        const seedType = this.game.selectedSeed;
-        const plant = PLANTS[seedType];
-        const fruit = FRUITS[seedType];
-
-        if (this.game.selectedTool === `seed-${seedType}` && (plant || fruit)) {
-            iconEl.textContent = cropIcons[seedType] || fruitIcons[seedType] || '🌱';
-            labelEl.textContent = (plant || fruit).name;
-        } else {
-            iconEl.textContent = '🌱';
-            labelEl.textContent = 'Select a Seed';
-        }
-    }
-
     updateSeason() {
         const season = SEASONS[this.game.currentSeason];
         const display = document.getElementById('season-display');
@@ -3206,8 +3182,6 @@ class Game {
         document.querySelectorAll('.seed-button').forEach(btn => {
             btn.classList.remove('active');
         });
-
-        this.ui.updateSeedMenuToggle();
     }
 
     selectSeed(seedType) {
@@ -3224,17 +3198,14 @@ class Game {
         document.querySelectorAll('.tool-button').forEach(btn => {
             btn.classList.remove('active');
         });
-
-        this.ui.updateSeedMenuToggle();
-        this.closeSeedMenu();
     }
 
-    toggleSeedMenu() {
-        document.getElementById('seed-modal')?.classList.toggle('active');
+    showStatsPanel() {
+        document.getElementById('stats-modal')?.classList.add('active');
     }
 
-    closeSeedMenu() {
-        document.getElementById('seed-modal')?.classList.remove('active');
+    closeStatsPanel() {
+        document.getElementById('stats-modal')?.classList.remove('active');
     }
 
     showShop() {

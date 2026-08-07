@@ -22,7 +22,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="styles/main.css?v=3.6">
+    <link rel="stylesheet" href="styles/main.css?v=3.7">
     <link rel="stylesheet" href="styles/garden.css?v=1.1">
     <link rel="stylesheet" href="styles/plants-svg.css?v=1.0">
     <link rel="stylesheet" href="styles/ui.css?v=3.3">
@@ -118,12 +118,6 @@
                     </div>
                 </div>
 
-                <div class="topbar-divider"></div>
-
-                <div class="topbar-stat" id="harvested-display" title="Click to view your harvest!" onclick="game.showHarvestPopup()">
-                    <span class="topbar-icon">🧺</span>
-                    <span id="harvested-count">0</span>
-                </div>
             </div>
 
             <div class="topbar-right">
@@ -131,6 +125,7 @@
                     <div class="coin-icon"></div>
                     <span id="money-display">100</span>
                 </div>
+                <button class="gear-btn" onclick="game.showStatsPanel()" title="Farm stats">⚙️</button>
                 <button class="dev-reset-btn" onclick="game.resetGame()" title="Reset game and start fresh (developer tool)">🔄</button>
             </div>
         </div>
@@ -157,30 +152,7 @@
         <div class="game-container">
             <!-- LEFT: stats + tools + seed menu, all together -->
             <aside class="stats-panel" id="stats-panel">
-                <h3 class="stats-panel-title">Farm Stats</h3>
-                <div class="stats-grid">
-                    <div class="stat-tile">
-                        <span class="stat-tile-icon">💰</span>
-                        <span class="stat-value" id="stat-total-earned">0</span>
-                        <span class="stat-label">Earned</span>
-                    </div>
-                    <div class="stat-tile">
-                        <span class="stat-tile-icon">🏆</span>
-                        <span class="stat-value" id="stat-best-seller">-</span>
-                        <span class="stat-label">Best Seller</span>
-                    </div>
-                    <div class="stat-tile">
-                        <span class="stat-tile-icon">🌾</span>
-                        <span class="stat-value" id="stat-top-harvest">-</span>
-                        <span class="stat-label">Top Harvest</span>
-                    </div>
-                    <div class="stat-tile">
-                        <span class="stat-tile-icon">⏱️</span>
-                        <span class="stat-value" id="stat-play-time">0s</span>
-                        <span class="stat-label">Play Time</span>
-                    </div>
-                </div>
-
+                <!-- Row 1: hoe, water, and the harvest basket -->
                 <div class="tool-section">
                     <button class="tool-button" data-tool="hoe" onclick="game.selectTool('hoe')">
                         <span class="tool-icon">
@@ -207,30 +179,54 @@
                         </span>
                         <span class="tool-name">Water</span>
                     </button>
+                    <button class="tool-button" id="harvested-display" onclick="game.showHarvestPopup()" title="Click to view your harvest!">
+                        <span class="tool-icon">🧺</span>
+                        <span class="tool-name" id="harvested-count">0</span>
+                    </button>
                 </div>
 
-                <!-- Seed menu - shows every seed, including locked ones -->
-                <button class="seed-menu-toggle" id="seed-menu-toggle" onclick="game.toggleSeedMenu()">
-                    <span class="seed-menu-toggle-icon" id="seed-menu-toggle-icon">🌱</span>
-                    <span id="seed-menu-toggle-label">Select a Seed</span>
-                </button>
+                <!-- Row 2: every vegetable seed, always visible, wraps as needed -->
+                <div class="seed-menu-section">
+                    <h4>Vegetables</h4>
+                    <div class="seed-menu-grid" id="vegetable-seeds"></div>
+                </div>
+
+                <!-- Row 3: every fruit seed, always visible, wraps as needed -->
+                <div class="seed-menu-section">
+                    <h4>Fruits</h4>
+                    <div class="seed-menu-grid" id="fruit-seeds"></div>
+                </div>
             </aside>
 
-            <!-- Seed selection - centered overlay, closes itself once you pick one -->
-            <div id="seed-modal" class="modal" onclick="if(event.target === this) game.closeSeedMenu()">
-                <div class="modal-content seed-modal-content">
+            <!-- Farm stats - opened from the gear icon in the topbar -->
+            <div id="stats-modal" class="modal" onclick="if(event.target === this) game.closeStatsPanel()">
+                <div class="modal-content">
                     <div class="modal-header">
-                        <h2>🌱 Select a Seed</h2>
-                        <button class="modal-close" onclick="game.closeSeedMenu()">✕</button>
+                        <h2>⚙️ Farm Stats</h2>
+                        <button class="modal-close" onclick="game.closeStatsPanel()">✕</button>
                     </div>
                     <div class="modal-body">
-                        <div class="seed-menu-section">
-                            <h4>Vegetables</h4>
-                            <div class="seed-menu-grid" id="vegetable-seeds"></div>
-                        </div>
-                        <div class="seed-menu-section">
-                            <h4>Fruits</h4>
-                            <div class="seed-menu-grid" id="fruit-seeds"></div>
+                        <div class="stats-grid">
+                            <div class="stat-tile">
+                                <span class="stat-tile-icon">💰</span>
+                                <span class="stat-value" id="stat-total-earned">0</span>
+                                <span class="stat-label">Earned</span>
+                            </div>
+                            <div class="stat-tile">
+                                <span class="stat-tile-icon">🏆</span>
+                                <span class="stat-value" id="stat-best-seller">-</span>
+                                <span class="stat-label">Best Seller</span>
+                            </div>
+                            <div class="stat-tile">
+                                <span class="stat-tile-icon">🌾</span>
+                                <span class="stat-value" id="stat-top-harvest">-</span>
+                                <span class="stat-label">Top Harvest</span>
+                            </div>
+                            <div class="stat-tile">
+                                <span class="stat-tile-icon">⏱️</span>
+                                <span class="stat-value" id="stat-play-time">0s</span>
+                                <span class="stat-label">Play Time</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -454,7 +450,7 @@
     <!-- SVG Plant Sprites System -->
     <script src="svg-plants.js?v=1.1"></script>
     <!-- Game Script (Bundled) - v3.2 -->
-    <script src="game-bundle.js?v=3.5"></script>
+    <script src="game-bundle.js?v=3.6"></script>
     <!-- Mobile UI System - Object-First Interaction -->
     <script src="mobile-ui.js?v=1.1"></script>
 </body>
