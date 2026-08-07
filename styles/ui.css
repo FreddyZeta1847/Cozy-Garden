@@ -295,55 +295,105 @@
 /* ===== Seed overview popup - opened from a compact shop card ===== */
 
 .seed-overview-content {
-    max-width: 460px;
+    max-width: 560px;
 }
 
 .seed-overview-content .modal-header {
-    padding: 10px 20px;
+    padding: 14px 24px;
+}
+
+.seed-overview-content .modal-header h2 {
+    font-size: 30px;
 }
 
 .seed-overview-content .modal-body {
-    padding: 12px 20px 16px;
+    padding: 16px 24px 20px;
     overflow-y: visible;
 }
 
 .seed-overview-top {
     display: flex;
     align-items: center;
-    gap: 14px;
-    margin-bottom: 10px;
+    gap: 18px;
+    margin-bottom: 14px;
 }
 
 .seed-overview-icon {
-    font-size: 44px;
+    font-size: 64px;
     flex-shrink: 0;
 }
 
+.seed-overview-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
 .seed-overview-description {
-    font-size: 13px;
+    font-size: 16px;
     color: var(--dark-brown);
     opacity: 0.85;
     margin: 0;
 }
 
+/* A quiet label, not a CTA button - but still a one-click "buy 1" */
+.seed-overview-price {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--dark-brown);
+    background: rgba(0, 0, 0, 0.04);
+    border: none;
+    border-radius: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.seed-overview-price .coin-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.seed-overview-price:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.seed-overview-price:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 .seed-overview-stats {
-    margin-bottom: 10px;
+    margin-bottom: 14px;
+}
+
+.seed-overview-stats .stat {
+    font-size: 15px;
+    padding: 8px 12px;
 }
 
 .seed-overview-seasons {
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    margin-bottom: 10px;
+    gap: 8px;
+    margin-bottom: 14px;
 }
 
 .season-tag {
-    font-size: 12px;
+    font-size: 15px;
     font-weight: 600;
     background: rgba(0, 0, 0, 0.04);
     color: var(--dark-brown);
     border-radius: 8px;
-    padding: 6px 10px;
+    padding: 9px 14px;
     opacity: 0.7;
 }
 
@@ -363,56 +413,39 @@
 
 .seed-overview-buy {
     border-top: 2px solid var(--season-border);
-    padding-top: 10px;
+    padding-top: 14px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 14px;
 }
 
 .seed-overview-buy .quantity-buttons {
     align-items: center;
     margin-bottom: 0;
+    gap: 8px;
+}
+
+.seed-overview-buy .qty-select-btn {
+    font-size: 15px;
+    padding: 9px 14px;
 }
 
 .seed-overview-custom-input {
-    width: 56px;
-    height: 34px;
+    width: 68px;
+    height: 40px;
     border: 2px solid var(--season-border);
     border-radius: 8px;
     padding: 6px 8px;
     font-family: var(--font-body);
-    font-size: 13px;
+    font-size: 16px;
     text-align: center;
     box-sizing: border-box;
 }
 
-.seed-overview-buy .price-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
-
-.seed-overview-buy .price {
-    font-size: 15px;
-    padding: 7px 14px;
-    cursor: pointer;
-    border-width: 3px;
-    transition: transform 0.15s, box-shadow 0.15s;
-}
-
-.seed-overview-buy .price:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 0 #CC7000;
-}
-
-.seed-overview-buy .price:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
-}
-
 .seed-overview-buy .buy-qty-display {
-    font-size: 12px;
+    font-size: 14px;
+    text-align: center;
+    opacity: 0.7;
 }
 
 .shop-item {

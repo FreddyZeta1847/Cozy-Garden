@@ -25,7 +25,7 @@
     <link rel="stylesheet" href="styles/main.css?v=3.17">
     <link rel="stylesheet" href="styles/garden.css?v=1.4">
     <link rel="stylesheet" href="styles/plants-svg.css?v=1.0">
-    <link rel="stylesheet" href="styles/ui.css?v=3.10">
+    <link rel="stylesheet" href="styles/ui.css?v=3.12">
     <link rel="stylesheet" href="styles/fruits.css?v=3.5">
     <!-- Mobile-specific styles (media queries only - does not affect desktop) -->
     <link rel="stylesheet" href="styles/mobile.css?v=1.2">
@@ -485,7 +485,10 @@
             <div class="modal-body">
                 <div class="seed-overview-top">
                     <div class="seed-overview-icon" id="seed-overview-icon">🌱</div>
-                    <p class="seed-overview-description" id="seed-overview-description"></p>
+                    <div class="seed-overview-info">
+                        <p class="seed-overview-description" id="seed-overview-description"></p>
+                        <button class="seed-overview-price" id="seed-overview-price-btn" title="Buy 1"><div class="coin-icon"></div><span id="seed-overview-price">0</span>/ea</button>
+                    </div>
                 </div>
 
                 <div class="stats seed-overview-stats" id="seed-overview-stats"></div>
@@ -494,10 +497,7 @@
 
                 <div class="seed-overview-buy">
                     <div class="quantity-buttons" id="seed-overview-qty-buttons"></div>
-                    <div class="price-row">
-                        <button class="price" id="seed-overview-price-btn" title="Buy 1"><div class="coin-icon"></div><span id="seed-overview-price">0</span>/ea</button>
-                        <div class="buy-qty-display" id="seed-overview-afford"></div>
-                    </div>
+                    <div class="buy-qty-display" id="seed-overview-afford"></div>
                 </div>
             </div>
         </div>
