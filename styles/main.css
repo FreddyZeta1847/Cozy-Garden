@@ -7,12 +7,18 @@
 }
 
 :root {
-    /* Color palette */
+    /* Typography */
+    --font-heading: 'Caveat', cursive;
+    --font-body: 'Quicksand', sans-serif;
+
+    /* Color palette - earth green + harvest gold */
     --primary-brown: #8B6F47;
     --dark-brown: #654321;
     --light-brown: #D2B48C;
-    --grass-green: #7CB342;
-    --dark-green: #558B2F;
+    --grass-green: #15803D;
+    --dark-green: #14532D;
+    --harvest-gold: #CA8A04;
+    --pale-green: #F0FDF4;
     --sky-blue: #87CEEB;
     --white: #FEFEFE;
     --shadow: rgba(0, 0, 0, 0.2);
@@ -89,12 +95,8 @@ body[data-season="winter"] {
 }
 
 body {
-    font-family: 'Fredoka', 'Comfortaa', sans-serif;
-    background: linear-gradient(to bottom, #87CEEB 0%, #7CB342 50%, #558B2F 100%);
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+    font-family: var(--font-body);
+    background: var(--season-background);
     min-height: 100vh;
     overflow: hidden;
     position: relative;
@@ -244,12 +246,21 @@ body[data-season] {
 }
 
 .title {
-    font-size: 30px;
+    font-family: var(--font-heading);
+    font-size: 38px;
+    font-weight: 700;
     align-items: center;
     justify-content: center;
     display: flex;
-    font-weight: 600;
     color: var(--season-text);
+}
+
+/* Headings across the game use the handwritten display font; body text stays on --font-body */
+h1, h2, h3,
+.garden-sign,
+.screen-header h2,
+.season-change-title {
+    font-family: var(--font-heading);
 }
 
 /* Coin icon (CSS art) */

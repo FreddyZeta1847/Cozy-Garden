@@ -1535,15 +1535,9 @@ class UIManager {
             }
         }
 
-        // Add data-season attribute to body for CSS theming
+        // Add data-season attribute to body - the seasonal CSS gradient (--season-background)
+        // reacts to this automatically, no background image needed
         document.body.setAttribute('data-season', season.name.toLowerCase());
-
-        // Use seasonal background image
-        document.body.style.backgroundImage = `url('${season.backgroundImage}')`;
-        document.body.style.backgroundSize = 'cover';
-        document.body.style.backgroundPosition = 'center';
-        document.body.style.backgroundRepeat = 'no-repeat';
-        document.body.style.backgroundColor = season.colors.primary;
 
         if (this.game.particles) {
             this.game.particles.updateSeason(season.name);
@@ -1581,30 +1575,17 @@ class UIManager {
             }, 300);
         }
 
-        // Smoothly transition data-season attribute for CSS theming
-        document.body.setAttribute('data-season', newSeason.name.toLowerCase());
-
-        // Preload next background image
-        const img = new Image();
-        img.onload = () => {
-            // Fade out current background
-            document.body.style.opacity = '0.7';
+        // Smoothly transition data-season attribute - the CSS gradient (--season-background)
+        // and its existing --season-primary/--season-secondary transition handle the crossfade
+        document.body.style.opacity = '0.85';
+        setTimeout(() => {
+            document.body.setAttribute('data-season', newSeason.name.toLowerCase());
+            document.body.style.opacity = '1';
 
             setTimeout(() => {
-                // Change background image
-                document.body.style.backgroundImage = `url('${newSeason.backgroundImage}')`;
-                document.body.style.backgroundColor = newSeason.colors.primary;
-
-                // Fade in new background
-                document.body.style.opacity = '1';
-
-                // Remove transition class after animation completes
-                setTimeout(() => {
-                    document.body.classList.remove('season-transitioning');
-                }, 800);
-            }, 400);
-        };
-        img.src = newSeason.backgroundImage;
+                document.body.classList.remove('season-transitioning');
+            }, 800);
+        }, 400);
 
         // Update particles with animation
         if (this.game.particles) {
