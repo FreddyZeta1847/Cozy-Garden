@@ -22,13 +22,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="styles/main.css?v=3.1">
+    <link rel="stylesheet" href="styles/main.css?v=3.2">
     <link rel="stylesheet" href="styles/garden.css?v=1.1">
     <link rel="stylesheet" href="styles/plants-svg.css?v=1.0">
-    <link rel="stylesheet" href="styles/ui.css?v=3.1">
-    <link rel="stylesheet" href="styles/fruits.css?v=3.1">
+    <link rel="stylesheet" href="styles/ui.css?v=3.2">
+    <link rel="stylesheet" href="styles/fruits.css?v=3.2">
     <!-- Mobile-specific styles (media queries only - does not affect desktop) -->
-    <link rel="stylesheet" href="styles/mobile.css?v=1.0">
+    <link rel="stylesheet" href="styles/mobile.css?v=1.1">
 </head>
 <body>
     <!-- Particle Background -->
@@ -155,44 +155,59 @@
         </nav>
 
         <div class="game-container">
-            <!-- Garden Indicators (Mobile) -->
-            <div class="garden-indicators" style="display: none;">
-                <button class="garden-dot active" data-garden="vegetables" onclick="game.switchToGarden('vegetables')">
-                    <span class="garden-dot-label">🥬</span>
-                </button>
-                <button class="garden-dot" data-garden="fruits" onclick="game.switchToGarden('fruits')">
-                    <span class="garden-dot-label">🍎</span>
-                </button>
-            </div>
+            <!-- LEFT: live stats panel -->
+            <aside class="stats-panel" id="stats-panel">
+                <h3 class="stats-panel-title">Farm Stats</h3>
+                <div class="stat-row">
+                    <span class="stat-label">💰 Total Earned</span>
+                    <span class="stat-value" id="stat-total-earned">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">🏆 Best Seller</span>
+                    <span class="stat-value" id="stat-best-seller">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">🌾 Top Harvest</span>
+                    <span class="stat-value" id="stat-top-harvest">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">⏱️ Play Time</span>
+                    <span class="stat-value" id="stat-play-time">0s</span>
+                </div>
+            </aside>
 
-            <!-- Gardens Slider Container -->
-            <div class="gardens-slider" id="gardens-slider">
-                <!-- Vegetable Garden -->
-                <div class="garden-view vegetable-garden active">
-                    <div class="garden-wrapper">
-                        <div class="garden-sign">🥬 Vegetable Garden</div>
-                        <div id="garden-grid" class="garden-grid"></div>
-                        <div class="garden-shadow"></div>
-                    </div>
-                    <!-- Right Arrow to Fruit Garden (Desktop only) -->
-                    <button class="garden-nav-arrow right-arrow" onclick="game.switchToFruitGarden()" title="Go to Fruit Garden">
-                        <span>➡️</span>
+            <!-- RIGHT: garden area -->
+            <div class="garden-area">
+                <!-- Garden Indicators (Mobile) -->
+                <div class="garden-indicators" style="display: none;">
+                    <button class="garden-dot active" data-garden="vegetables" onclick="game.switchToGarden('vegetables')">
+                        <span class="garden-dot-label">🥬</span>
                     </button>
-                    <!-- Swipe hint (Mobile) -->
-                    <div class="swipe-hint" id="swipe-hint">
-                        <span>👆</span>
-                        <span>Swipe to see Orchard</span>
-                        <span>👉</span>
-                    </div>
+                    <button class="garden-dot" data-garden="fruits" onclick="game.switchToGarden('fruits')">
+                        <span class="garden-dot-label">🍎</span>
+                    </button>
                 </div>
 
-                <!-- Fruit Garden -->
-                <div class="garden-view fruit-garden">
-                    <!-- Left Arrow back to Vegetables (Desktop only) -->
-                    <button class="garden-nav-arrow left-arrow" onclick="game.switchToVegetableGarden()" title="Back to Vegetable Garden">
-                        <span>⬅️</span>
-                    </button>
-                    <div class="fruit-wrapper">
+                <!-- Gardens Slider Container -->
+                <div class="gardens-slider" id="gardens-slider">
+                    <!-- Vegetable Garden -->
+                    <div class="garden-view vegetable-garden active">
+                        <div class="garden-wrapper">
+                            <div class="garden-sign">🥬 Vegetable Garden</div>
+                            <div id="garden-grid" class="garden-grid"></div>
+                            <div class="garden-shadow"></div>
+                        </div>
+                        <!-- Swipe hint (Mobile) -->
+                        <div class="swipe-hint" id="swipe-hint">
+                            <span>👆</span>
+                            <span>Swipe to see Orchard</span>
+                            <span>👉</span>
+                        </div>
+                    </div>
+
+                    <!-- Fruit Garden -->
+                    <div class="garden-view fruit-garden">
+                        <div class="fruit-wrapper">
                         <div class="garden-sign">🍎 Fruit Orchard</div>
                         <div id="fruit-grid" class="fruit-grid">
                             <!-- 5 fruit cells in triangular layout -->
@@ -204,6 +219,17 @@
                         </div>
                         <div class="garden-shadow"></div>
                     </div>
+                </div>
+                </div>
+
+                <!-- Switch between the two gardens, centered below -->
+                <div class="garden-switch" id="garden-switch">
+                    <button class="garden-switch-option active" data-garden="vegetables" onclick="game.switchToGarden('vegetables')">
+                        <span>🥬</span> Vegetables
+                    </button>
+                    <button class="garden-switch-option" data-garden="fruits" onclick="game.switchToGarden('fruits')">
+                        <span>🍎</span> Fruits
+                    </button>
                 </div>
             </div>
         </div>
@@ -429,10 +455,10 @@
     </div>
 
     <!-- SVG Plant Sprites System -->
-    <script src="svg-plants.js?v=1.0"></script>
-    <!-- Game Script (Bundled) - v3.1 with SVG PLANTS -->
-    <script src="game-bundle.js?v=3.1"></script>
+    <script src="svg-plants.js?v=1.1"></script>
+    <!-- Game Script (Bundled) - v3.2 -->
+    <script src="game-bundle.js?v=3.2"></script>
     <!-- Mobile UI System - Object-First Interaction -->
-    <script src="mobile-ui.js?v=1.0"></script>
+    <script src="mobile-ui.js?v=1.1"></script>
 </body>
 </html>

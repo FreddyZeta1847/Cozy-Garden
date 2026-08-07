@@ -1368,17 +1368,31 @@ class UIManager {
         this.updateSeedSelector();
         this.updateSeason();
         this.updateGardenLockState();
+        this.updateStatsPanel();
+    }
+
+    updateStatsPanel() {
+        const stats = this.game.getLifetimeStats();
+        const totalEarnedEl = document.getElementById('stat-total-earned');
+        const bestSellerEl = document.getElementById('stat-best-seller');
+        const topHarvestEl = document.getElementById('stat-top-harvest');
+        const playTimeEl = document.getElementById('stat-play-time');
+
+        if (totalEarnedEl) totalEarnedEl.textContent = stats.totalMoneyEarned;
+        if (bestSellerEl) bestSellerEl.textContent = stats.bestSeller ? `${stats.bestSeller.name} (${stats.bestSeller.count})` : '-';
+        if (topHarvestEl) topHarvestEl.textContent = stats.topHarvest ? `${stats.topHarvest.name} (${stats.topHarvest.count})` : '-';
+        if (playTimeEl) playTimeEl.textContent = stats.playTime;
     }
 
     // Grey out + lock-badge the Fruit Garden entry points until Premium Orchard is purchased
     updateGardenLockState() {
         const unlocked = this.game.player.upgrades.premiumOrchard;
-        const rightArrow = document.querySelector('.garden-nav-arrow.right-arrow');
+        const switchOption = document.querySelector('.garden-switch-option[data-garden="fruits"]');
         const fruitDot = document.querySelector('.garden-dot[data-garden="fruits"]');
 
-        if (rightArrow) {
-            rightArrow.classList.toggle('locked', !unlocked);
-            rightArrow.title = unlocked ? 'Go to Fruit Garden' : 'Locked - Purchase Premium Orchard (Level 8)';
+        if (switchOption) {
+            switchOption.classList.toggle('locked', !unlocked);
+            switchOption.title = unlocked ? '' : 'Locked - Purchase Premium Orchard (Level 8)';
         }
         if (fruitDot) {
             fruitDot.classList.toggle('locked', !unlocked);
@@ -2727,6 +2741,7 @@ class Game {
     startGameLoop() {
         setInterval(() => {
             this.gameTime++;
+            this.ui.updateStatsPanel(); // keeps play time genuinely real-time
 
             // Update vegetable garden growth
             const growthResult = this.garden.updateGrowth(this.gameTime, this.player.upgrades.fasterGrowth);
@@ -3623,24 +3638,28 @@ class Game {
 
         const slider = document.querySelector('.gardens-slider');
         if (slider) {
-            slider.classList.add('show-fruits');
-            this.updateGardenIndicators('fruits');
-            this.hideSwipeHint();
-            console.log('🍎 Switched to fruit garden');
+            slider.classList.add('show-fruits'); // mobile slide (mobile.css owns this behavior)
         }
+        document.querySelector('.garden-view.vegetable-garden')?.classList.remove('active');
+        document.querySelector('.garden-view.fruit-garden')?.classList.add('active');
+        this.updateGardenIndicators('fruits');
+        this.hideSwipeHint();
+        console.log('🍎 Switched to fruit garden');
     }
 
     switchToVegetableGarden() {
         const slider = document.querySelector('.gardens-slider');
         if (slider) {
-            slider.classList.remove('show-fruits');
-            this.updateGardenIndicators('vegetables');
-            this.hideSwipeHint();
-            console.log('🥕 Switched to vegetable garden');
+            slider.classList.remove('show-fruits'); // mobile slide (mobile.css owns this behavior)
         }
+        document.querySelector('.garden-view.fruit-garden')?.classList.remove('active');
+        document.querySelector('.garden-view.vegetable-garden')?.classList.add('active');
+        this.updateGardenIndicators('vegetables');
+        this.hideSwipeHint();
+        console.log('🥕 Switched to vegetable garden');
     }
 
-    // Switch to garden by name (for indicator dots)
+    // Switch to garden by name (for indicator dots and the desktop garden switch)
     switchToGarden(gardenName) {
         if (gardenName === 'fruits') {
             this.switchToFruitGarden();
@@ -3649,15 +3668,16 @@ class Game {
         }
     }
 
-    // Update garden indicator dots
+    // Update garden indicator dots (mobile) and the garden switch buttons (desktop)
     updateGardenIndicators(activeGarden) {
         const dots = document.querySelectorAll('.garden-dot');
         dots.forEach(dot => {
-            if (dot.dataset.garden === activeGarden) {
-                dot.classList.add('active');
-            } else {
-                dot.classList.remove('active');
-            }
+            dot.classList.toggle('active', dot.dataset.garden === activeGarden);
+        });
+
+        const switchOptions = document.querySelectorAll('.garden-switch-option');
+        switchOptions.forEach(option => {
+            option.classList.toggle('active', option.dataset.garden === activeGarden);
         });
     }
 

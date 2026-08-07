@@ -1,97 +1,33 @@
-/* Fruit Garden Swipe System */
+/* Fruit Garden - desktop uses a simple show/hide toggle (.garden-view.active);
+   mobile.css fully re-specifies these under its own media query for the swipe/slide version. */
 
-/* Gardens Slider Container */
 .gardens-slider {
     position: relative;
+    width: 100%;
     height: 100%;
-    display: flex;
-    transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    transform: translateX(0);
-}
-
-.gardens-slider.show-fruits {
-    transform: translateX(-100vw);
-}
-
-/* Individual Garden Views */
-.garden-view {
-    width: 100vw;
-    height: 100%;
-    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
+}
+
+/* Individual Garden Views - only .active is shown on desktop */
+.garden-view {
+    width: 100%;
+    height: 100%;
+    display: none;
+    align-items: center;
+    justify-content: center;
     padding: 20px;
     box-sizing: border-box;
 }
 
-/* Garden Navigation Arrows */
-.garden-nav-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 240, 240, 0.95) 100%);
-    border: 4px solid var(--season-primary, #A4D65E);
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 32px;
-    display: flex; /* VISIBLE FROM START */
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2),
-                0 0 20px var(--season-shadow, rgba(164, 214, 94, 0.4));
-    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    backdrop-filter: blur(10px);
+.garden-view.active {
+    display: flex;
 }
 
-.garden-nav-arrow:hover {
-    transform: translateY(-50%) scale(1.15);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3),
-                0 0 30px var(--season-shadow, rgba(164, 214, 94, 0.6));
-}
-
-.garden-nav-arrow:active {
-    transform: translateY(-50%) scale(1.05);
-}
-
-.garden-nav-arrow.right-arrow {
-    right: 20px;
-}
-
-.garden-nav-arrow.left-arrow {
-    left: 20px;
-}
-
-.garden-nav-arrow span {
-    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
-    line-height: 1;
-}
-
-/* Locked state - shown before Premium Orchard is purchased */
-.garden-nav-arrow.locked,
 .garden-dot.locked {
     opacity: 0.55;
     filter: grayscale(80%);
-}
-
-.garden-nav-arrow.locked:hover {
-    transform: translateY(-50%);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2),
-                0 0 20px var(--season-shadow, rgba(164, 214, 94, 0.4));
-}
-
-.garden-nav-arrow.locked::after {
-    content: '🔒';
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    font-size: 16px;
-    filter: none;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 /* Fruit Wrapper - Match Vegetable Garden Style */

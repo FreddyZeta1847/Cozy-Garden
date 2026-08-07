@@ -562,13 +562,102 @@ h1, h2, h3,
 .game-container {
     flex: 1;
     display: flex;
-    align-items: center;
-    justify-content: flex-start;
+    align-items: stretch;
     padding: 0;
     position: relative;
-    overflow: hidden; /* Hide overflow for garden slider */
     width: 100%;
     max-width: 100%;
+    gap: 20px;
+}
+
+/* ===== Left: live stats panel ===== */
+
+.stats-panel {
+    width: 220px;
+    flex-shrink: 0;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-self: center;
+}
+
+.stats-panel-title {
+    font-family: var(--font-heading);
+    font-size: 26px;
+    color: var(--season-text);
+    margin-bottom: 4px;
+}
+
+.stat-row {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--season-border);
+    opacity: 0.9;
+}
+
+.stat-label {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--season-text);
+    opacity: 0.75;
+}
+
+.stat-value {
+    font-family: var(--font-body);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--season-text);
+}
+
+/* ===== Right: garden area ===== */
+
+.garden-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden; /* keeps the mobile slider contained */
+    min-width: 0;
+}
+
+/* ===== Garden switch - centered below the garden, replaces the old arrows ===== */
+
+.garden-switch {
+    display: flex;
+    gap: 4px;
+    margin-top: 18px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 10px;
+    padding: 4px;
+}
+
+.garden-switch-option {
+    background: none;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--season-text);
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.2s;
+}
+
+.garden-switch-option.active {
+    background: var(--white);
+    box-shadow: 0 2px 6px var(--season-shadow);
+}
+
+.garden-switch-option.locked {
+    opacity: 0.5;
+    filter: grayscale(60%);
 }
 
 /* Mobile-only elements - hidden on desktop */
