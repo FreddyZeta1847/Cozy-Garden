@@ -1369,6 +1369,54 @@ class UIManager {
         this.updateSeason();
         this.updateGardenLockState();
         this.updateStatsPanel();
+        this.updateGardenCardInfo();
+    }
+
+    // Section counts on the seed pouch headers, and the plot-stat/legend line on the garden card
+    updateGardenCardInfo() {
+        const vegCount = document.getElementById('veg-section-count');
+        if (vegCount) {
+            const unlocked = this.game.player.getUnlockedVegetables().length;
+            vegCount.textContent = `${unlocked} of ${Object.keys(PLANTS).length}`;
+        }
+
+        const fruitCount = document.getElementById('fruit-section-count');
+        const fruitLock = document.getElementById('fruit-section-lock');
+        const hasOrchard = this.game.player.upgrades.premiumOrchard;
+        if (fruitCount) {
+            const unlocked = hasOrchard ? this.game.player.getUnlockedFruits().length : 0;
+            fruitCount.textContent = `${unlocked} of ${Object.keys(FRUITS).length}`;
+        }
+        if (fruitLock) {
+            fruitLock.textContent = hasOrchard ? '' : `🔒 Level ${LEVEL_SYSTEM.unlocks.upgrades.premiumOrchard}`;
+        }
+
+        const plotStat = document.getElementById('veg-plot-stat');
+        if (plotStat) {
+            const total = this.game.garden.rows * this.game.garden.cols;
+            const unlocked = this.game.garden.unlockedCount;
+            plotStat.textContent = `${unlocked} plots unlocked · ${total - unlocked} locked`;
+        }
+
+        const nextCostLabel = document.getElementById('veg-next-unlock-cost');
+        const legend = nextCostLabel ? nextCostLabel.closest('.garden-legend') : null;
+        if (nextCostLabel) {
+            const nextCluster = ['plotCluster1', 'plotCluster2', 'plotCluster3', 'plotCluster4']
+                .find(key => !this.game.player.upgrades[key]);
+            if (nextCluster) {
+                nextCostLabel.textContent = UPGRADES[nextCluster].cost;
+            } else if (legend) {
+                legend.querySelector('.legend-item:last-child').style.display = 'none';
+            }
+        }
+
+        const fruitStat = document.getElementById('fruit-plot-stat');
+        if (fruitStat) {
+            const planted = this.game.fruitGarden.trees.filter(t => t.status !== 'empty' && t.status !== 'dead').length;
+            fruitStat.textContent = hasOrchard
+                ? `${planted} of ${this.game.fruitGarden.slots} trees planted`
+                : `🔒 Unlock the Premium Orchard`;
+        }
     }
 
     updateStatsPanel() {
@@ -1532,7 +1580,7 @@ class UIManager {
         const seedVisual = document.createElement('div');
         seedVisual.className = 'seed-icon';
         seedVisual.textContent = icon;
-        seedVisual.style.fontSize = '32px';
+        seedVisual.style.fontSize = '26px';
 
         const countLabel = document.createElement('span');
         countLabel.className = 'seed-count';
@@ -1578,7 +1626,7 @@ class UIManager {
         const dateText = document.getElementById('topbar-date-text');
         if (dateText) {
             const info = this.game.getCalendarInfo();
-            dateText.textContent = `Day ${info.day}, Year ${info.year}`;
+            dateText.textContent = `Day ${info.day} · Year ${info.year}`;
         }
     }
 
@@ -1671,6 +1719,8 @@ class UIManager {
                 gardenGrid.appendChild(tile);
             }
         }
+
+        this.updateGardenCardInfo();
     }
 
     createTile(row, col) {

@@ -22,13 +22,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="styles/main.css?v=3.10">
-    <link rel="stylesheet" href="styles/garden.css?v=1.3">
+    <link rel="stylesheet" href="styles/main.css?v=3.14">
+    <link rel="stylesheet" href="styles/garden.css?v=1.4">
     <link rel="stylesheet" href="styles/plants-svg.css?v=1.0">
-    <link rel="stylesheet" href="styles/ui.css?v=3.5">
-    <link rel="stylesheet" href="styles/fruits.css?v=3.4">
+    <link rel="stylesheet" href="styles/ui.css?v=3.6">
+    <link rel="stylesheet" href="styles/fruits.css?v=3.5">
     <!-- Mobile-specific styles (media queries only - does not affect desktop) -->
-    <link rel="stylesheet" href="styles/mobile.css?v=1.1">
+    <link rel="stylesheet" href="styles/mobile.css?v=1.2">
 </head>
 <body>
     <!-- Particle Background -->
@@ -103,15 +103,15 @@
             <div class="topbar-info">
                 <div class="topbar-stat" id="season-display">
                     <span class="season-icon"></span>
-                    <span class="topbar-season-text">Spring</span>
-                    <span class="topbar-date-text" id="topbar-date-text">Day 1, Year 1</span>
+                    <div class="topbar-stat-text">
+                        <span class="topbar-season-text">Spring</span>
+                        <span class="topbar-date-text" id="topbar-date-text">Day 1 · Year 1</span>
+                    </div>
                 </div>
-
-                <div class="topbar-divider"></div>
 
                 <div class="topbar-stat topbar-level" id="level-display" onclick="game.showLevelPage()" title="See what unlocks at every level">
                     <span class="level-icon">⭐</span>
-                    <span class="level-number" id="level-number">1</span>
+                    <span class="level-label">Lv <span class="level-number" id="level-number">1</span></span>
                     <div class="xp-bar-container">
                         <div class="xp-bar" id="xp-bar"></div>
                         <span class="xp-text" id="xp-text">0 / 100 XP</span>
@@ -132,33 +132,21 @@
                         <rect x="16" y="4" width="4" height="16" rx="1" fill="currentColor"/>
                     </svg>
                 </button>
-                <button class="dev-reset-btn" onclick="game.resetGame()" title="Reset game and start fresh (developer tool)">🔄</button>
+                <button class="dev-reset-btn" onclick="game.resetGame()" title="Reset game and start fresh (developer tool)" aria-label="Reset game">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 11A8 8 0 1 0 18.5 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M20 5v6h-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
             </div>
         </div>
-
-        <nav class="nav-strip">
-            <button class="nav-strip-btn" onclick="game.showMarket()">
-                <span class="nav-strip-icon">📊</span>
-                <span>Market</span>
-            </button>
-            <button class="nav-strip-btn" onclick="game.showShop()">
-                <span class="nav-strip-icon">🛒</span>
-                <span>Shop</span>
-            </button>
-            <button class="nav-strip-btn" onclick="game.showUpgrades()">
-                <span class="nav-strip-icon">🏡</span>
-                <span>Upgrade</span>
-            </button>
-            <button class="nav-strip-btn" onclick="game.showNews()">
-                <span class="nav-strip-icon">📰</span>
-                <span>News</span>
-            </button>
-        </nav>
 
         <div class="game-container">
             <!-- LEFT: stats + tools + seed menu, all together -->
             <aside class="stats-panel" id="stats-panel">
                 <!-- Row 1: hoe, water, and the harvest basket -->
+                <div class="side-card">
+                <h3 class="side-card-label">Tools</h3>
                 <div class="tool-section">
                     <button class="tool-button" data-tool="hoe" onclick="game.selectTool('hoe')">
                         <span class="tool-icon">
@@ -170,6 +158,7 @@
                             </svg>
                         </span>
                         <span class="tool-name">Hoe</span>
+                        <span class="tool-subtitle">Till</span>
                     </button>
                     <button class="tool-button" data-tool="water" onclick="game.selectTool('water')">
                         <span class="tool-icon">
@@ -184,23 +173,54 @@
                             </svg>
                         </span>
                         <span class="tool-name">Water</span>
+                        <span class="tool-subtitle">Grow</span>
                     </button>
                     <button class="tool-button" id="harvested-display" onclick="game.showHarvestPopup()" title="Click to view your harvest!">
-                        <span class="tool-icon">🧺</span>
+                        <span class="tool-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4 10h16l-1.6 9.3a2 2 0 0 1-2 1.7H7.6a2 2 0 0 1-2-1.7L4 10Z" fill="#E8C088" stroke="#8B5A2B" stroke-width="1.8" stroke-linejoin="round"/>
+                                <path d="M8 10 9.5 4.5M16 10 14.5 4.5M12 10V4.5" stroke="#8B5A2B" stroke-width="1.8" stroke-linecap="round"/>
+                                <path d="M4 10h16" stroke="#8B5A2B" stroke-width="1.8"/>
+                            </svg>
+                        </span>
                         <span class="tool-name" id="harvested-count">0</span>
                     </button>
                 </div>
+                </div>
 
-                <!-- Row 2: every vegetable seed, always visible, wraps as needed -->
+                <!-- Row 2 & 3: every vegetable and fruit seed, always visible, wraps as needed -->
+                <div class="side-card">
+                <h3 class="side-card-label">Seed Pouch</h3>
                 <div class="seed-menu-section">
-                    <h4>Vegetables</h4>
+                    <h4>
+                        <span class="seed-section-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 19c-1-6 2-13 14-14 1 12-6 15-14 14Z" fill="#7CB342" stroke="#33691E" stroke-width="1.3" stroke-linejoin="round"/>
+                                <path d="M6 18 17 6" stroke="#33691E" stroke-width="1.1" stroke-linecap="round" opacity="0.6"/>
+                            </svg>
+                        </span>
+                        Vegetables
+                        <span class="seed-section-count" id="veg-section-count">0 of 0</span>
+                    </h4>
                     <div class="seed-menu-grid" id="vegetable-seeds"></div>
                 </div>
 
                 <!-- Row 3: every fruit seed, always visible, wraps as needed -->
                 <div class="seed-menu-section">
-                    <h4>Fruits</h4>
+                    <h4>
+                        <span class="seed-section-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="8" cy="16" r="5" fill="#E53935" stroke="#B71C1C" stroke-width="1.2"/>
+                                <circle cx="15" cy="14" r="4" fill="#EF5350" stroke="#B71C1C" stroke-width="1.2"/>
+                                <path d="M9 12c1-2 2-3 4-2" stroke="#66BB6A" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+                            </svg>
+                        </span>
+                        Fruits
+                        <span class="seed-section-count" id="fruit-section-count">0 of 0</span>
+                        <span class="seed-section-lock" id="fruit-section-lock"></span>
+                    </h4>
                     <div class="seed-menu-grid" id="fruit-seeds"></div>
+                </div>
                 </div>
             </aside>
 
@@ -240,6 +260,48 @@
 
             <!-- RIGHT: garden area -->
             <div class="garden-area">
+                <nav class="nav-strip">
+                    <button class="nav-strip-btn" onclick="game.showMarket()">
+                        <span class="nav-strip-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 17 9 11 13 15 21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M15 6h6v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        <span>Market</span>
+                    </button>
+                    <button class="nav-strip-btn" onclick="game.showShop()">
+                        <span class="nav-strip-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="10" cy="21" r="1.4" fill="currentColor"/>
+                                <circle cx="17" cy="21" r="1.4" fill="currentColor"/>
+                            </svg>
+                        </span>
+                        <span>Shop</span>
+                    </button>
+                    <button class="nav-strip-btn" onclick="game.showUpgrades()">
+                        <span class="nav-strip-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4 11 12 4l8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M6 10v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M10 20v-5h4v5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        <span>Upgrade</span>
+                    </button>
+                    <button class="nav-strip-btn" onclick="game.showNews()">
+                        <span class="nav-strip-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="3" y="5" width="14" height="15" rx="1.5" stroke="currentColor" stroke-width="2"/>
+                                <path d="M17 8h3a1 1 0 0 1 1 1v10a2 2 0 0 1-2 2H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M6 9h8M6 12.5h8M6 16h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                            </svg>
+                        </span>
+                        <span>News</span>
+                    </button>
+                </nav>
+
                 <!-- Garden Indicators (Mobile) -->
                 <div class="garden-indicators" style="display: none;">
                     <button class="garden-dot active" data-garden="vegetables" onclick="game.switchToGarden('vegetables')">
@@ -251,14 +313,47 @@
                 </div>
 
                 <!-- Garden card - the garden view and its switch, grouped as one unit -->
-                <div class="garden-card">
                 <div class="gardens-slider" id="gardens-slider">
                     <!-- Vegetable Garden -->
                     <div class="garden-view vegetable-garden active">
-                        <div class="garden-wrapper">
-                            <div class="garden-sign">🥬 Vegetable Garden</div>
-                            <div id="garden-grid" class="garden-grid"></div>
-                            <div class="garden-shadow"></div>
+                        <div class="garden-panel">
+                            <div class="garden-card-header">
+                                <div class="garden-card-title-group">
+                                    <span class="garden-card-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M5 19c-1-6 2-13 14-14 1 12-6 15-14 14Z" fill="#7CB342" stroke="#33691E" stroke-width="1.3" stroke-linejoin="round"/>
+                                            <path d="M6 18 17 6" stroke="#33691E" stroke-width="1.1" stroke-linecap="round" opacity="0.6"/>
+                                        </svg>
+                                    </span>
+                                    <div>
+                                        <div class="garden-card-title">Vegetable Garden</div>
+                                        <div class="garden-card-subtitle" id="veg-plot-stat">plots unlocked</div>
+                                    </div>
+                                </div>
+                                <div class="garden-switch">
+                                    <button class="garden-switch-option active" data-garden="vegetables" onclick="game.switchToGarden('vegetables')">
+                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M5 19c-1-6 2-13 14-14 1 12-6 15-14 14Z" fill="#7CB342" stroke="#33691E" stroke-width="1.3" stroke-linejoin="round"/>
+                                        </svg>
+                                        Vegetables
+                                    </button>
+                                    <button class="garden-switch-option" data-garden="fruits" onclick="game.switchToGarden('fruits')">
+                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <circle cx="8" cy="16" r="5" fill="#E53935" stroke="#B71C1C" stroke-width="1.2"/>
+                                            <circle cx="15" cy="14" r="4" fill="#EF5350" stroke="#B71C1C" stroke-width="1.2"/>
+                                        </svg>
+                                        Fruits
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="garden-wrapper">
+                                <div id="garden-grid" class="garden-grid"></div>
+                                <div class="garden-shadow"></div>
+                            </div>
+                            <div class="garden-legend">
+                                <span class="legend-item"><span class="legend-swatch legend-tilled"></span>Tilled &amp; ready</span>
+                                <span class="legend-item"><span class="legend-swatch legend-locked"></span>Locked — <span class="coin-icon legend-coin"></span><span id="veg-next-unlock-cost">--</span> each</span>
+                            </div>
                         </div>
                         <!-- Swipe hint (Mobile) -->
                         <div class="swipe-hint" id="swipe-hint">
@@ -270,30 +365,50 @@
 
                     <!-- Fruit Garden -->
                     <div class="garden-view fruit-garden">
-                        <div class="fruit-wrapper">
-                        <div class="garden-sign">🍎 Fruit Orchard</div>
-                        <div id="fruit-grid" class="fruit-grid">
-                            <!-- 5 fruit cells in triangular layout -->
-                            <div class="fruit-cell" data-index="0"></div>
-                            <div class="fruit-cell" data-index="1"></div>
-                            <div class="fruit-cell" data-index="2"></div>
-                            <div class="fruit-cell" data-index="3"></div>
-                            <div class="fruit-cell" data-index="4"></div>
+                        <div class="garden-panel">
+                            <div class="garden-card-header">
+                                <div class="garden-card-title-group">
+                                    <span class="garden-card-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <circle cx="8" cy="16" r="5" fill="#E53935" stroke="#B71C1C" stroke-width="1.2"/>
+                                            <circle cx="15" cy="14" r="4" fill="#EF5350" stroke="#B71C1C" stroke-width="1.2"/>
+                                            <path d="M9 12c1-2 2-3 4-2" stroke="#66BB6A" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+                                        </svg>
+                                    </span>
+                                    <div>
+                                        <div class="garden-card-title">Fruit Orchard</div>
+                                        <div class="garden-card-subtitle" id="fruit-plot-stat">trees planted</div>
+                                    </div>
+                                </div>
+                                <div class="garden-switch">
+                                    <button class="garden-switch-option" data-garden="vegetables" onclick="game.switchToGarden('vegetables')">
+                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M5 19c-1-6 2-13 14-14 1 12-6 15-14 14Z" fill="#7CB342" stroke="#33691E" stroke-width="1.3" stroke-linejoin="round"/>
+                                        </svg>
+                                        Vegetables
+                                    </button>
+                                    <button class="garden-switch-option active" data-garden="fruits" onclick="game.switchToGarden('fruits')">
+                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <circle cx="8" cy="16" r="5" fill="#E53935" stroke="#B71C1C" stroke-width="1.2"/>
+                                            <circle cx="15" cy="14" r="4" fill="#EF5350" stroke="#B71C1C" stroke-width="1.2"/>
+                                        </svg>
+                                        Fruits
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="fruit-wrapper">
+                                <div id="fruit-grid" class="fruit-grid">
+                                    <!-- 5 fruit cells in triangular layout -->
+                                    <div class="fruit-cell" data-index="0"></div>
+                                    <div class="fruit-cell" data-index="1"></div>
+                                    <div class="fruit-cell" data-index="2"></div>
+                                    <div class="fruit-cell" data-index="3"></div>
+                                    <div class="fruit-cell" data-index="4"></div>
+                                </div>
+                                <div class="garden-shadow"></div>
+                            </div>
                         </div>
-                        <div class="garden-shadow"></div>
                     </div>
-                </div>
-                </div>
-
-                <!-- Switch between the two gardens, centered below -->
-                <div class="garden-switch" id="garden-switch">
-                    <button class="garden-switch-option active" data-garden="vegetables" onclick="game.switchToGarden('vegetables')">
-                        <span>🥬</span> Vegetables
-                    </button>
-                    <button class="garden-switch-option" data-garden="fruits" onclick="game.switchToGarden('fruits')">
-                        <span>🍎</span> Fruits
-                    </button>
-                </div>
                 </div>
             </div>
         </div>
@@ -458,7 +573,7 @@
     <!-- SVG Plant Sprites System -->
     <script src="svg-plants.js?v=1.1"></script>
     <!-- Game Script (Bundled) - v3.2 -->
-    <script src="game-bundle.js?v=3.7"></script>
+    <script src="game-bundle.js?v=3.10"></script>
     <!-- Mobile UI System - Object-First Interaction -->
     <script src="mobile-ui.js?v=1.1"></script>
 </body>

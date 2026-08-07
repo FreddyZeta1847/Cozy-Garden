@@ -189,10 +189,22 @@
         overflow: hidden;
     }
 
-    .garden-sign {
-        font-size: 12px;
-        padding: 4px 12px;
-        top: -10px;
+    .garden-panel {
+        padding: 10px;
+        width: 95%;
+        max-width: 350px;
+    }
+
+    .garden-card-title {
+        font-size: 15px;
+    }
+
+    .garden-card-subtitle {
+        font-size: 10px;
+    }
+
+    .garden-card-header .garden-switch {
+        display: none; /* mobile uses the garden-dot indicators instead */
     }
 
     /* Mobile garden grid - 6x4 with horizontal scroll */

@@ -41,9 +41,6 @@
     backdrop-filter: blur(5px);
 }
 
-/* Fruit Orchard Sign - Match Vegetable Garden Style (no overrides needed) */
-/* The .garden-sign styles from garden.css will apply automatically */
-
 /* Fruit Grid - Single row, horizontally scrollable */
 .fruit-grid {
     display: flex;

@@ -234,18 +234,18 @@ body[data-season] {
 }
 
 /* Season display - tinted with the active season's own palette */
-.season-display {
+#season-display {
     background: var(--season-background);
     border-color: var(--season-primary);
     color: var(--season-text);
     box-shadow: 0 2px 0 var(--season-primary), 0 3px 6px var(--season-shadow);
 }
 
-.season-display .season-icon {
+#season-display .season-icon {
     font-size: 28px;
 }
 
-/* ===== Redesigned topbar - no pill badges, plain grouped text on the header's own background ===== */
+/* ===== Topbar - title plain, season/level/money each their own card ===== */
 
 .topbar-title {
     font-family: var(--font-heading);
@@ -258,7 +258,7 @@ body[data-season] {
 .topbar-info {
     display: flex;
     align-items: center;
-    gap: 18px;
+    gap: 12px;
 }
 
 .topbar-stat {
@@ -269,6 +269,11 @@ body[data-season] {
     font-weight: 600;
     font-size: 15px;
     color: var(--season-text);
+    background: var(--white);
+    border: 2px solid var(--season-border);
+    border-radius: 14px;
+    padding: 6px 14px;
+    box-shadow: 0 2px 0 var(--season-border), 0 3px 6px var(--season-shadow);
 }
 
 #harvested-display.topbar-stat,
@@ -288,22 +293,24 @@ body[data-season] {
     line-height: 1;
 }
 
+.topbar-stat-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+}
+
 .topbar-season-text {
     font-weight: 700;
 }
 
 .topbar-date-text {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--season-text);
     opacity: 0.75;
 }
 
-.topbar-divider {
-    width: 2px;
-    height: 28px;
-    background: var(--season-border);
-    opacity: 0.35;
-    border-radius: 1px;
+.level-label {
+    font-weight: 700;
 }
 
 .topbar-right {
@@ -321,6 +328,11 @@ body[data-season] {
     font-weight: 700;
     font-size: 20px;
     color: var(--season-text);
+    background: var(--white);
+    border: 2px solid var(--season-border);
+    border-radius: 14px;
+    padding: 6px 16px;
+    box-shadow: 0 2px 0 var(--season-border), 0 3px 6px var(--season-shadow);
 }
 
 /* Reset is a developer tool, not a gameplay action - kept small and visually apart */
@@ -352,15 +364,22 @@ body[data-season] {
 .dev-reset-btn {
     background: none;
     border: none;
-    font-size: 16px;
+    color: var(--dark-brown);
     opacity: 0.4;
     cursor: pointer;
     padding: 4px;
-    transition: opacity 0.2s;
+    display: inline-flex;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.dev-reset-btn svg {
+    width: 18px;
+    height: 18px;
 }
 
 .dev-reset-btn:hover {
     opacity: 0.9;
+    transform: rotate(-45deg);
 }
 
 /* ===== Nav strip - between the topbar and the garden/seeds area ===== */
@@ -370,7 +389,7 @@ body[data-season] {
     display: flex;
     justify-content: center;
     gap: 10px;
-    padding: 10px 15px;
+    padding: 0 15px 14px;
     background: none;
     flex-shrink: 0;
 }
@@ -397,7 +416,13 @@ body[data-season] {
 }
 
 .nav-strip-icon {
-    font-size: 18px;
+    display: inline-flex;
+    color: var(--season-text);
+}
+
+.nav-strip-icon svg {
+    width: 18px;
+    height: 18px;
 }
 
 .title {
@@ -412,7 +437,6 @@ body[data-season] {
 
 /* Headings across the game use the handwritten display font; body text stays on --font-body */
 h1, h2, h3,
-.garden-sign,
 .screen-header h2,
 .season-change-title {
     font-family: var(--font-heading);
@@ -600,14 +624,34 @@ h1, h2, h3,
 .stats-panel {
     width: 340px;
     flex-shrink: 0;
-    padding: 18px;
+    padding: 14px 0;
     margin-left: 40px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     align-self: flex-start;
     max-height: 100%;
     overflow-y: auto;
+}
+
+/* Card container for the Tools and Seed Pouch sections in the left column */
+.side-card {
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid var(--season-border);
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow: 0 3px 10px var(--season-shadow);
+}
+
+.side-card-label {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--season-text);
+    opacity: 0.6;
+    margin-bottom: 8px;
 }
 
 .stats-panel-title {
@@ -671,21 +715,61 @@ h1, h2, h3,
     min-width: 0;
 }
 
-/* The garden view and its switch, grouped as one unit so they never drift apart */
-.garden-card {
+/* The white card wrapping a garden view's header, grid and legend */
+.garden-panel {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 6px;
+    gap: 12px;
+    background: var(--season-background);
+    border-radius: 18px;
+    padding: 16px;
+    box-shadow: 0 4px 16px var(--season-shadow);
 }
 
-/* ===== Garden switch - centered below the garden, replaces the old arrows ===== */
+.garden-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.garden-card-title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.garden-card-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+}
+
+.garden-card-icon svg {
+    width: 28px;
+    height: 28px;
+}
+
+.garden-card-title {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    color: var(--season-text);
+}
+
+.garden-card-subtitle {
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--season-text);
+    opacity: 0.7;
+}
+
+/* ===== Garden switch - now embedded in the garden card header ===== */
 
 .garden-switch {
     display: flex;
     gap: 4px;
     flex-shrink: 0;
-    background: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.5);
     border-radius: 10px;
     padding: 4px;
 }
@@ -694,13 +778,21 @@ h1, h2, h3,
     background: none;
     border: none;
     border-radius: 8px;
-    padding: 8px 18px;
+    padding: 7px 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
     font-family: var(--font-body);
     font-weight: 700;
-    font-size: 14px;
+    font-size: 13px;
     color: var(--season-text);
     cursor: pointer;
     transition: background 0.2s, opacity 0.2s;
+}
+
+.garden-switch-option svg {
+    width: 15px;
+    height: 15px;
 }
 
 .garden-switch-option.active {
@@ -711,6 +803,46 @@ h1, h2, h3,
 .garden-switch-option.locked {
     opacity: 0.5;
     filter: grayscale(60%);
+}
+
+/* ===== Legend footer - explains the plot colors and the next unlock cost ===== */
+
+.garden-legend {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 0 4px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--season-text);
+    opacity: 0.85;
+}
+
+.legend-swatch {
+    width: 13px;
+    height: 13px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.legend-swatch.legend-tilled {
+    background: linear-gradient(135deg, #6B4423 0%, #5A3A1F 100%);
+}
+
+.legend-swatch.legend-locked {
+    background: linear-gradient(135deg, #8B7355 0%, #6B5D4F 100%);
+}
+
+.legend-coin {
+    width: 13px;
+    height: 13px;
 }
 
 /* Mobile-only elements - hidden on desktop */
@@ -762,6 +894,22 @@ h1, h2, h3,
     color: var(--dark-brown);
 }
 
+.tool-subtitle {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--season-text);
+    background: var(--season-accent);
+    border-radius: 6px;
+    padding: 1px 8px;
+}
+
+.tool-button.active .tool-subtitle {
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--dark-green);
+}
+
 /* ===== Expandable seed menu - replaces the old always-visible scrolling seed strip ===== */
 
 .seed-menu-toggle {
@@ -785,17 +933,60 @@ h1, h2, h3,
     font-size: 28px;
 }
 
+.seed-menu-section {
+    margin-bottom: 10px;
+}
+
+.seed-menu-section:last-child {
+    margin-bottom: 0;
+}
+
 .seed-menu-section h4 {
     font-family: var(--font-heading);
     font-size: 20px;
     color: var(--season-text);
     margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.seed-section-icon {
+    display: inline-flex;
+}
+
+.seed-section-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.seed-section-count {
+    margin-left: auto;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--season-text);
+    opacity: 0.7;
+}
+
+.seed-section-lock {
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--season-text);
+    background: var(--season-accent);
+    border-radius: 6px;
+    padding: 2px 7px;
+}
+
+.seed-section-lock:empty {
+    display: none;
 }
 
 .seed-menu-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 6px;
 }
 
 /* Screen Headers - COMPACT REDESIGN */
@@ -1915,7 +2106,7 @@ body[data-season="winter"] .new-market-content::before {
 }
 
 /* Season Display Smooth Transition */
-.season-display {
+#season-display {
     transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
