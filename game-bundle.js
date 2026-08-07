@@ -1462,11 +1462,8 @@ class UIManager {
 
         // Crop emoji icons (fully grown)
         const cropIcons = {
-            tomato: '🍅',
-            lettuce: '🥬',
-            carrot: '🥕',
-            corn: '🌽',
-            potato: '🥔'
+            tomato: '🍅', lettuce: '🥬', carrot: '🥕', corn: '🌽', potato: '🥔',
+            cabbage: '🥬', pumpkin: '🎃', garlic: '🧄'
         };
 
         // Fruit emoji icons
@@ -1477,98 +1474,106 @@ class UIManager {
             pear: '🍐'
         };
 
-        // Render vegetable seeds (only unlocked ones)
+        // Render every vegetable - unlocked ones are selectable, locked ones show a level badge
         const unlockedVegetables = this.game.player.getUnlockedVegetables();
         for (const [key, plant] of Object.entries(PLANTS)) {
-            // Skip locked vegetables
-            if (!unlockedVegetables.includes(key)) continue;
-
-            const btn = document.createElement('button');
-            btn.className = 'seed-button';
-            btn.dataset.seed = key;
-
-            const count = this.game.player.inventory.seeds[key];
-            if (count === 0) {
-                btn.classList.add('disabled');
-            }
-
-            // Restore active state if this seed is currently selected
-            if (this.game.selectedSeed === key && this.game.selectedTool === `seed-${key}`) {
-                btn.classList.add('active');
-            }
-
-            btn.onclick = () => {
-                if (count > 0) {
-                    this.game.selectSeed(key);
-                }
-            };
-
-            const seedVisual = document.createElement('div');
-            seedVisual.className = 'seed-icon';
-            seedVisual.textContent = cropIcons[key] || '🌱';
-            seedVisual.style.fontSize = '32px';
-
-            const countLabel = document.createElement('span');
-            countLabel.className = 'seed-count';
-            countLabel.textContent = count;
-
-            const nameLabel = document.createElement('span');
-            nameLabel.className = 'seed-name';
-            nameLabel.textContent = plant.name;
-
-            btn.appendChild(seedVisual);
-            btn.appendChild(countLabel);
-            btn.appendChild(nameLabel);
-
-            vegetableSection.appendChild(btn);
+            const isUnlocked = unlockedVegetables.includes(key);
+            const requiredLevel = LEVEL_SYSTEM.unlocks.vegetables[key] || 1;
+            const count = this.game.player.inventory.seeds[key] || 0;
+            vegetableSection.appendChild(this.createSeedMenuButton({
+                key, name: plant.name, icon: cropIcons[key] || '🌱',
+                isUnlocked, requiredLevel, count,
+                isActive: this.game.selectedSeed === key && this.game.selectedTool === `seed-${key}`,
+                onSelect: () => this.game.selectSeed(key)
+            }));
         }
 
-        // Render fruit seeds (only if orchard unlocked and fruits unlocked)
+        // Render every fruit - locked until the orchard is purchased, then per-level like vegetables
         const unlockedFruits = this.game.player.getUnlockedFruits();
         const hasOrchard = this.game.player.upgrades.premiumOrchard;
 
         for (const [key, fruit] of Object.entries(FRUITS)) {
-            // Skip if orchard not purchased or fruit not unlocked
-            if (!hasOrchard || !unlockedFruits.includes(key)) continue;
-
-            const btn = document.createElement('button');
-            btn.className = 'seed-button';
-            btn.dataset.seed = key;
-
+            const isUnlocked = hasOrchard && unlockedFruits.includes(key);
+            const requiredLevel = LEVEL_SYSTEM.unlocks.fruits[key] || 1;
             const count = this.game.player.inventory.fruitSeeds[key] || 0;
-            if (count === 0) {
-                btn.classList.add('disabled');
-            }
+            fruitSection.appendChild(this.createSeedMenuButton({
+                key, name: fruit.name, icon: fruitIcons[key] || '🌳',
+                isUnlocked, requiredLevel, count,
+                lockReason: hasOrchard ? null : 'Requires Premium Orchard',
+                isActive: this.game.selectedSeed === key && this.game.selectedTool === `seed-${key}`,
+                onSelect: () => this.game.selectSeed(key)
+            }));
+        }
+    }
 
-            // Restore active state if this seed is currently selected
-            if (this.game.selectedSeed === key && this.game.selectedTool === `seed-${key}`) {
-                btn.classList.add('active');
-            }
+    // Shared builder for one seed/fruit button in the expandable seed menu
+    createSeedMenuButton({ key, name, icon, isUnlocked, requiredLevel, count, isActive, onSelect, lockReason }) {
+        const btn = document.createElement('button');
+        btn.className = 'seed-button';
+        btn.dataset.seed = key;
 
-            btn.onclick = () => {
-                if (count > 0) {
-                    this.game.selectSeed(key);
-                }
-            };
+        if (!isUnlocked) {
+            btn.classList.add('locked');
+        } else if (count === 0) {
+            btn.classList.add('disabled');
+        }
+        if (isActive) {
+            btn.classList.add('active');
+        }
 
-            const seedVisual = document.createElement('div');
-            seedVisual.className = 'seed-icon';
-            seedVisual.textContent = fruitIcons[key] || '🌳';
-            seedVisual.style.fontSize = '32px';
+        btn.onclick = () => {
+            if (isUnlocked && count > 0) onSelect();
+        };
 
-            const countLabel = document.createElement('span');
-            countLabel.className = 'seed-count';
-            countLabel.textContent = count;
+        const seedVisual = document.createElement('div');
+        seedVisual.className = 'seed-icon';
+        seedVisual.textContent = icon;
+        seedVisual.style.fontSize = '32px';
 
-            const nameLabel = document.createElement('span');
-            nameLabel.className = 'seed-name';
-            nameLabel.textContent = fruit.name;
+        const countLabel = document.createElement('span');
+        countLabel.className = 'seed-count';
+        countLabel.textContent = isUnlocked ? count : '';
 
-            btn.appendChild(seedVisual);
-            btn.appendChild(countLabel);
-            btn.appendChild(nameLabel);
+        const nameLabel = document.createElement('span');
+        nameLabel.className = 'seed-name';
+        nameLabel.textContent = name;
 
-            fruitSection.appendChild(btn);
+        btn.appendChild(seedVisual);
+        btn.appendChild(countLabel);
+        btn.appendChild(nameLabel);
+
+        if (!isUnlocked) {
+            const lockBadge = document.createElement('div');
+            lockBadge.className = 'level-requirement';
+            lockBadge.textContent = lockReason || `🔒 Level ${requiredLevel}`;
+            btn.appendChild(lockBadge);
+        }
+
+        return btn;
+    }
+
+    // Updates the collapsed seed-menu button to summarize what's currently selected
+    updateSeedMenuToggle() {
+        const iconEl = document.getElementById('seed-menu-toggle-icon');
+        const labelEl = document.getElementById('seed-menu-toggle-label');
+        if (!iconEl || !labelEl) return;
+
+        const cropIcons = {
+            tomato: '🍅', lettuce: '🥬', carrot: '🥕', corn: '🌽', potato: '🥔',
+            cabbage: '🥬', pumpkin: '🎃', garlic: '🧄'
+        };
+        const fruitIcons = { apple: '🍎', orange: '🍊', banana: '🍌', pear: '🍐' };
+
+        const seedType = this.game.selectedSeed;
+        const plant = PLANTS[seedType];
+        const fruit = FRUITS[seedType];
+
+        if (this.game.selectedTool === `seed-${seedType}` && (plant || fruit)) {
+            iconEl.textContent = cropIcons[seedType] || fruitIcons[seedType] || '🌱';
+            labelEl.textContent = (plant || fruit).name;
+        } else {
+            iconEl.textContent = '🌱';
+            labelEl.textContent = 'Select a Seed';
         }
     }
 
@@ -3201,6 +3206,8 @@ class Game {
         document.querySelectorAll('.seed-button').forEach(btn => {
             btn.classList.remove('active');
         });
+
+        this.ui.updateSeedMenuToggle();
     }
 
     selectSeed(seedType) {
@@ -3217,6 +3224,17 @@ class Game {
         document.querySelectorAll('.tool-button').forEach(btn => {
             btn.classList.remove('active');
         });
+
+        this.ui.updateSeedMenuToggle();
+        this.closeSeedMenu();
+    }
+
+    toggleSeedMenu() {
+        document.getElementById('seed-menu-panel')?.classList.toggle('hidden');
+    }
+
+    closeSeedMenu() {
+        document.getElementById('seed-menu-panel')?.classList.add('hidden');
     }
 
     showShop() {

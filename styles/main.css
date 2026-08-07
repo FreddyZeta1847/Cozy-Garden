@@ -775,18 +775,17 @@ h1, h2, h3,
 .tool-button {
     background: var(--white);
     border: 3px solid var(--season-border); /* SEASONAL BORDER */
-    border-radius: 8px; /* Was 10px */
-    /* REDUCED PADDING */
-    padding: 6px 8px; /* Was 8px 12px */
+    border-radius: 10px;
+    /* Sized to match the seed buttons, per user feedback */
+    padding: 10px 14px;
     cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px; /* Was 4px */
+    gap: 4px;
     transition: all 0.2s;
     box-shadow: 0 2px 0 var(--season-border), 0 3px 6px var(--season-shadow); /* SEASONAL SHADOW */
-    /* REDUCED WIDTH */
-    min-width: 55px; /* Was 65px */
+    min-width: 72px;
 }
 
 .tool-button:hover {
@@ -806,85 +805,89 @@ h1, h2, h3,
     color: var(--dark-brown);
 }
 
-/* Seed Selector Container with Vertical Scroll */
-.seed-selector-container {
+/* ===== Expandable seed menu - replaces the old always-visible scrolling seed strip ===== */
+
+.seed-menu-container {
     position: relative;
-    height: 90px; /* Increased height */
-    overflow: hidden; /* Hide content outside container */
-    padding-left: 25px;
-    padding-right: 45px; /* Make room for arrow on the right */
-    border-left: 4px solid var(--dark-brown);
-    flex: 1; /* Take available space */
+    flex: 1;
 }
 
-.seeds-slider {
+.seed-menu-toggle {
+    width: 100%;
     display: flex;
-    flex-direction: column;
-    gap: 30px; /* Add spacing between vegetable and fruit sections */
-    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    transform: translateY(0); /* Start with vegetables visible */
-}
-
-.seeds-slider.show-fruits {
-    transform: translateY(-120px); /* Slide up to show fruits (90px height + 30px gap) */
-}
-
-.seed-section {
-    display: flex;
-    gap: 12px;
-    height: 90px; /* Match container height */
-    min-height: 90px;
     align-items: center;
-    flex-shrink: 0; /* Prevent shrinking */
-}
-
-/* Seed Navigation Arrows (Up/Down) */
-.seed-nav-arrow {
-    position: absolute;
-    right: 5px; /* Moved closer to right edge */
-    top: 50%; /* Vertically centered */
-    transform: translateY(-50%); /* Center alignment */
-    width: 32px;
-    height: 32px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 240, 240, 0.9) 100%);
-    border: 3px solid var(--season-primary, #A4D65E);
-    border-radius: 50%;
+    gap: 10px;
+    background: var(--white);
+    border: 3px solid var(--season-border);
+    border-radius: 10px;
+    padding: 10px 16px;
     cursor: pointer;
-    font-size: 18px;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s ease;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--season-text);
 }
 
-.seed-nav-arrow:hover {
-    transform: translateY(-50%) scale(1.15); /* Maintain centering on hover */
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
+.seed-menu-toggle-icon {
+    font-size: 28px;
 }
 
-/* Down arrow - visible by default */
-.seed-nav-arrow.down-arrow {
-    display: flex;
+.seed-menu-toggle-caret {
+    margin-left: auto;
+    font-size: 12px;
+    opacity: 0.6;
 }
 
-/* Up arrow - hidden by default */
-.seed-nav-arrow.up-arrow {
+.seed-menu-panel {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 0;
+    right: 0;
+    max-height: 340px;
+    overflow-y: auto;
+    background: var(--white);
+    border: 3px solid var(--season-border);
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.2);
+    z-index: 200;
+}
+
+.seed-menu-panel.hidden {
     display: none;
 }
 
-/* When showing fruits: hide down, show up */
-.seeds-slider.show-fruits ~ .down-arrow {
-    display: none;
+.seed-menu-section h4 {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    color: var(--season-text);
+    margin-bottom: 8px;
 }
 
-.seeds-slider.show-fruits ~ .up-arrow {
-    display: flex;
+.seed-menu-section + .seed-menu-section {
+    margin-top: 16px;
 }
 
-.nav-buttons {
+.seed-menu-grid {
     display: flex;
-    gap: 12px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.seed-button.locked {
+    opacity: 0.55;
+    filter: grayscale(70%);
+    cursor: not-allowed;
+}
+
+.seed-button .level-requirement {
+    position: static;
+    margin-top: 2px;
+    padding: 2px 6px;
+    font-size: 9px;
+    border-radius: 8px;
+    border-width: 2px;
+    white-space: nowrap;
 }
 
 /* Screen Headers - COMPACT REDESIGN */

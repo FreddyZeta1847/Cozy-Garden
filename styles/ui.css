@@ -154,7 +154,7 @@
 
 /* Tool icons (Simple Emoji) */
 .tool-icon {
-    font-size: 28px;
+    font-size: 40px; /* Sized to match the seed buttons, per user feedback */
     display: inline-flex;
 }
 
