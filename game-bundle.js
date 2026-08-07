@@ -1584,7 +1584,9 @@ class UIManager {
 
         const countLabel = document.createElement('span');
         countLabel.className = 'seed-count';
-        countLabel.textContent = isUnlocked ? count : '';
+        // Always render real text (never empty) so every card has the same intrinsic
+        // height regardless of lock state - .locked hides it visually via CSS instead.
+        countLabel.textContent = count;
 
         const nameLabel = document.createElement('span');
         nameLabel.className = 'seed-name';
