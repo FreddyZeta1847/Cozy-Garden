@@ -1566,11 +1566,12 @@ class UIManager {
             if (seasonIcon) {
                 seasonIcon.textContent = season.icon;
             }
-            const seasonName = display.querySelector('span:last-child');
+            const seasonName = display.querySelector('.topbar-season-text');
             if (seasonName) {
                 seasonName.textContent = season.name;
             }
         }
+        this.updateCalendarText();
 
         // Add data-season attribute to body - the seasonal CSS gradient (--season-background)
         // reacts to this automatically, no background image needed
@@ -1578,6 +1579,14 @@ class UIManager {
 
         if (this.game.particles) {
             this.game.particles.updateSeason(season.name);
+        }
+    }
+
+    updateCalendarText() {
+        const dateText = document.getElementById('topbar-date-text');
+        if (dateText) {
+            const info = this.game.getCalendarInfo();
+            dateText.textContent = `Day ${info.day}, Year ${info.year}`;
         }
     }
 
@@ -1601,10 +1610,11 @@ class UIManager {
                 if (seasonIcon) {
                     seasonIcon.textContent = newSeason.icon;
                 }
-                const seasonName = display.querySelector('span:last-child');
+                const seasonName = display.querySelector('.topbar-season-text');
                 if (seasonName) {
                     seasonName.textContent = newSeason.name;
                 }
+                this.updateCalendarText();
 
                 // Fade in new season
                 display.style.opacity = '1';
@@ -2737,6 +2747,7 @@ class Game {
 
             if (this.gameTime % DAY_LENGTH === 0) {
                 this.updateNews();
+                this.ui.updateCalendarText();
             }
 
             // Update plant info popup timers (if open)
@@ -3591,6 +3602,16 @@ class Game {
 
     showGarden() {
         this.ui.showScreen('garden-screen');
+    }
+
+    // TODO(interface redesign task 17): replace with the real Level page
+    showLevelPage() {
+        this.ui.showToast('info', '⭐', 'Level Page', 'Coming soon - the full level roadmap.');
+    }
+
+    // TODO(interface redesign task 16): replace with the real News page
+    showNews() {
+        this.ui.showToast('info', '📰', 'News Page', 'Coming soon - active market events.');
     }
 
     switchToFruitGarden() {

@@ -245,6 +245,137 @@ body[data-season] {
     font-size: 28px;
 }
 
+/* ===== Redesigned topbar - no pill badges, plain grouped text on the header's own background ===== */
+
+.topbar-title {
+    font-family: var(--font-heading);
+    font-size: 34px;
+    font-weight: 700;
+    color: var(--season-text);
+    flex-shrink: 0;
+}
+
+.topbar-info {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.topbar-stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--season-text);
+}
+
+#harvested-display.topbar-stat,
+.topbar-level {
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+#harvested-display.topbar-stat:hover,
+.topbar-level:hover {
+    opacity: 0.75;
+}
+
+.topbar-icon,
+.season-icon {
+    font-size: 22px;
+    line-height: 1;
+}
+
+.topbar-season-text {
+    font-weight: 700;
+}
+
+.topbar-date-text {
+    font-size: 13px;
+    color: var(--season-text);
+    opacity: 0.75;
+}
+
+.topbar-divider {
+    width: 2px;
+    height: 28px;
+    background: var(--season-border);
+    opacity: 0.35;
+    border-radius: 1px;
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.topbar-money {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--season-text);
+}
+
+/* Reset is a developer tool, not a gameplay action - kept small and visually apart */
+.dev-reset-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    opacity: 0.4;
+    cursor: pointer;
+    padding: 4px;
+    transition: opacity 0.2s;
+}
+
+.dev-reset-btn:hover {
+    opacity: 0.9;
+}
+
+/* ===== Nav strip - between the topbar and the garden/seeds area ===== */
+
+.nav-strip {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 15px;
+    background: var(--toolbar-base, rgba(139, 111, 71, 0.65));
+    background-image: var(--toolbar-bg);
+    background-blend-mode: overlay;
+    border-bottom: 3px solid var(--season-border);
+    flex-shrink: 0;
+}
+
+.nav-strip-btn {
+    background: none;
+    border: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--season-text);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.nav-strip-btn:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+.nav-strip-icon {
+    font-size: 18px;
+}
+
 .title {
     font-family: var(--font-heading);
     font-size: 38px;

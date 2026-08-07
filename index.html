@@ -98,43 +98,61 @@
     <!-- Main Garden Screen -->
     <div id="garden-screen" class="screen">
         <div class="header">
-            <div style="display: flex; gap: 30px;">
-                <div class="title">
-                    <span>Cozy Garden</span>
+            <div class="topbar-title">Cozy Garden</div>
+
+            <div class="topbar-info">
+                <div class="topbar-stat" id="season-display">
+                    <span class="season-icon"></span>
+                    <span class="topbar-season-text">Spring</span>
+                    <span class="topbar-date-text" id="topbar-date-text">Day 1, Year 1</span>
                 </div>
-                <div class="resources">
-                    <div class="resource season-display" id="season-display">
-                        <span class="season-icon"></span>
-                        <span>Spring</span>
-                    </div>
-                    <div class="resource money-display">
-                        <div class="coin-icon"></div>
-                        <span id="money-display">100</span>
-                    </div>
-                    <div class="resource harvested-display" id="harvested-display" title="Click to view your harvest!" onclick="game.showHarvestPopup()" style="cursor: pointer;">
-                        <span style="font-size: 24px;">🧺</span>
-                        <span id="harvested-count">0</span>
-                    </div>
-                </div>
-            </div>
-            <div style="display: flex; gap: 15px; align-items: center;">
-                <!-- Level Display with XP Bar -->
-                <div class="level-display" id="level-display">
-                    <div class="level-badge">
-                        <span class="level-icon">⭐</span>
-                        <span class="level-number" id="level-number">1</span>
-                    </div>
+
+                <div class="topbar-divider"></div>
+
+                <div class="topbar-stat topbar-level" id="level-display" onclick="game.showLevelPage()" title="See what unlocks at every level">
+                    <span class="level-icon">⭐</span>
+                    <span class="level-number" id="level-number">1</span>
                     <div class="xp-bar-container">
                         <div class="xp-bar" id="xp-bar"></div>
                         <span class="xp-text" id="xp-text">0 / 100 XP</span>
                     </div>
                 </div>
-                <button class="nav-button reset-btn" onclick="game.resetGame()" title="Reset game and start fresh">
-                    <span class="btn-icon">🔄</span>
-                    <span>Reset</span>
-                </button>
+
+                <div class="topbar-divider"></div>
+
+                <div class="topbar-stat" id="harvested-display" title="Click to view your harvest!" onclick="game.showHarvestPopup()">
+                    <span class="topbar-icon">🧺</span>
+                    <span id="harvested-count">0</span>
+                </div>
+            </div>
+
+            <div class="topbar-right">
+                <div class="topbar-money">
+                    <div class="coin-icon"></div>
+                    <span id="money-display">100</span>
+                </div>
+                <button class="dev-reset-btn" onclick="game.resetGame()" title="Reset game and start fresh (developer tool)">🔄</button>
             </div>
         </div>
+
+        <nav class="nav-strip">
+            <button class="nav-strip-btn" onclick="game.showMarket()">
+                <span class="nav-strip-icon">📊</span>
+                <span>Market</span>
+            </button>
+            <button class="nav-strip-btn" onclick="game.showShop()">
+                <span class="nav-strip-icon">🛒</span>
+                <span>Shop</span>
+            </button>
+            <button class="nav-strip-btn" onclick="game.showUpgrades()">
+                <span class="nav-strip-icon">🏡</span>
+                <span>Upgrade</span>
+            </button>
+            <button class="nav-strip-btn" onclick="game.showNews()">
+                <span class="nav-strip-icon">📰</span>
+                <span>News</span>
+            </button>
+        </nav>
 
         <div class="game-container">
             <!-- Garden Indicators (Mobile) -->
