@@ -1017,11 +1017,38 @@ h1, h2, h3,
     box-shadow: 0 2px 8px var(--season-shadow);
     backdrop-filter: blur(10px);
     flex-shrink: 0;
+    position: relative;
     /* PERFORMANCE OPTIMIZATION */
     will-change: background;
     contain: layout style;
     transform: translateZ(0);
     transition: background 0.6s ease-in-out;
+}
+
+/* Money display - pinned to the absolute center of the header, not flex-relative */
+.header-money {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--white);
+    border: 3px solid var(--season-border);
+    border-radius: 16px;
+    padding: 8px 18px;
+    font-family: var(--font-body);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--dark-brown);
+    box-shadow: 0 3px 0 var(--season-border), 0 4px 10px var(--season-shadow);
+    z-index: 1;
+}
+
+.header-money .coin-icon {
+    width: 28px;
+    height: 28px;
 }
 
 .screen-header h2 {
@@ -1038,9 +1065,14 @@ h1, h2, h3,
 }
 
 .header-icon {
-    /* REDUCED SIZE - was 42px */
-    font-size: 28px;
+    display: inline-flex;
+    color: var(--white);
     filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+}
+
+.header-icon svg {
+    width: 28px;
+    height: 28px;
 }
 
 .season-subtitle {
@@ -1075,24 +1107,28 @@ body[data-season="winter"] .seasonal-header {
 }
 
 .back-button {
-    background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%);
-    border: 3px solid #FF1493;
-    border-radius: 8px;
-    /* REDUCED PADDING - was 12px 20px */
-    padding: 12px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    background: var(--white);
+    border: 3px solid var(--season-border);
+    border-radius: 10px;
     cursor: pointer;
-    /* REDUCED FONT SIZE - was 16px */
-    font-size: 13px;
-    font-weight: 600;
-    font-family: 'Fredoka', sans-serif;
-    box-shadow: 0 2px 0 #C71585, 0 3px 6px var(--shadow);
-    transition: all 0.2s;
-    color: white;
+    color: var(--dark-brown);
+    box-shadow: 0 2px 0 var(--season-border), 0 3px 6px var(--season-shadow);
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.back-button svg {
+    width: 20px;
+    height: 20px;
 }
 
 .back-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 0 #C71585, 0 5px 8px var(--shadow);
+    box-shadow: 0 4px 0 var(--season-border), 0 6px 10px var(--season-shadow);
 }
 
 /* Content areas - REDUCED PADDING */

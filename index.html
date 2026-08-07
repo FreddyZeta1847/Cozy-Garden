@@ -22,7 +22,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="styles/main.css?v=3.17">
+    <link rel="stylesheet" href="styles/main.css?v=3.18">
     <link rel="stylesheet" href="styles/garden.css?v=1.4">
     <link rel="stylesheet" href="styles/plants-svg.css?v=1.0">
     <link rel="stylesheet" href="styles/ui.css?v=3.12">
@@ -410,16 +410,27 @@
     <div id="shop-screen" class="screen">
         <div class="screen-header seasonal-header">
             <h2>
-                <span class="header-icon">🏪</span>
+                <span class="header-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 9 5.5 4h13L20 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M4 9v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M4 9a2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M10 20v-6h4v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
                 General Store
                 <span class="season-subtitle"></span>
             </h2>
+            <div class="header-money" aria-label="Your money">
+                <div class="coin-icon"></div>
+                <span id="shop-money" role="status" aria-live="polite">100</span>
+            </div>
             <div class="header-actions">
-                <div class="resource money-display" aria-label="Your money">
-                    <div class="coin-icon"></div>
-                    <span id="shop-money" role="status" aria-live="polite">100</span>
-                </div>
-                <button class="back-button" onclick="game.showGarden()">← Back to Garden</button>
+                <button class="back-button" onclick="game.showGarden()" title="Back to Garden" aria-label="Back to Garden">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 5 8 12l7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
             </div>
         </div>
 
@@ -507,18 +518,30 @@
     <div id="upgrades-screen" class="screen">
         <div class="screen-header seasonal-header">
             <h2>
-                <span class="header-icon">🏡</span>
+                <span class="header-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 11 12 4l8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M6 10v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M10 20v-5h4v5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
                 Upgrade Workshop
                 <span class="season-subtitle"></span>
             </h2>
-            <button class="back-button" onclick="game.showGarden()">← Back to Garden</button>
+            <div class="header-money" aria-label="Your money">
+                <div class="coin-icon"></div>
+                <span id="upgrades-money" role="status" aria-live="polite">100</span>
+            </div>
+            <div class="header-actions">
+                <button class="back-button" onclick="game.showGarden()" title="Back to Garden" aria-label="Back to Garden">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 5 8 12l7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <div class="upgrades-content">
-            <div class="player-money seasonal-money">
-                <div class="coin-icon" aria-label="Your money"></div>
-                <span id="upgrades-money" role="status" aria-live="polite">100</span>
-            </div>
             <div id="upgrades-list" class="upgrades-list"></div>
         </div>
     </div>
